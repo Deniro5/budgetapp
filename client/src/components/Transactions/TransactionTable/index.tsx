@@ -115,7 +115,7 @@ const TableHead = styled.thead`
 
   th {
     padding: 10px;
-    text-align: left;
+    text-align: center;
   }
 `;
 

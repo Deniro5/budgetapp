@@ -100,7 +100,7 @@ const MenuItem = styled.div<{ isActive?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.font)};
+  color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.pureWhite)};
   padding: ${SPACING.spacing2x};
   border-radius: 4px;
   margin: 0;
@@ -130,7 +130,7 @@ const SidebarContainer = styled.div<{ isExpanded: boolean }>`
   gap: ${SPACING.spacing4x};
   height: calc(100vh);
   width: ${({ isExpanded }) => (isExpanded ? "200px" : "40px")};
-  background: ${COLORS.sidebarColor};
+  background: ${COLORS.primary};
   padding: ${({ isExpanded }) =>
     isExpanded
       ? `${SPACING.spacing6x} ${SPACING.spacing3x}`

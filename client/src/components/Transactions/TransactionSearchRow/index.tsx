@@ -1,13 +1,13 @@
 import styled from "styled-components";
-import { COLORS, FONTSIZE, SPACING } from "../../Theme";
+import { SPACING } from "../../../Theme";
 import {
   faFilter,
   faAngleDown,
-  faCalendar,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BaseButton, BaseInput, PageTitle } from "../../Styles";
+import { BaseButton, BaseInput } from "../../../Styles";
+import TransactionDateRange from "./TransactionDateRange";
 
 function TransactionsSearchRow() {
   return (
@@ -23,11 +23,7 @@ function TransactionsSearchRow() {
         Filter
         <FontAwesomeIcon icon={faAngleDown} />
       </BaseButton>
-      <CalendarButton>
-        <FontAwesomeIcon icon={faCalendar} />
-        Last 90 Days
-        <FontAwesomeIcon icon={faAngleDown} />
-      </CalendarButton>
+      <TransactionDateRange />
     </Container>
   );
 }
@@ -50,12 +46,6 @@ const SearchBar = styled(BaseInput)`
 const SearchButton = styled(BaseButton)`
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
-`;
-
-const CalendarButton = styled(BaseButton)`
-  background: ${COLORS.lightGrey};
-  color: ${COLORS.font};
-  border: 1px solid ${COLORS.mediumGrey};
 `;
 
 export default TransactionsSearchRow;

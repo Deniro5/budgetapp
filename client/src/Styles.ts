@@ -18,7 +18,7 @@ export const PageTitle = styled.h1`
 export const BaseButton = styled.button`
   background: ${COLORS.primary};
   border-radius: 4px;
-  color: white;
+  color: ${COLORS.pureWhite};
   border: none;
   padding: ${SPACING.spacing3x} ${SPACING.spacing5x};
   display: flex;
@@ -27,6 +27,17 @@ export const BaseButton = styled.button`
   font-weight: 600;
   &:hover {
     background: ${COLORS.darkPrimary};
+  }
+  gap: ${SPACING.spacing2x};
+`;
+
+export const SecondaryButton = styled(BaseButton)`
+  background: ${COLORS.pureWhite};
+  color: ${COLORS.font};
+  border: 1px solid ${COLORS.mediumGrey};
+  &:hover {
+    background: ${COLORS.lightGrey};
+    border: 1px solid ${COLORS.mediumGrey};
   }
   gap: ${SPACING.spacing2x};
 `;

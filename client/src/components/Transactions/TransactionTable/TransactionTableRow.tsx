@@ -24,6 +24,7 @@ const Container = styled.tr`
   font-weight: 500;
   border-bottom: 1px solid ${COLORS.mediumGrey};
   td {
+    text-align: center;
     padding: ${SPACING.spacing4x};
     border-left: none; /* Hide vertical borders */
     border-right: none; /* Hide vertical borders */
