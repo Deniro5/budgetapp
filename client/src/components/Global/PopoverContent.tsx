@@ -11,10 +11,18 @@ type PopoverContentProps = {
 };
 
 function PopoverContent({ menuItems }: PopoverContentProps) {
+  const handleClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    callback: () => void
+  ) => {
+    callback();
+    e.stopPropagation();
+  };
+
   return (
     <PopoverContentContainer>
       {menuItems.map((menuItem) => (
-        <PopoverMenuItem onClick={() => menuItem.function()}>
+        <PopoverMenuItem onClick={(e) => handleClick(e, menuItem.function)}>
           {menuItem.label}
         </PopoverMenuItem>
       ))}

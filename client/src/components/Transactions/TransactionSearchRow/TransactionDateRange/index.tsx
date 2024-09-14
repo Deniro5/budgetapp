@@ -7,6 +7,7 @@ import TransactionDateRangePopoverMenu from "./TransactionDateRangePopoverMenu";
 
 function TransactionDateRange() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleButtonClick = (
@@ -15,6 +16,9 @@ function TransactionDateRange() {
     e.stopPropagation();
     setIsMenuOpen(true);
   };
+
+  console.log(isMenuOpen);
+
   return (
     <>
       <Popover

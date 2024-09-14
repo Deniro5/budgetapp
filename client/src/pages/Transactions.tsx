@@ -1,7 +1,7 @@
-import { PageContainer, PageTitle } from "../Styles";
+import { PageContainer } from "../Styles";
 import TransactionTable from "../components/Transactions/TransactionTable";
-import TransactionsHeader from "../components/Transactions/TransactionsHeader";
 import TransactionsSearchRow from "../components/Transactions/TransactionSearchRow";
+import TransactionsHeader from "../components/Transactions/TransactionsHeader";
 
 function Transactions() {
   return (

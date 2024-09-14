@@ -7,6 +7,8 @@ export const Card = styled.div`
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
 
+// -------------------- Page Elements --------------------------
+
 export const PageContainer = styled.div``;
 
 export const PageTitle = styled.h1`
@@ -14,6 +16,8 @@ export const PageTitle = styled.h1`
   font-size: ${FONTSIZE.xl};
   color: ${COLORS.pureBlack};
 `;
+
+// -------------------- Buttons --------------------------
 
 export const BaseButton = styled.button`
   background: ${COLORS.primary};
@@ -29,6 +33,7 @@ export const BaseButton = styled.button`
     background: ${COLORS.darkPrimary};
   }
   gap: ${SPACING.spacing2x};
+  cursor: pointer;
 `;
 
 export const SecondaryButton = styled(BaseButton)`
@@ -42,9 +47,24 @@ export const SecondaryButton = styled(BaseButton)`
   gap: ${SPACING.spacing2x};
 `;
 
+export const IconButton = styled.button`
+  cursor: pointer;
+  border: none;
+  background: none;
+  &:hover {
+    background: none;
+  }
+  color: ${COLORS.font};
+  &:focus {
+    outline: none;
+  }
+`;
+
+// -------------------- Forms --------------------------
+
 export const BaseInput = styled.input`
   background: ${COLORS.lightGrey};
-  border: 1px solid ${COLORS.mediumGrey};
+  border: 1px solid ${COLORS.darkGrey};
   border-radius: 4px;
   height: 44px;
   padding: 0 ${SPACING.spacing3x};
@@ -53,4 +73,28 @@ export const BaseInput = styled.input`
   &::placeholder {
     color: ${COLORS.lightFont};
   }
+`;
+
+export const BaseSelect = styled.select`
+  background: ${COLORS.lightGrey};
+  border: 1px solid ${COLORS.darkGrey};
+  border-radius: 4px;
+  height: 44px;
+  padding: 0 ${SPACING.spacing3x};
+  color: ${COLORS.font};
+  font-size: ${FONTSIZE.md};
+  &::placeholder {
+    color: ${COLORS.lightFont};
+  }
+`;
+
+export const InputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${SPACING.spacing2x};
+`;
+
+export const InputLabel = styled.label`
+  font-size: ${FONTSIZE.sm};
+  font-weight: 600;
 `;

@@ -9,6 +9,8 @@ export const COLORS = {
   darkPrimary: "#3D0FA8",
   lightGrey: "#efefef",
   mediumGrey: "#d9d9d9",
+  darkGrey: "#c4c4c4",
+  calendarBlue: "#1087ff",
 };
 
 export const SPACING = {
