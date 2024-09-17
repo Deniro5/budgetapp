@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { COLORS, SPACING } from "../../Theme";
+import React from "react";
 
 type MenuItem = {
   label: string;
@@ -7,10 +8,16 @@ type MenuItem = {
 };
 
 type PopoverContentProps = {
-  menuItems: MenuItem[];
+  menuItems?: MenuItem[];
+  children?: React.ReactNode;
+  width?: number;
 };
 
-function PopoverContent({ menuItems }: PopoverContentProps) {
+function PopoverContent({
+  menuItems,
+  children,
+  width = 180,
+}: PopoverContentProps) {
   const handleClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     callback: () => void
@@ -19,22 +26,30 @@ function PopoverContent({ menuItems }: PopoverContentProps) {
     e.stopPropagation();
   };
 
-  return (
-    <PopoverContentContainer>
-      {menuItems.map((menuItem) => (
+  const getPopoverContent = () => {
+    if (menuItems) {
+      return menuItems.map((menuItem) => (
         <PopoverMenuItem onClick={(e) => handleClick(e, menuItem.function)}>
           {menuItem.label}
         </PopoverMenuItem>
-      ))}
+      ));
+    } else {
+      return children;
+    }
+  };
+
+  return (
+    <PopoverContentContainer width={width}>
+      {getPopoverContent()}
     </PopoverContentContainer>
   );
 }
 
-const PopoverContentContainer = styled.div`
+const PopoverContentContainer = styled.div<{ width: number }>`
   background: ${COLORS.pureWhite};
   border: 1px solid ${COLORS.mediumGrey};
   color: ${COLORS.font};
-  width: 180px;
+  width: ${({ width }) => width}px;
   border-radius: 4px;
 `;
 

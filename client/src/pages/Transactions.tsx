@@ -1,6 +1,6 @@
 import { PageContainer } from "../Styles";
 import TransactionTable from "../components/Transactions/TransactionTable";
-import TransactionsSearchRow from "../components/Transactions/TransactionSearchRow";
+import TransactionsSearchRow from "../components/Transactions/TransactionFilterRow";
 import TransactionsHeader from "../components/Transactions/TransactionsHeader";
 
 function Transactions() {

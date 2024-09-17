@@ -13,7 +13,7 @@ function TransactionsHeaderPresetButton() {
     <>
       <SecondaryButton onClick={openModal}>
         <FontAwesomeIcon icon={faFolderPlus} />
-        Add Preset Transaction
+        Manage Preset Transactions
       </SecondaryButton>
       <Modal isOpen={isOpen} onClose={closeModal}>
         <TransactionBaseModal

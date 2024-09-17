@@ -32,16 +32,30 @@ function TransactionDateRangePopoverMenu() {
       },
     },
     {
-      label: "Custom",
+      label: "Custom Range",
       function: () => {
         setIsCalendarOpen(true);
       },
     },
   ];
 
+  const handleClose = () => {
+    setIsCalendarOpen(false);
+  };
+
+  const handleSubmit = () => {
+    //have to add the missing stuff
+    setIsCalendarOpen(false);
+  };
+
   return isCalendarOpen ? (
     <>
-      <BaseCalendar isOpen isRangeCalendar />
+      <BaseCalendar
+        handleSubmit={handleSubmit}
+        handleClose={handleClose}
+        isOpen
+        isRangeCalendar
+      />
     </>
   ) : (
     <PopoverContent menuItems={popoverMenuItems} />

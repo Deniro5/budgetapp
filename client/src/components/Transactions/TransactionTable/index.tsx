@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import { PageContainer, PageTitle } from "../Styles";
 import { COLORS, SPACING } from "../../../Theme";
 import TransactionTableRow from "./TransactionTableRow";
+import TransactionTableAddRow from "./TransactionTableAddRow";
 
 const tableColumns = ["Name", "Amount", "Type", "Date", "Account", "Category"];
+
 const tableRows = [
   {
     name: "Walmart",
@@ -56,6 +57,10 @@ const tableRows = [
 ];
 
 function TransactionTable() {
+  const handleAddClick = () => {
+    alert("add transaction");
+  };
+
   return (
     <TableWrapper>
       <ScrollableTable>
@@ -67,6 +72,7 @@ function TransactionTable() {
           </tr>
         </TableHead>
         <ScrollBody>
+          <TransactionTableAddRow handleClick={handleAddClick} />
           {tableRows.map((transaction, index) => (
             <TransactionTableRow key={index} transaction={transaction} />
           ))}

@@ -34,6 +34,12 @@ export const BaseButton = styled.button`
   }
   gap: ${SPACING.spacing2x};
   cursor: pointer;
+
+  &:disabled {
+    background: ${COLORS.darkGrey}; /* or any other disabled color */
+    cursor: not-allowed;
+    opacity: 0.6; /* adjust opacity to indicate disabled state */
+  }
 `;
 
 export const SecondaryButton = styled(BaseButton)`
@@ -97,4 +103,21 @@ export const InputContainer = styled.div`
 export const InputLabel = styled.label`
   font-size: ${FONTSIZE.sm};
   font-weight: 600;
+`;
+
+export const Row = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: ${SPACING.spacing4x};
+  gap: 24px;
+
+  ${InputContainer} {
+    flex: 1;
+  }
+`;
+
+export const Divider = styled.hr`
+  border: none;
+  border-bottom: 1px solid ${COLORS.mediumGrey};
+  margin: ${SPACING.spacing4x} 0;
 `;

@@ -3,8 +3,10 @@ import {
   BaseButton,
   BaseInput,
   BaseSelect,
+  Divider,
   InputContainer,
   InputLabel,
+  Row,
   SecondaryButton,
 } from "../../../Styles";
 import { COLORS, FONTSIZE, SPACING } from "../../../Theme";
@@ -120,27 +122,10 @@ const TagInputContainer = styled(InputContainer)`
   flex: 2 !important;
 `;
 
-const Row = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: ${SPACING.spacing4x};
-  gap: 24px;
-
-  ${InputContainer} {
-    flex: 1;
-  }
-`;
-
-const Divider = styled.hr`
-  border: none;
-  border-bottom: 1px solid ${COLORS.mediumGrey};
-  margin: ${SPACING.spacing4x} 0;
-`;
-
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: ${SPACING.spacing4x};
   padding-top: ${SPACING.spacing6x};
   gap: ${SPACING.spacing6x};
 `;

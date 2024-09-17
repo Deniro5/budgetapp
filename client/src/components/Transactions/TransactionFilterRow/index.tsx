@@ -7,7 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BaseButton, BaseInput } from "../../../Styles";
-import TransactionDateRange from "./TransactionDateRange";
+import TransactionFilterButton from "./TransactionFilterButton";
 
 function TransactionsSearchRow() {
   return (
@@ -18,12 +18,7 @@ function TransactionsSearchRow() {
           <FontAwesomeIcon icon={faSearch} />
         </SearchButton>
       </SearchBarContainer>
-      <BaseButton>
-        <FontAwesomeIcon icon={faFilter} />
-        Filter
-        <FontAwesomeIcon icon={faAngleDown} />
-      </BaseButton>
-      <TransactionDateRange />
+      <TransactionFilterButton />
     </Container>
   );
 }

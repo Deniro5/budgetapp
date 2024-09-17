@@ -23,6 +23,11 @@ const Container = styled.tr`
   color: ${COLORS.font};
   font-weight: 500;
   border-bottom: 1px solid ${COLORS.mediumGrey};
+  cursor: pointer;
+
+  &:hover {
+    background: ${COLORS.lightGrey};
+  }
   td {
     text-align: center;
     padding: ${SPACING.spacing4x};

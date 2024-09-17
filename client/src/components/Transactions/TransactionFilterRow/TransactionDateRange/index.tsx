@@ -17,8 +17,6 @@ function TransactionDateRange() {
     setIsMenuOpen(true);
   };
 
-  console.log(isMenuOpen);
-
   return (
     <>
       <Popover
@@ -30,7 +28,7 @@ function TransactionDateRange() {
       >
         <SecondaryButton ref={buttonRef} onClick={(e) => handleButtonClick(e)}>
           <FontAwesomeIcon icon={faCalendar} />
-          Last 90 Days
+          Dec 21 2024 - Sep 21 2026
           <FontAwesomeIcon icon={faAngleDown} />
         </SecondaryButton>
       </Popover>
