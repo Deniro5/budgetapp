@@ -1,4 +1,3 @@
-import { useState } from "react";
 import PopoverContent from "../../../Global/PopoverContent";
 import { SPACING } from "../../../../Theme";
 import styled from "styled-components";
@@ -9,24 +8,13 @@ import {
   BaseButton,
   SecondaryButton,
   BaseInput,
-  Divider,
   Row,
 } from "../../../../Styles";
-import TransactionDateRange from "../TransactionDateRange";
 
 function TransactionFilterPopoverMenu() {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-
   return (
     <PopoverContent width={480}>
       <Container>
-        <Row>
-          <InputContainer>
-            <InputLabel>Date Range</InputLabel>
-            <TransactionDateRange />
-          </InputContainer>
-        </Row>
-
         <Row>
           <InputContainer>
             <InputLabel>Min Amount</InputLabel>

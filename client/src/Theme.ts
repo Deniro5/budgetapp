@@ -11,6 +11,8 @@ export const COLORS = {
   mediumGrey: "#d9d9d9",
   darkGrey: "#c4c4c4",
   calendarBlue: "#1087ff",
+  deleteRed: "#E63946",
+  darkDeleteRed: "#D32F2F",
 };
 
 export const SPACING = {
@@ -30,6 +32,6 @@ export const FONTSIZE = {
   xs: "12px",
   sm: "14px",
   md: "16px",
-  lg: "24px",
+  lg: "18px",
   xl: "32px;",
 };

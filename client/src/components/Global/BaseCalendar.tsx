@@ -2,12 +2,20 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "../../Theme";
-import { BaseButton, SecondaryButton } from "../../Styles";
+import {
+  BaseButton,
+  InputContainer,
+  InputLabel,
+  Row,
+  SecondaryButton,
+  BaseInput,
+} from "../../Styles";
 import { useState } from "react";
+import { dateToFormattedString, parseDate } from "../../utils";
 
 type BaseCalendarProps = {
   isOpen: boolean;
-  isRangeCalendar: boolean;
+  isRangeCalendar?: boolean;
   handleSubmit: () => void;
   handleClose: () => void;
 };
@@ -18,27 +26,85 @@ function BaseCalendar({
   handleSubmit,
   handleClose,
 }: BaseCalendarProps) {
-  const [selectedDate, setSelectedDate] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<any>(null);
+  const [endDate, setEndDate] = useState<any>(null);
+
+  const [startInput, setStartInput] = useState("");
+  const [endInput, setEndInput] = useState("");
 
   const handleChange = (value: any) => {
-    setSelectedDate(value);
+    const newStartDate = value[0];
+    const newEndDate = value[1];
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+
+    if (isRangeCalendar) {
+      setStartInput(dateToFormattedString(newStartDate));
+      setEndInput(dateToFormattedString(newEndDate));
+    }
   };
+
+  const handleStartInputBlur = () => {
+    const date = parseDate(startInput);
+    if (date && isRangeCalendar && (!endDate || date <= endDate)) {
+      setStartDate(date);
+    } else {
+      //revert
+      setStartInput(dateToFormattedString(startDate));
+    }
+  };
+
+  const handleEndInputBlur = () => {
+    const date = parseDate(endInput);
+
+    if (date && isRangeCalendar && (!startDate || date >= startDate)) {
+      setEndDate(date);
+    } else {
+      //revert
+      setEndInput(dateToFormattedString(endDate));
+    }
+  };
+
+  const isSubmitDisabled = () => !startDate && !endDate;
 
   return isOpen ? (
     <CalendarContainer>
       <Calendar
         selectRange={isRangeCalendar}
-        onClickDay={(value, e) => {
-          e.stopPropagation();
-        }}
+        onClickDay={(value, e) => e.stopPropagation()}
         onChange={(value) => handleChange(value)}
-        returnValue={isRangeCalendar ? "range" : "start"}
+        value={[startDate, endDate]}
+        returnValue={"range"}
       />
       <Footer>
-        <BaseButton disabled={!selectedDate.length} onClick={handleSubmit}>
-          Save Changes
-        </BaseButton>
-        <SecondaryButton onClick={handleClose}> Cancel </SecondaryButton>{" "}
+        {isRangeCalendar && (
+          <Row>
+            <InputContainer>
+              <InputLabel>Start Date</InputLabel>
+              <DateInput
+                value={startInput}
+                onChange={(e) => setStartInput(e.target.value)}
+                onBlur={handleStartInputBlur}
+                placeholder="mm/dd/yyyy"
+              />
+            </InputContainer>
+            <InputContainer>
+              <InputLabel>End Date</InputLabel>
+              <DateInput
+                value={endInput}
+                onChange={(e) => setEndInput(e.target.value)}
+                onBlur={handleEndInputBlur}
+                placeholder="mm/dd/yyyy"
+              />
+            </InputContainer>
+          </Row>
+        )}
+        <ButtonContainer>
+          <BaseButton disabled={isSubmitDisabled()} onClick={handleSubmit}>
+            Save Changes
+          </BaseButton>
+          <SecondaryButton onClick={handleClose}>Cancel</SecondaryButton>
+        </ButtonContainer>
       </Footer>
     </CalendarContainer>
   ) : null;
@@ -80,19 +146,33 @@ const CalendarContainer = styled.div`
     .react-calendar__navigation__arrow {
       font-size: ${FONTSIZE.md};
     }
+
+    .react-calendar__tile--hasActive {
+      background: unset;
+    }
   }
 `;
 
 const Footer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: ${SPACING.spacing6x};
+  padding: ${SPACING.spacing4x} ${SPACING.spacing6x};
   background: white;
   border: 1px solid ${COLORS.darkGrey};
   border-top: none;
   border-radius: 4px;
   gap: ${SPACING.spacing6x};
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${SPACING.spacing4x};
+  padding-top: ${SPACING.spacing6x};
+`;
+
+const DateInput = styled(BaseInput)`
+  height: 30px;
+  width: 139px;
 `;
 
 export default BaseCalendar;

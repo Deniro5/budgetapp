@@ -1,10 +1,18 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "./Theme";
 
+// -------------------- Containers --------------------------
+
 export const Card = styled.div`
   background: ${COLORS.pureWhite};
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+`;
+
+export const Flex = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${SPACING.spacing6x};
 `;
 
 // -------------------- Page Elements --------------------------
@@ -53,6 +61,13 @@ export const SecondaryButton = styled(BaseButton)`
   gap: ${SPACING.spacing2x};
 `;
 
+export const DeleteButton = styled(BaseButton)`
+  background: ${COLORS.deleteRed};
+  &:hover {
+    background: ${COLORS.darkDeleteRed};
+  }
+`;
+
 export const IconButton = styled.button`
   cursor: pointer;
   border: none;
@@ -98,6 +113,7 @@ export const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${SPACING.spacing2x};
+  flex: 1;
 `;
 
 export const InputLabel = styled.label`

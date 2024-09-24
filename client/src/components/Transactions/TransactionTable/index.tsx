@@ -95,7 +95,6 @@ const TableWrapper = styled.div`
   width: 100%;
   overflow-y: auto;
   max-height: calc(100vh - 240px);
-  margin-top: ${SPACING.spacing9x};
   border: 1px solid ${COLORS.mediumGrey};
   ::-webkit-scrollbar {
     display: none;

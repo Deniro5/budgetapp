@@ -1,13 +1,10 @@
 import styled from "styled-components";
 import { SPACING } from "../../../Theme";
-import {
-  faFilter,
-  faAngleDown,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BaseButton, BaseInput } from "../../../Styles";
 import TransactionFilterButton from "./TransactionFilterButton";
+import TransactionDateRange from "./TransactionDateRange";
 
 function TransactionsSearchRow() {
   return (
@@ -19,6 +16,7 @@ function TransactionsSearchRow() {
         </SearchButton>
       </SearchBarContainer>
       <TransactionFilterButton />
+      <TransactionDateRange />
     </Container>
   );
 }
