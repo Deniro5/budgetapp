@@ -15,7 +15,7 @@ const tableRows = [
     category: "Transit",
   },
   {
-    name: "Walmart",
+    name: "Petro Canada",
     amount: 200.0,
     type: "Income",
     date: "26 Sep 2024",
@@ -110,6 +110,7 @@ const TableWrapper = styled.div`
 const ScrollableTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  position: relative;
 `;
 
 const TableHead = styled.thead`
@@ -119,8 +120,9 @@ const TableHead = styled.thead`
   top: 0;
 
   th {
-    padding: 10px;
+    padding: ${SPACING.spacing3x};
     text-align: center;
+  }
   }
 `;
 

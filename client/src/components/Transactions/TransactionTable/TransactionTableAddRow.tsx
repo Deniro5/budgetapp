@@ -9,19 +9,24 @@ type TransactionTableAddRowProps = {
 
 function TransactionTableAddRow({ handleClick }: TransactionTableAddRowProps) {
   return (
-    <Container>
-      <td onClick={() => handleClick()}>
+    <StyledRow onClick={() => handleClick()}>
+      <td>
         <FontAwesomeIcon icon={faAdd} /> Add New Transaction
       </td>
-    </Container>
+      <td colSpan={5}></td>
+    </StyledRow>
   );
 }
 
 //Todo remove this style and use the one from the transaction table row
-const Container = styled.tr`
+const StyledRow = styled.tr`
   color: ${COLORS.font};
-  font-weight: 500;
-  border-bottom: 1px solid ${COLORS.mediumGrey};
+  font-weight: 600;
+  box-shadow: 0 1px 0 0 #ebebeb; //hacky way to keep the border sticky
+  background: ${COLORS.pureWhite};
+  position: sticky;
+
+  top: 48px;
 
   cursor: pointer;
   &:hover {
@@ -31,8 +36,6 @@ const Container = styled.tr`
   td {
     text-align: center;
     padding: ${SPACING.spacing4x};
-    border-left: none; /* Hide vertical borders */
-    border-right: none; /* Hide vertical borders */
   }
 `;
 
