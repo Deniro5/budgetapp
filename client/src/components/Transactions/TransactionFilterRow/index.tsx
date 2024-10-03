@@ -1,44 +1,26 @@
 import styled from "styled-components";
 import { SPACING } from "../../../Theme";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BaseButton, BaseInput } from "../../../Styles";
-import TransactionFilterButton from "./TransactionFilterButton";
-import TransactionDateRange from "./TransactionDateRange";
+import TransactionFilterTag from "./TransactionFilterTag";
 
-function TransactionsSearchRow() {
+function TransactionsFilterRow() {
   return (
     <Container>
-      <SearchBarContainer>
-        <SearchBar placeholder="Search Transactions" />
-        <SearchButton>
-          <FontAwesomeIcon icon={faSearch} />
-        </SearchButton>
-      </SearchBarContainer>
-      <TransactionFilterButton />
-      <TransactionDateRange />
+      Filtering By
+      <TransactionFilterTag name="Account: Joint" />
+      <TransactionFilterTag name="Account: Joint" />
+      <TransactionFilterTag name="Account: Joint" />
+      <TransactionFilterTag name="Account: Joint" />
     </Container>
   );
 }
 
 const Container = styled.div`
   display: flex;
-  gap: ${SPACING.spacing6x};
-  margin-top: ${SPACING.spacing9x};
+  align-items: center;
+  gap: ${SPACING.spacing4x};
+  height: 48px;
+  width: 100%;
+  font-weight: 600;
 `;
 
-const SearchBarContainer = styled.div`
-  display: flex;
-  flex: 1;
-`;
-
-const SearchBar = styled(BaseInput)`
-  flex: 1;
-`;
-
-const SearchButton = styled(BaseButton)`
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
-`;
-
-export default TransactionsSearchRow;
+export default TransactionsFilterRow;

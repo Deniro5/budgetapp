@@ -25,7 +25,6 @@ const StyledRow = styled.tr`
   box-shadow: 0 1px 0 0 #ebebeb; //hacky way to keep the border sticky
   background: ${COLORS.pureWhite};
   position: sticky;
-
   top: 48px;
 
   cursor: pointer;
