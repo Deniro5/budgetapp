@@ -1,14 +1,43 @@
 import styled from "styled-components";
 import { COLORS, SPACING } from "../../../Theme";
-import { TransactionType } from "../types";
+import { Transaction } from "../../../types/transaction";
 
 type TransactionTableRowProps = {
-  transaction: TransactionType;
+  transaction: Transaction;
+  onClick: (transactionId: string | null) => void;
+  onRightClick: (
+    e: React.MouseEvent<HTMLTableRowElement>,
+    transaction: Transaction | null
+  ) => void;
+  isSelected: boolean;
 };
 
-function TransactionTableRow({ transaction }: TransactionTableRowProps) {
+function TransactionTableRow({
+  transaction,
+  onClick,
+  onRightClick,
+  isSelected,
+}: TransactionTableRowProps) {
+  const handleClick = () => {
+    if (isSelected) {
+      onClick(null);
+      return;
+    }
+    onClick(transaction._id);
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onRightClick(e, transaction);
+  };
+
   return (
-    <Container>
+    <Container
+      onContextMenu={handleContextMenu}
+      isSelected={isSelected}
+      onClick={handleClick}
+    >
       <td> {transaction.name} </td>
       <td> {transaction.amount} </td>
       <td> {transaction.type} </td>
@@ -19,11 +48,12 @@ function TransactionTableRow({ transaction }: TransactionTableRowProps) {
   );
 }
 
-const Container = styled.tr`
+const Container = styled.tr<{ isSelected: boolean }>`
   color: ${COLORS.font};
   font-weight: 500;
   border-bottom: 1px solid ${COLORS.mediumGrey};
   cursor: pointer;
+  background: ${({ isSelected }) => isSelected && COLORS.lightGrey};
 
   &:hover {
     background: ${COLORS.lightGrey};

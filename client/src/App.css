@@ -1,7 +1,8 @@
-#root {
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: #f1f3f5;
   color: #4f4f4f;
+  box-sizing: border-box;
 }

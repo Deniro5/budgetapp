@@ -4,7 +4,7 @@ import Modal from "../../../Global/Modal";
 import useModalController from "../../../Global/Modal/useModalController";
 import { faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 import { SecondaryButton } from "../../../../Styles";
-import TransactionBaseModal from "../../TransactionBaseModal";
+import TransactionBaseModal from "../../Modals/TransactionBaseModal";
 
 function TransactionsHeaderPresetButton() {
   const { isOpen, closeModal, openModal } = useModalController();

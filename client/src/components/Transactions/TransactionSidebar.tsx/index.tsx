@@ -12,12 +12,111 @@ import {
   Divider,
   SecondaryButton,
 } from "../../../Styles";
+import { Transaction } from "../../../types/transaction";
+import { format } from "date-fns";
+import { getSelectedTransactionById } from "../../../zustand/transaction/transactionSelectors";
+import { TransactionOverlayType } from "../../../pages/Transactions";
 
-const TransactionSidebar = () => {
+type TransactionSidebarProps = {
+  transactionId: string | null;
+  setActiveTransaction: React.Dispatch<
+    React.SetStateAction<Transaction | null>
+  >;
+  setActiveOverlay: React.Dispatch<
+    React.SetStateAction<TransactionOverlayType | null>
+  >;
+};
+
+const TransactionSidebar = ({
+  transactionId,
+  setActiveTransaction,
+  setActiveOverlay,
+}: TransactionSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const selectedTransaction = getSelectedTransactionById(transactionId);
 
-  const toggleExpanded = () => {
-    setIsExpanded((isExpanded) => !isExpanded);
+  const toggleExpanded = () => setIsExpanded((isExpanded) => !isExpanded);
+
+  const handleEditClick = () => {
+    if (!selectedTransaction) return;
+    setActiveTransaction(selectedTransaction);
+    setActiveOverlay(TransactionOverlayType.EDIT);
+  };
+
+  const handleDeleteClick = () => {
+    if (!selectedTransaction) return;
+    setActiveTransaction(selectedTransaction);
+    setActiveOverlay(TransactionOverlayType.DELETE);
+  };
+
+  const getSidebarContent = () => {
+    return (
+      <>
+        <SidebarHeader>
+          Transaction Details
+          <IconContainer onClick={toggleExpanded}>
+            <FontAwesomeIcon
+              width={8}
+              height={8}
+              color={COLORS.lightFont}
+              icon={isExpanded ? faChevronRight : faChevronLeft}
+            />
+          </IconContainer>
+        </SidebarHeader>
+        {selectedTransaction ? (
+          <>
+            <Row>
+              <b> Name: </b> <span> {selectedTransaction.name} </span>
+            </Row>
+            <Row>
+              <b> Vendor: </b> <span> {selectedTransaction.vendor} </span>
+            </Row>
+            <Row>
+              <b> Date: </b> <span> {selectedTransaction.date} </span>
+            </Row>
+            <Row>
+              <b> Amount: </b> <span> ${selectedTransaction.amount} </span>
+            </Row>
+            <Row>
+              <b> Type: </b> <span> {selectedTransaction.type} </span>
+            </Row>
+            <Divider />
+            <Row>
+              <b> Category: </b> <span> {selectedTransaction.category} </span>
+            </Row>
+            <Row>
+              <b> Tags: </b> <span> Loan, Test, Borrow</span>
+            </Row>
+            <Divider />
+            <Row>
+              <b> Created: </b>{" "}
+              <span>
+                {" "}
+                {format(selectedTransaction.createdAt, "MM/dd/yyyy")}{" "}
+              </span>
+            </Row>
+            <Row>
+              <b> Updated: </b>{" "}
+              <span>
+                {" "}
+                {format(selectedTransaction.updatedAt, "MM/dd/yyyy")}{" "}
+              </span>
+            </Row>
+            <ButtonContainer>
+              <BaseButton onClick={handleEditClick}>
+                {" "}
+                Edit Transaction{" "}
+              </BaseButton>
+              <DeleteButton onClick={handleDeleteClick}>
+                Delete Transaction
+              </DeleteButton>
+            </ButtonContainer>
+          </>
+        ) : (
+          <> Click a transaction to view </>
+        )}
+      </>
+    );
   };
 
   return (
@@ -32,49 +131,7 @@ const TransactionSidebar = () => {
           />
         </IconContainer>
       ) : (
-        <>
-          <SidebarHeader>
-            Transaction Details
-            <IconContainer onClick={toggleExpanded}>
-              <FontAwesomeIcon
-                width={8}
-                height={8}
-                color={COLORS.lightFont}
-                icon={isExpanded ? faChevronRight : faChevronLeft}
-              />
-            </IconContainer>
-          </SidebarHeader>
-          <Row>
-            <b> Vendor: </b> <span> Walmart </span>
-          </Row>
-          <Row>
-            <b> Date: </b> <span> Sept 26 2024 </span>
-          </Row>
-          <Row>
-            <b> Amount: </b> <span> $120.00 </span>
-          </Row>
-          <Row>
-            <b> Type: </b> <span> Expense </span>
-          </Row>
-          <Divider />
-          <Row>
-            <b> Category: </b> <span> Walmart </span>
-          </Row>
-          <Row>
-            <b> Tags: </b> <span> Loan, Test, Borrow</span>
-          </Row>
-          <Divider />
-          <Row>
-            <b> Created: </b> <span> Sept 26 2024 </span>
-          </Row>
-          <Row>
-            <b> Updated: </b> <span> Sept 26 2024 </span>
-          </Row>
-          <ButtonContainer>
-            <BaseButton> Edit Transaction </BaseButton>
-            <SecondaryButton> Delete Transaction </SecondaryButton>
-          </ButtonContainer>
-        </>
+        getSidebarContent()
       )}
     </SidebarContainer>
   );

@@ -543,8 +543,6 @@ interface LiabilitiesDataResponse {
 
 export const transformLiabilitiesData = (data: LiabilitiesDataResponse) => {
   const liabilitiesData = data.liabilities.liabilities;
-  //console.log(liabilitiesData)
-  //console.log("random")
   const credit = liabilitiesData.credit!.map((credit) => {
     const account = data.liabilities.accounts.filter(
       (acc) => acc.account_id === credit.account_id

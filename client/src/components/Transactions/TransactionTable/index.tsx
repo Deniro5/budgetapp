@@ -2,63 +2,45 @@ import styled from "styled-components";
 import { COLORS, SPACING } from "../../../Theme";
 import TransactionTableRow from "./TransactionTableRow";
 import TransactionTableAddRow from "./TransactionTableAddRow";
+import { Transaction } from "../../../types/transaction";
+import { TransactionOverlayType } from "../../../pages/Transactions";
+
+type TransactionTableProps = {
+  transactions: Transaction[];
+  error: string | null;
+  loading: boolean;
+  selectedTransactionId: string | null;
+  setSelectedTransactionId: React.Dispatch<React.SetStateAction<string | null>>;
+  setActiveTransaction: React.Dispatch<
+    React.SetStateAction<Transaction | null>
+  >;
+  setActiveOverlay: React.Dispatch<
+    React.SetStateAction<TransactionOverlayType | null>
+  >;
+  setContextMenuPosition: React.Dispatch<
+    React.SetStateAction<{ top: number; left: number }>
+  >;
+};
 
 const tableColumns = ["Name", "Amount", "Type", "Date", "Account", "Category"];
 
-const tableRows = [
-  {
-    name: "Walmart",
-    amount: 200.0,
-    type: "Income",
-    date: "26 Sep 2024",
-    account: "Joint",
-    category: "Transit",
-  },
-  {
-    name: "Petro Canada",
-    amount: 200.0,
-    type: "Income",
-    date: "26 Sep 2024",
-    account: "Joint",
-    category: "Transit",
-  },
-  {
-    name: "Walmart",
-    amount: 200.0,
-    type: "Income",
-    date: "26 Sep 2024",
-    account: "Joint",
-    category: "Transit",
-  },
-  {
-    name: "Walmart",
-    amount: 200.0,
-    type: "Income",
-    date: "26 Sep 2024",
-    account: "Joint",
-    category: "Transit",
-  },
-  {
-    name: "Walmart",
-    amount: 200.0,
-    type: "Income",
-    date: "26 Sep 2024",
-    account: "Joint",
-    category: "Transit",
-  },
-  {
-    name: "Walmart",
-    amount: 200.0,
-    type: "Income",
-    date: "26 Sep 2024",
-    account: "Joint",
-    category: "Transit",
-  },
-];
-
-function TransactionTable() {
-  const handleAddClick = () => {
-    alert("add transaction");
+function TransactionTable({
+  transactions,
+  error,
+  loading,
+  selectedTransactionId,
+  setSelectedTransactionId,
+  setActiveTransaction,
+  setActiveOverlay,
+  setContextMenuPosition,
+}: TransactionTableProps) {
+  const handleRightClick = (
+    e: React.MouseEvent<HTMLTableRowElement>,
+    transaction: Transaction | null
+  ) => {
+    setActiveTransaction(transaction);
+    setActiveOverlay(TransactionOverlayType.CONTEXT);
+    setContextMenuPosition({ top: e.clientY, left: e.clientX });
   };
 
   return (
@@ -72,18 +54,15 @@ function TransactionTable() {
           </tr>
         </TableHead>
         <ScrollBody>
-          <TransactionTableAddRow handleClick={handleAddClick} />
-          {tableRows.map((transaction, index) => (
-            <TransactionTableRow key={index} transaction={transaction} />
-          ))}
-          {tableRows.map((transaction, index) => (
-            <TransactionTableRow key={index} transaction={transaction} />
-          ))}
-          {tableRows.map((transaction, index) => (
-            <TransactionTableRow key={index} transaction={transaction} />
-          ))}
-          {tableRows.map((transaction, index) => (
-            <TransactionTableRow key={index} transaction={transaction} />
+          {/* <TransactionTableAddRow handleClick={handleAddClick} /> */}
+          {transactions.map((transaction, index) => (
+            <TransactionTableRow
+              key={index}
+              transaction={transaction}
+              isSelected={transaction._id === selectedTransactionId}
+              onClick={setSelectedTransactionId}
+              onRightClick={handleRightClick}
+            />
           ))}
         </ScrollBody>
       </ScrollableTable>

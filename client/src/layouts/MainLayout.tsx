@@ -5,9 +5,10 @@ import { COLORS, SPACING } from "../Theme";
 import Dashboard from "../components/Dashboard";
 import { useState } from "react";
 import Transactions from "../pages/Transactions";
+import Settings from "../pages/Settings";
 
 function MainLayout() {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const toggleExpanded = () => {
     setIsExpanded((isExpanded) => !isExpanded);
@@ -24,7 +25,7 @@ function MainLayout() {
           <Route path="/reports" element={<p> reports </p>} />
           <Route path="/savings" element={<p> savings </p>} />
           <Route path="/debts" element={<p> debts </p>} />
-          <Route path="/settings" element={<p> settings </p>} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </ContentContainer>
     </AppContainer>
