@@ -14,11 +14,12 @@ import {
 } from "../../../Styles";
 import { Transaction } from "../../../types/transaction";
 import { format } from "date-fns";
-import { getSelectedTransactionById } from "../../../zustand/transaction/transactionSelectors";
+import { getTransactionById } from "../../../zustand/transaction/transactionSelectors";
 import { TransactionOverlayType } from "../../../pages/Transactions";
+import { getDollarValue } from "../../../utils";
 
 type TransactionSidebarProps = {
-  transactionId: string | null;
+  sidebarTransactionId: string | null;
   setActiveTransaction: React.Dispatch<
     React.SetStateAction<Transaction | null>
   >;
@@ -28,24 +29,24 @@ type TransactionSidebarProps = {
 };
 
 const TransactionSidebar = ({
-  transactionId,
+  sidebarTransactionId,
   setActiveTransaction,
   setActiveOverlay,
 }: TransactionSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const selectedTransaction = getSelectedTransactionById(transactionId);
+  const sidebarTransaction = getTransactionById(sidebarTransactionId);
 
   const toggleExpanded = () => setIsExpanded((isExpanded) => !isExpanded);
 
   const handleEditClick = () => {
-    if (!selectedTransaction) return;
-    setActiveTransaction(selectedTransaction);
+    if (!sidebarTransaction) return;
+    setActiveTransaction(sidebarTransaction);
     setActiveOverlay(TransactionOverlayType.EDIT);
   };
 
   const handleDeleteClick = () => {
-    if (!selectedTransaction) return;
-    setActiveTransaction(selectedTransaction);
+    if (!sidebarTransaction) return;
+    setActiveTransaction(sidebarTransaction);
     setActiveOverlay(TransactionOverlayType.DELETE);
   };
 
@@ -63,26 +64,27 @@ const TransactionSidebar = ({
             />
           </IconContainer>
         </SidebarHeader>
-        {selectedTransaction ? (
+        {sidebarTransaction ? (
           <>
             <Row>
-              <b> Name: </b> <span> {selectedTransaction.name} </span>
+              <b> Name: </b> <span> {sidebarTransaction.name} </span>
             </Row>
             <Row>
-              <b> Vendor: </b> <span> {selectedTransaction.vendor} </span>
+              <b> Vendor: </b> <span> {sidebarTransaction.vendor} </span>
             </Row>
             <Row>
-              <b> Date: </b> <span> {selectedTransaction.date} </span>
+              <b> Date: </b> <span> {sidebarTransaction.date} </span>
             </Row>
             <Row>
-              <b> Amount: </b> <span> ${selectedTransaction.amount} </span>
+              <b> Amount: </b>{" "}
+              <span>{getDollarValue(sidebarTransaction.amount)}</span>
             </Row>
             <Row>
-              <b> Type: </b> <span> {selectedTransaction.type} </span>
+              <b> Type: </b> <span> {sidebarTransaction.type} </span>
             </Row>
             <Divider />
             <Row>
-              <b> Category: </b> <span> {selectedTransaction.category} </span>
+              <b> Category: </b> <span> {sidebarTransaction.category} </span>
             </Row>
             <Row>
               <b> Tags: </b> <span> Loan, Test, Borrow</span>
@@ -92,14 +94,14 @@ const TransactionSidebar = ({
               <b> Created: </b>{" "}
               <span>
                 {" "}
-                {format(selectedTransaction.createdAt, "MM/dd/yyyy")}{" "}
+                {format(sidebarTransaction.createdAt, "MM/dd/yyyy")}{" "}
               </span>
             </Row>
             <Row>
               <b> Updated: </b>{" "}
               <span>
                 {" "}
-                {format(selectedTransaction.updatedAt, "MM/dd/yyyy")}{" "}
+                {format(sidebarTransaction.updatedAt, "MM/dd/yyyy")}{" "}
               </span>
             </Row>
             <ButtonContainer>

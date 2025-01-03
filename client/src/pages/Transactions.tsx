@@ -1,6 +1,6 @@
 import { Flex, PageContainer } from "../Styles";
 import TransactionTable from "../components/Transactions/TransactionTable";
-import TransactionsSearchRow from "../components/Transactions/TransactionSearchRow/index.tsx";
+import TransactionsSearchBar from "../components/Transactions/TransactionSearchBar";
 import TransactionsHeader from "../components/Transactions/TransactionsHeader";
 import TransactionSidebar from "../components/Transactions/TransactionSidebar.tsx";
 import styled from "styled-components";
@@ -10,9 +10,11 @@ import { useState } from "react";
 import useTransaction from "../hooks/useTransaction.ts";
 import TransactionContextMenu from "../components/Transactions/TransactionContextMenu/index.tsx";
 import TransactionEditModal from "../components/Transactions/Modals/TransactionEditModal/index.tsx";
-import { Transaction } from "../types/transaction.ts";
+import { Transaction, TransactionFilter } from "../types/transaction.ts";
 import TransactionDeleteModal from "../components/Transactions/Modals/TransactionDeleteModal/index.tsx";
 import TransactionAddModal from "../components/Transactions/Modals/TransactionAddModal/index.tsx";
+import TransactionFilterButton from "../components/Transactions/TransactionSearchBar/TransactionFilterButton/index.tsx";
+import TransactionDateRange from "../components/Transactions/TransactionSearchBar/TransactionDateRange/index.tsx";
 
 export enum TransactionOverlayType {
   ADD = "add",
@@ -23,8 +25,9 @@ export enum TransactionOverlayType {
 }
 
 function Transactions() {
-  const [hasFilters, setHasFilters] = useState(false);
-  const [selectedTransactionId, setSelectedTransactionId] = useState<
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<TransactionFilter>({});
+  const [sidebarTransactionId, setSidebarTransactionId] = useState<
     string | null
   >(null);
   const [activeTransaction, setActiveTransaction] =
@@ -39,42 +42,54 @@ function Transactions() {
     left: 0,
   });
 
-  const { transactions, isLoading, error } = useTransaction();
+  const { transactions, isLoading, error } = useTransaction({ search, filter });
 
   const handleCloseOverlay = () => {
     setActiveOverlay(null);
     setActiveTransaction(null);
   };
 
+  const hasFilters = Object.keys(filter).length > 0;
+
   return (
     <PageContainer>
       <TransactionsHeader setActiveOverlay={setActiveOverlay} />
-
       <PageColumnFlexContainer
         gap={hasFilters ? SPACING.spacing4x : SPACING.spacing9x}
       >
-        <TransactionsSearchRow />
-        {hasFilters && <TransactionsFilterRow />}
+        <FiltersContainer>
+          <TransactionsSearchBar setSearch={setSearch} search={search} />
+          <TransactionFilterButton setFilter={setFilter} filter={filter} />
+
+          <TransactionDateRange />
+        </FiltersContainer>
+
+        {hasFilters && (
+          <TransactionsFilterRow filter={filter} setFilter={setFilter} />
+        )}
         <StyledTableContainer>
           <TransactionTable
             transactions={transactions}
             loading={isLoading}
             error={error}
-            selectedTransactionId={selectedTransactionId}
-            setSelectedTransactionId={setSelectedTransactionId}
+            sidebarTransactionId={sidebarTransactionId}
+            setSidebarTransactionId={setSidebarTransactionId}
             setActiveTransaction={setActiveTransaction}
             setActiveOverlay={setActiveOverlay}
             setContextMenuPosition={setContextMenuPosition}
           />
           <TransactionSidebar
-            transactionId={selectedTransactionId}
+            sidebarTransactionId={sidebarTransactionId}
             setActiveTransaction={setActiveTransaction}
             setActiveOverlay={setActiveOverlay}
           />
         </StyledTableContainer>
       </PageColumnFlexContainer>
       {activeOverlay === TransactionOverlayType.ADD && (
-        <TransactionAddModal onClose={handleCloseOverlay} />
+        <TransactionAddModal
+          onClose={handleCloseOverlay}
+          initialTransaction={activeTransaction}
+        />
       )}
       {activeOverlay === TransactionOverlayType.PRESET && (
         <TransactionAddModal onClose={handleCloseOverlay} />
@@ -101,12 +116,6 @@ function Transactions() {
             left={contextMenuPosition.left}
           />
         )}
-      {/* {transactionToDelete && (
-        <TransactionEditModal
-          transaction={transactionToEdit}
-          onClose={() => setTransactionToEdit(null)}
-        />
-      )} */}
     </PageContainer>
   );
 }
@@ -120,6 +129,11 @@ const PageColumnFlexContainer = styled.div<{ gap: string }>`
 
 const StyledTableContainer = styled(Flex)`
   align-items: flex-start;
+`;
+
+const FiltersContainer = styled.div`
+  display: flex;
+  gap: ${SPACING.spacing6x};
 `;
 
 export default Transactions;

@@ -4,8 +4,17 @@ import { BaseButton } from "../../../../Styles";
 import { Popover } from "react-tiny-popover";
 import { useState } from "react";
 import TransactionFilterPopoverMenu from "./TransactionFilterPopoverMenu";
+import { TransactionFilter } from "../../../../types/transaction";
 
-function TransactionFilterButton() {
+type TransactionFilterButtonProps = {
+  filter: TransactionFilter;
+  setFilter: React.Dispatch<React.SetStateAction<TransactionFilter>>;
+};
+
+function TransactionFilterButton({
+  filter,
+  setFilter,
+}: TransactionFilterButtonProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleButtonClick = (
@@ -15,14 +24,24 @@ function TransactionFilterButton() {
     setIsMenuOpen(true);
   };
 
+  const handleClose = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <>
       <Popover
         isOpen={isMenuOpen}
         positions={"bottom"}
         padding={4}
-        onClickOutside={() => setIsMenuOpen(false)}
-        content={<TransactionFilterPopoverMenu />}
+        onClickOutside={handleClose}
+        content={
+          <TransactionFilterPopoverMenu
+            filter={filter}
+            setFilter={setFilter}
+            handleClose={handleClose}
+          />
+        }
       >
         <BaseButton onClick={(e) => handleButtonClick(e)}>
           <FontAwesomeIcon icon={faFilter} />

@@ -10,30 +10,72 @@ import {
   BaseInput,
   Row,
 } from "../../../../Styles";
+import { TransactionFilter } from "../../../../types/transaction";
+import { ChangeEvent, useState } from "react";
 
-function TransactionFilterPopoverMenu() {
+type TransactionFilterPopoverMenuProps = {
+  filter: TransactionFilter;
+  setFilter: React.Dispatch<React.SetStateAction<TransactionFilter>>;
+  handleClose: () => void;
+};
+
+function TransactionFilterPopoverMenu({
+  filter,
+  setFilter,
+  handleClose,
+}: TransactionFilterPopoverMenuProps) {
+  const [tempFilter, setTempFilter] = useState(filter);
+
+  const handleFilterChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    filterName: string
+  ) => {
+    setTempFilter({ ...tempFilter, [filterName]: e.target.value });
+  };
+
+  const updateFilters = () => {
+    setFilter(tempFilter);
+    handleClose();
+  };
+
   return (
     <PopoverContent width={480}>
       <Container>
         <Row>
           <InputContainer>
             <InputLabel>Min Amount</InputLabel>
-            <BaseInput placeholder="Enter amount" />
+            <BaseInput
+              value={tempFilter.minAmount}
+              onChange={(e) => handleFilterChange(e, "minAmount")}
+              placeholder="Enter amount"
+            />
           </InputContainer>
           <InputContainer>
             <InputLabel>Max Amount</InputLabel>
-            <BaseInput placeholder="Enter type" />
+            <BaseInput
+              value={tempFilter.maxAmount}
+              onChange={(e) => handleFilterChange(e, "maxAmount")}
+              placeholder="Enter type"
+            />
           </InputContainer>
         </Row>
 
         <Row>
           <InputContainer>
             <InputLabel>Type</InputLabel>
-            <BaseInput placeholder="Enter amount" />
+            <BaseInput
+              value={tempFilter.type}
+              onChange={(e) => handleFilterChange(e, "type")}
+              placeholder="Enter amount"
+            />
           </InputContainer>
           <InputContainer>
             <InputLabel>Account</InputLabel>
-            <BaseInput placeholder="Enter type" />
+            <BaseInput
+              value={tempFilter.account}
+              onChange={(e) => handleFilterChange(e, "account")}
+              placeholder="Enter type"
+            />
           </InputContainer>
         </Row>
 
@@ -60,8 +102,8 @@ function TransactionFilterPopoverMenu() {
         </Row>
 
         <ButtonContainer>
-          <BaseButton>Update Filters</BaseButton>
-          <SecondaryButton>Cancel</SecondaryButton>
+          <BaseButton onClick={updateFilters}>Update Filters</BaseButton>
+          <SecondaryButton onClick={handleClose}>Cancel</SecondaryButton>
         </ButtonContainer>
       </Container>
     </PopoverContent>

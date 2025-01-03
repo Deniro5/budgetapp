@@ -30,6 +30,12 @@ export default function TransactionContextMenu({
       },
     },
     {
+      label: "Copy Transaction",
+      function: () => {
+        handleCopyClick();
+      },
+    },
+    {
       label: "Delete Transaction",
       function: () => {
         handleDeleteClick();
@@ -43,6 +49,10 @@ export default function TransactionContextMenu({
 
   const handleDeleteClick = () => {
     setActiveOverlay(TransactionOverlayType.DELETE);
+  };
+
+  const handleCopyClick = () => {
+    setActiveOverlay(TransactionOverlayType.ADD);
   };
 
   const handleOutsideClick = () => {

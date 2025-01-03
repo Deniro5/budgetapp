@@ -19,3 +19,13 @@ export type RawTransaction = Omit<
   Transaction,
   "_id" | "userId" | "createdAt" | "updatedAt"
 >;
+
+export type TransactionFilter = {
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  type?: string;
+  account?: string;
+};

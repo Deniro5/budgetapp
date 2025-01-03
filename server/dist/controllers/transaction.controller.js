@@ -69,13 +69,21 @@ exports.getTransactionById = getTransactionById;
 const getTransactions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req;
-        const { limit = 100, sort = "-date", startDate, endDate, categories, types, minAmount, maxAmount, accounts, } = req.query;
+        const { q, limit = 100, sort = "-date", startDate, endDate, categories, types, minAmount, maxAmount, accounts, } = req.query;
+        console.log(req.query);
         if (!userId) {
             res.status(401).json({ error: "Unauthorized" });
             return;
         }
         // Build the query object
         const query = { userId };
+        if (q) {
+            query.$or = [
+                { name: { $regex: q, $options: "i" } }, // Replace 'field1' with the field you want to search
+                { vendor: { $regex: q, $options: "i" } }, // Add more fields if needed
+                { description: { $regex: q, $options: "i" } }, // Add more fields if needed
+            ];
+        }
         // Date range filter
         if (startDate || endDate) {
             query.date = {};

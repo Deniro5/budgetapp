@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { COLORS, SPACING } from "../../../Theme";
 import { Transaction } from "../../../types/transaction";
+import { getDollarValue } from "../../../utils";
 
 type TransactionTableRowProps = {
   transaction: Transaction;
@@ -39,7 +40,7 @@ function TransactionTableRow({
       onClick={handleClick}
     >
       <td> {transaction.name} </td>
-      <td> {transaction.amount} </td>
+      <td> {getDollarValue(transaction.amount)} </td>
       <td> {transaction.type} </td>
       <td> {transaction.date} </td>
       <td> {transaction.account} </td>

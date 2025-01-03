@@ -1,15 +1,36 @@
 import styled from "styled-components";
 import { SPACING } from "../../../Theme";
 import TransactionFilterTag from "./TransactionFilterTag";
+import { TransactionFilter } from "../../../types/transaction";
+import { formatCamelCaseToTitleCase } from "../../../utils";
 
-function TransactionsFilterRow() {
+type TransactionFilterRowProps = {
+  filter: TransactionFilter;
+  setFilter: React.Dispatch<React.SetStateAction<TransactionFilter>>;
+};
+
+function TransactionFilterRow({
+  filter,
+  setFilter,
+}: TransactionFilterRowProps) {
+  const removeFilter = (filterName: string) => {
+    setFilter({ ...filter, [filterName]: undefined });
+    console.log(filter);
+  };
+
   return (
     <Container>
       Filtering By
-      <TransactionFilterTag name="Account: Joint" />
-      <TransactionFilterTag name="Account: Joint" />
-      <TransactionFilterTag name="Account: Joint" />
-      <TransactionFilterTag name="Account: Joint" />
+      {Object.keys(filter).map((filterName) => {
+        return filter[filterName] ? (
+          <TransactionFilterTag
+            name={`${formatCamelCaseToTitleCase(filterName)} : ${
+              filter[filterName]
+            }`}
+            onClick={() => removeFilter(filterName)}
+          />
+        ) : null;
+      })}
     </Container>
   );
 }
@@ -23,4 +44,4 @@ const Container = styled.div`
   font-weight: 600;
 `;
 
-export default TransactionsFilterRow;
+export default TransactionFilterRow;

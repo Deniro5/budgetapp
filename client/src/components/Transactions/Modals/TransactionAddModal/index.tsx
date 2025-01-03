@@ -5,10 +5,12 @@ import useTransactionStore from "../../../../zustand/transaction/transactionStor
 
 type TransactionAddModalProps = {
   onClose: () => void;
+  initialTransaction?: Transaction | null;
 };
 
 export default function TransactionAddModal({
   onClose,
+  initialTransaction,
 }: TransactionAddModalProps) {
   const { addTransaction } = useTransactionStore();
 
@@ -21,6 +23,7 @@ export default function TransactionAddModal({
         title="Add Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
+        initialTransaction={initialTransaction}
       />
     </Modal>
   );

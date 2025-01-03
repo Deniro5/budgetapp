@@ -9,8 +9,8 @@ type TransactionTableProps = {
   transactions: Transaction[];
   error: string | null;
   loading: boolean;
-  selectedTransactionId: string | null;
-  setSelectedTransactionId: React.Dispatch<React.SetStateAction<string | null>>;
+  sidebarTransactionId: string | null;
+  setSidebarTransactionId: React.Dispatch<React.SetStateAction<string | null>>;
   setActiveTransaction: React.Dispatch<
     React.SetStateAction<Transaction | null>
   >;
@@ -28,8 +28,8 @@ function TransactionTable({
   transactions,
   error,
   loading,
-  selectedTransactionId,
-  setSelectedTransactionId,
+  sidebarTransactionId,
+  setSidebarTransactionId,
   setActiveTransaction,
   setActiveOverlay,
   setContextMenuPosition,
@@ -59,8 +59,8 @@ function TransactionTable({
             <TransactionTableRow
               key={index}
               transaction={transaction}
-              isSelected={transaction._id === selectedTransactionId}
-              onClick={setSelectedTransactionId}
+              isSelected={transaction._id === sidebarTransactionId}
+              onClick={setSidebarTransactionId}
               onRightClick={handleRightClick}
             />
           ))}

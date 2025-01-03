@@ -19,7 +19,7 @@ type TransactionBaseModalProps = {
   confirmText?: string;
   onClose: () => void;
   onSubmit: (transaction: RawTransaction) => void;
-  initialTransaction?: RawTransaction;
+  initialTransaction?: RawTransaction | null;
 };
 
 export default function TransactionBaseModal({

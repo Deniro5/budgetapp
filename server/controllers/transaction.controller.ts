@@ -69,6 +69,7 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
   try {
     const { userId } = req;
     const {
+      q,
       limit = 100,
       sort = "-date",
       startDate,
@@ -80,6 +81,8 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
       accounts,
     } = req.query;
 
+    console.log(req.query);
+
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
@@ -87,6 +90,13 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
 
     // Build the query object
     const query: any = { userId };
+    if (q) {
+      query.$or = [
+        { name: { $regex: q, $options: "i" } }, // Replace 'field1' with the field you want to search
+        { vendor: { $regex: q, $options: "i" } }, // Add more fields if needed
+        { description: { $regex: q, $options: "i" } }, // Add more fields if needed
+      ];
+    }
 
     // Date range filter
     if (startDate || endDate) {

@@ -3,14 +3,18 @@ import { SecondaryButton } from "../../../Styles";
 import { COLORS } from "../../../Theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
+import { TransactionFilter } from "../../../types/transaction";
 
 type TransactionFilterTagProps = {
   name: string;
+  onClick: () => void;
 };
 
-function TransactionFilterTag({ name }: TransactionFilterTagProps) {
+function TransactionFilterTag({ name, onClick }: TransactionFilterTagProps) {
+  const handleClick = () => onClick();
+
   return (
-    <Tag>
+    <Tag onClick={handleClick}>
       {name} <FontAwesomeIcon icon={faClose} height={16} width={16} />
     </Tag>
   );

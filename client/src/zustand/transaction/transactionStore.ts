@@ -10,7 +10,7 @@ export interface TransactionStore {
   isLoading: boolean;
   error: string | null;
 
-  fetchTransactions: () => Promise<void>;
+  fetchTransactions: (queryString: string) => Promise<void>;
   addTransaction: (transaction: RawTransaction) => Promise<void>;
   updateTransaction: (
     id: string,
@@ -25,10 +25,12 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
   error: null,
 
   // Fetch all transactions
-  fetchTransactions: async () => {
+  fetchTransactions: async (queryString: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get<Transaction[]>(API_BASE_URL);
+      const response = await axios.get<Transaction[]>(
+        API_BASE_URL + queryString
+      );
       set({ transactions: response.data });
     } catch (error) {
       console.error("Error fetching transactions:", error);
