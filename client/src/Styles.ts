@@ -113,7 +113,6 @@ export const InputContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${SPACING.spacing2x};
-  flex: 1;
 `;
 
 export const InputLabel = styled.label`
@@ -134,6 +133,25 @@ export const Row = styled.div`
 
 export const Divider = styled.hr`
   border: none;
-  border-bottom: 1px solid ${COLORS.mediumGrey};
+  border-bottom: 1px solid ${COLORS.darkGrey};
   margin: ${SPACING.spacing4x} 0;
+`;
+
+export const BaseCheckbox = styled.input`
+  cursor: pointer;
+`;
+
+export const BaseCheckboxContainer = styled.button`
+  display: flex;
+  gap: ${SPACING.spacingBase};
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: ${FONTSIZE.sm}
+
+  &:hover {
+    color: ${COLORS.pureBlack};
+  }
 `;

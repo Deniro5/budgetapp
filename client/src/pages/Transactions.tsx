@@ -10,7 +10,10 @@ import { useState } from "react";
 import useTransaction from "../hooks/useTransaction.ts";
 import TransactionContextMenu from "../components/Transactions/TransactionContextMenu/index.tsx";
 import TransactionEditModal from "../components/Transactions/Modals/TransactionEditModal/index.tsx";
-import { Transaction, TransactionFilter } from "../types/transaction.ts";
+import {
+  Transaction,
+  TransactionFilter,
+} from "../components/Transactions/types.ts";
 import TransactionDeleteModal from "../components/Transactions/Modals/TransactionDeleteModal/index.tsx";
 import TransactionAddModal from "../components/Transactions/Modals/TransactionAddModal/index.tsx";
 import TransactionFilterButton from "../components/Transactions/TransactionSearchBar/TransactionFilterButton/index.tsx";

@@ -2,7 +2,7 @@ import React from "react";
 import PopoverContent from "../../Global/PopoverContent";
 import { Popover } from "react-tiny-popover";
 import { getSelectedTransactionById } from "../../../zustand/transaction/transactionSelectors";
-import { Transaction } from "../../../types/transaction";
+import { Transaction } from "../types";
 import { TransactionOverlayType } from "../../../pages/Transactions";
 
 type TransactionContextMenuProps = {

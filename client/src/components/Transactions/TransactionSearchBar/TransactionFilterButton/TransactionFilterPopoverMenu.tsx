@@ -10,7 +10,7 @@ import {
   BaseInput,
   Row,
 } from "../../../../Styles";
-import { TransactionFilter } from "../../../../types/transaction";
+import { TransactionFilter, TransactionType } from "../../types";
 import { ChangeEvent, useState } from "react";
 
 type TransactionFilterPopoverMenuProps = {
@@ -27,7 +27,7 @@ function TransactionFilterPopoverMenu({
   const [tempFilter, setTempFilter] = useState(filter);
 
   const handleFilterChange = (
-    e: ChangeEvent<HTMLInputElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     filterName: string
   ) => {
     setTempFilter({ ...tempFilter, [filterName]: e.target.value });
@@ -63,11 +63,19 @@ function TransactionFilterPopoverMenu({
         <Row>
           <InputContainer>
             <InputLabel>Type</InputLabel>
-            <BaseInput
+            <BaseSelect
+              name="type"
               value={tempFilter.type}
               onChange={(e) => handleFilterChange(e, "type")}
-              placeholder="Enter amount"
-            />
+            >
+              <option value="">Select Type</option>
+              <option value={TransactionType.EXPENSE}>
+                {TransactionType.EXPENSE}
+              </option>
+              <option value={TransactionType.INCOME}>
+                {TransactionType.INCOME}
+              </option>
+            </BaseSelect>
           </InputContainer>
           <InputContainer>
             <InputLabel>Account</InputLabel>
@@ -81,7 +89,7 @@ function TransactionFilterPopoverMenu({
 
         <Row>
           <InputContainer>
-            <InputLabel>Categories</InputLabel>
+            <InputLabel>Category</InputLabel>
             <BaseSelect>
               <option value="">Select category</option>
               <option value="category1">Category 1</option>
@@ -92,12 +100,12 @@ function TransactionFilterPopoverMenu({
 
         <Row>
           <InputContainer>
-            <InputLabel>Tags</InputLabel>
-            <BaseSelect>
-              <option value="">Select category</option>
-              <option value="category1">Category 1</option>
-              <option value="category2">Category 2</option>
-            </BaseSelect>
+            <InputLabel>Tags\</InputLabel>
+            <BaseInput
+              value={tempFilter.tag}
+              onChange={(e) => handleFilterChange(e, "tag")}
+              placeholder="Enter tag"
+            />
           </InputContainer>
         </Row>
 

@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 // Mongoose Schema definition
 const transactionSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
+    name: { type: String, required: false },
     description: { type: String, required: false },
     amount: { type: Number, required: true },
     type: { type: String, required: true },
@@ -45,7 +45,7 @@ const transactionSchema = new mongoose_1.Schema({
     category: { type: String, required: true },
     userId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the User
     vendor: { type: String, required: false },
-    //maybe tags later
+    tags: { type: [String], required: false },
 }, { timestamps: true }); // Enable automatic createdAt and updatedAt fields);
 // Create the Mongoose model
 const TransactionModel = mongoose_1.default.model("Transaction", transactionSchema);

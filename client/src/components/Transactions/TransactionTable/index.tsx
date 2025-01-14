@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { COLORS, SPACING } from "../../../Theme";
 import TransactionTableRow from "./TransactionTableRow";
 import TransactionTableAddRow from "./TransactionTableAddRow";
-import { Transaction } from "../../../types/transaction";
+import { Transaction } from "../types";
 import { TransactionOverlayType } from "../../../pages/Transactions";
 
 type TransactionTableProps = {
@@ -22,7 +22,14 @@ type TransactionTableProps = {
   >;
 };
 
-const tableColumns = ["Name", "Amount", "Type", "Date", "Account", "Category"];
+const tableColumns = [
+  "Vendor",
+  "Amount",
+  "Type",
+  "Date",
+  "Account",
+  "Category",
+];
 
 function TransactionTable({
   transactions,

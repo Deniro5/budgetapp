@@ -4,7 +4,7 @@ import { BaseButton } from "../../../../Styles";
 import { Popover } from "react-tiny-popover";
 import { useState } from "react";
 import TransactionFilterPopoverMenu from "./TransactionFilterPopoverMenu";
-import { TransactionFilter } from "../../../../types/transaction";
+import { TransactionFilter } from "../../types";
 
 type TransactionFilterButtonProps = {
   filter: TransactionFilter;

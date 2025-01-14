@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { SPACING } from "../../../Theme";
 import TransactionFilterTag from "./TransactionFilterTag";
-import { TransactionFilter } from "../../../types/transaction";
+import { TransactionFilter } from "../types";
 import { formatCamelCaseToTitleCase } from "../../../utils";
 
 type TransactionFilterRowProps = {

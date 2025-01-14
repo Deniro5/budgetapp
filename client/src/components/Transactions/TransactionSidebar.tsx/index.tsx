@@ -12,7 +12,7 @@ import {
   Divider,
   SecondaryButton,
 } from "../../../Styles";
-import { Transaction } from "../../../types/transaction";
+import { Transaction } from "../types";
 import { format } from "date-fns";
 import { getTransactionById } from "../../../zustand/transaction/transactionSelectors";
 import { TransactionOverlayType } from "../../../pages/Transactions";
@@ -67,13 +67,13 @@ const TransactionSidebar = ({
         {sidebarTransaction ? (
           <>
             <Row>
-              <b> Name: </b> <span> {sidebarTransaction.name} </span>
-            </Row>
-            <Row>
               <b> Vendor: </b> <span> {sidebarTransaction.vendor} </span>
             </Row>
             <Row>
               <b> Date: </b> <span> {sidebarTransaction.date} </span>
+            </Row>
+            <Row>
+              <b> Account: </b> <span>{sidebarTransaction.account}</span>
             </Row>
             <Row>
               <b> Amount: </b>{" "}
@@ -82,12 +82,23 @@ const TransactionSidebar = ({
             <Row>
               <b> Type: </b> <span> {sidebarTransaction.type} </span>
             </Row>
-            <Divider />
             <Row>
               <b> Category: </b> <span> {sidebarTransaction.category} </span>
             </Row>
+            <Divider />
             <Row>
-              <b> Tags: </b> <span> Loan, Test, Borrow</span>
+              <b> Name: </b> <span> {sidebarTransaction.name} </span>
+            </Row>
+
+            <Row>
+              <b> Tags: </b>{" "}
+              {sidebarTransaction.tags.map((tag) => (
+                <span> {tag} </span>
+              ))}
+            </Row>
+            <Row>
+              <b> Description: </b>{" "}
+              <span> {sidebarTransaction.description} </span>
             </Row>
             <Divider />
             <Row>

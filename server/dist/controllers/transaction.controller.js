@@ -22,7 +22,7 @@ const createTransaction = (req, res) => __awaiter(void 0, void 0, void 0, functi
             res.status(401).json({ error: "Unauthorized" });
             return;
         }
-        const { name, description, amount, type, date, account, category, vendor } = req.body;
+        const { name, description, amount, type, date, account, category, vendor, tags, } = req.body;
         const newTransaction = new transaction_model_1.default({
             userId,
             name,
@@ -33,6 +33,7 @@ const createTransaction = (req, res) => __awaiter(void 0, void 0, void 0, functi
             account,
             category,
             vendor,
+            tags,
         });
         const savedTransaction = yield newTransaction.save();
         res.status(201).json(savedTransaction);
@@ -69,7 +70,7 @@ exports.getTransactionById = getTransactionById;
 const getTransactions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req;
-        const { q, limit = 100, sort = "-date", startDate, endDate, categories, types, minAmount, maxAmount, accounts, } = req.query;
+        const { q, limit = 100, sort = "-date", startDate, endDate, category, tag, type, minAmount, maxAmount, accounts, } = req.query;
         console.log(req.query);
         if (!userId) {
             res.status(401).json({ error: "Unauthorized" });
@@ -93,14 +94,18 @@ const getTransactions = (req, res) => __awaiter(void 0, void 0, void 0, function
                 query.date.$lte = endDate;
         }
         // Category filter
-        if (categories) {
-            query.category = {
-                $in: Array.isArray(categories) ? categories : [categories],
+        if (category) {
+            query.category = category;
+        }
+        // Tags filter
+        if (tag) {
+            query.tags = {
+                $in: tag,
             };
         }
         // Type filter
-        if (types) {
-            query.type = { $in: Array.isArray(types) ? types : [types] };
+        if (type) {
+            query.type = type;
         }
         // Amount range filter
         if (minAmount || maxAmount) {

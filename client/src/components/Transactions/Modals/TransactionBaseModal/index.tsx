@@ -10,8 +10,12 @@ import {
   SecondaryButton,
 } from "../../../../Styles";
 import { COLORS, FONTSIZE, SPACING } from "../../../../Theme";
-import { RawTransaction, Transaction } from "../../../../types/transaction";
+import { RawTransaction, Transaction, TransactionType } from "../../types";
 import { useState } from "react";
+import TagInput from "../../../Global/TagInput";
+import DropdownList from "../../../Global/DropdownList";
+import { TRANSACTION_CATEGORIES } from "../../constants";
+import { getUserTransactionCategories } from "../../../../zustand/user/userSelectors";
 
 type TransactionBaseModalProps = {
   title: string;
@@ -36,12 +40,15 @@ export default function TransactionBaseModal({
       description: "",
       vendor: "",
       amount: 0.0,
-      type: "",
-      date: "",
+      type: TransactionType.EXPENSE,
+      date: new Date().toISOString().split("T")[0],
       account: "",
       category: "",
+      tags: [],
     }
   );
+
+  const userTransactionCategories = getUserTransactionCategories();
 
   // Update form state when inputs change
   const handleChange = (
@@ -51,6 +58,20 @@ export default function TransactionBaseModal({
     setTransaction((prevTransaction) => ({
       ...prevTransaction,
       [name]: value,
+    }));
+  };
+
+  const handleTagsChange = (tags: string[]) => {
+    setTransaction((prevTransaction) => ({
+      ...prevTransaction,
+      tags,
+    }));
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setTransaction((prevTransaction) => ({
+      ...prevTransaction,
+      category,
     }));
   };
 
@@ -96,32 +117,10 @@ export default function TransactionBaseModal({
           <Divider />
         </>
       )}
-
+      <SubTitle> Required Fields </SubTitle>
       <Row>
         <InputContainer>
-          <InputLabel>Name*</InputLabel>
-          <BaseInput
-            name="name"
-            placeholder="Enter name"
-            value={transaction.name}
-            onChange={handleChange}
-            required
-          />
-        </InputContainer>
-        <InputContainer>
-          <InputLabel>Description</InputLabel>
-          <BaseInput
-            name="description"
-            placeholder="Enter description"
-            value={transaction.description}
-            onChange={handleChange}
-          />
-        </InputContainer>
-      </Row>
-
-      <Row>
-        <InputContainer>
-          <InputLabel>Vendor*</InputLabel>
+          <InputLabel>Vendor</InputLabel>
           <BaseInput
             name="vendor"
             placeholder="Enter vendor"
@@ -142,12 +141,18 @@ export default function TransactionBaseModal({
         </InputContainer>
         <InputContainer>
           <InputLabel>Type</InputLabel>
-          <BaseInput
+          <BaseSelect
             name="type"
-            placeholder="Enter type"
             value={transaction.type}
             onChange={handleChange}
-          />
+          >
+            <option value={TransactionType.EXPENSE}>
+              {TransactionType.EXPENSE}
+            </option>
+            <option value={TransactionType.INCOME}>
+              {TransactionType.INCOME}
+            </option>
+          </BaseSelect>
         </InputContainer>
       </Row>
 
@@ -176,20 +181,18 @@ export default function TransactionBaseModal({
         </InputContainer>
         <InputContainer>
           <InputLabel>Category</InputLabel>
-          <BaseSelect
-            name="category"
-            value={transaction.category}
-            onChange={handleChange}
-          >
-            <option value="">Select category</option>
-            <option value="category1">Category 1</option>
-            <option value="category2">Category 2</option>
-          </BaseSelect>
+          <DropdownList
+            items={userTransactionCategories}
+            selected={transaction.category}
+            onSelect={handleCategoryChange}
+            placeholder="Select Category"
+            searchable
+          />
         </InputContainer>
       </Row>
 
       <Divider />
-
+      <SubTitle> Additional Fields </SubTitle>
       <Row>
         <InputContainer>
           <InputLabel>Frequency</InputLabel>
@@ -199,15 +202,36 @@ export default function TransactionBaseModal({
             <option value="recurring">Recurring</option>
           </BaseSelect>
         </InputContainer>
+        <InputContainer>
+          <InputLabel>Name</InputLabel>
+          <BaseInput
+            name="name"
+            placeholder="Enter name"
+            value={transaction.name}
+            onChange={handleChange}
+            required
+          />
+        </InputContainer>
+      </Row>
+      <Row>
         <TagInputContainer>
           <InputLabel>Tags</InputLabel>
-          <BaseInput
-            name="tags"
-            placeholder="Enter tags"
-            value={[]}
-            onChange={handleChange}
+          <TagInput
+            selected={transaction.tags || []}
+            onChange={handleTagsChange}
           />
         </TagInputContainer>
+      </Row>
+      <Row>
+        <InputContainer>
+          <InputLabel>Description</InputLabel>
+          <BaseInput
+            name="description"
+            placeholder="Enter description"
+            value={transaction.description}
+            onChange={handleChange}
+          />
+        </InputContainer>
       </Row>
 
       <ButtonContainer>
@@ -223,10 +247,19 @@ const Title = styled.h2`
   margin-top: 0;
   margin-bottom: ${SPACING.spacing6x};
   font-size: ${FONTSIZE.lg};
+  color: ${COLORS.pureBlack};
+`;
+
+const SubTitle = styled.h3`
+  text-align: left;
+  margin-top: 0;
+  margin-bottom: ${SPACING.spacing6x};
+  font-size: ${FONTSIZE.md};
+  color: ${COLORS.pureBlack};
 `;
 
 const TagInputContainer = styled(InputContainer)`
-  flex: 2 !important;
+  max-width: 547px;
 `;
 
 const ButtonContainer = styled.div`

@@ -5,7 +5,7 @@ import Modal from "../../../Global/Modal";
 import useModalController from "../../../Global/Modal/useModalController";
 import TransactionBaseModal from "../../Modals/TransactionBaseModal";
 import useTransactionStore from "../../../../zustand/transaction/transactionStore";
-import { Transaction } from "../../../../types/transaction";
+import { Transaction } from "../../types";
 
 function TransactionsHeaderAddButton() {
   const { isOpen, closeModal, openModal } = useModalController();

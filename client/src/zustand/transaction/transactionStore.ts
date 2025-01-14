@@ -1,7 +1,10 @@
 // src/stores/transactionStore.ts
 import axios from "axios";
 import { create } from "zustand";
-import { RawTransaction, Transaction } from "../../types/transaction";
+import {
+  RawTransaction,
+  Transaction,
+} from "../../components/Transactions/types";
 
 const API_BASE_URL = "http://localhost:8000/transactions"; // Replace with your API base URL
 

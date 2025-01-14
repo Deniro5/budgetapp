@@ -1,6 +1,6 @@
 import Modal from "../../../Global/Modal";
 import TransactionBaseModal from "../TransactionBaseModal";
-import { RawTransaction, Transaction } from "../../../../types/transaction";
+import { RawTransaction, Transaction } from "../../types";
 import useTransactionStore from "../../../../zustand/transaction/transactionStore";
 
 type TransactionAddModalProps = {

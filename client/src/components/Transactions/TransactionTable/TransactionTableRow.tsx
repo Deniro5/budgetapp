@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { COLORS, SPACING } from "../../../Theme";
-import { Transaction } from "../../../types/transaction";
+import { Transaction } from "../types";
 import { getDollarValue } from "../../../utils";
 
 type TransactionTableRowProps = {
@@ -39,7 +39,7 @@ function TransactionTableRow({
       isSelected={isSelected}
       onClick={handleClick}
     >
-      <td> {transaction.name} </td>
+      <td> {transaction.vendor} </td>
       <td> {getDollarValue(transaction.amount)} </td>
       <td> {transaction.type} </td>
       <td> {transaction.date} </td>

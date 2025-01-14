@@ -6,30 +6,33 @@ import axios from "axios";
 axios.defaults.withCredentials = true;
 const BASE_URL = "http://localhost:8000";
 
-interface State {
+export interface UserStore {
   user: User | null;
   isAuthenticated: boolean;
   setUser: (user: User) => void;
   refetchUser: (id: string) => void;
-  updateUser: (_id: string, newFields: Partial<User>) => Promise<boolean>;
+  updateUser: (newFields: Partial<User>) => Promise<boolean>;
   login: (username: string, password: string) => Promise<boolean>;
   signup: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => void;
 }
 
-const useUserStore = create<State>((set) => ({
+const useUserStore = create<UserStore>((set) => ({
   user: null,
   isAuthenticated: false,
   setUser: (user) => set(() => ({ user })),
-  updateUser: async (id, newFields) => {
+  updateUser: async (newFields) => {
     try {
+      const { user } = useUserStore.getState();
+      if (!user) return false;
+
       const response = await axios.put(
-        `${BASE_URL}/user/update/` + id,
+        `${BASE_URL}/user/update/` + user._id,
         newFields
       );
-      const { user } = response.data;
-      set(() => ({ user }));
+      const { user: newUser } = response.data;
+      set(() => ({ user: newUser }));
       return true;
     } catch (e) {
       console.error(e);

@@ -3,7 +3,7 @@ import { SecondaryButton } from "../../../Styles";
 import { COLORS } from "../../../Theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
-import { TransactionFilter } from "../../../types/transaction";
+import { TransactionFilter } from "../types";
 
 type TransactionFilterTagProps = {
   name: string;

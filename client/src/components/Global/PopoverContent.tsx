@@ -51,7 +51,7 @@ const PopoverContentContainer = styled.div<{ width: number }>`
   color: ${COLORS.font};
   width: ${({ width }) => width}px;
   border-radius: 4px;
-  z-index: 10;
+  z-index: 1000;
 `;
 
 const PopoverMenuItem = styled.div`

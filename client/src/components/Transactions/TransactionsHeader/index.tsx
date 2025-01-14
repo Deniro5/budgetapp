@@ -7,7 +7,7 @@ import TransactionsHeaderPresetButton from "./TransactionsHeaderPresetButton";
 import { faAdd, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TransactionOverlayType } from "../../../pages/Transactions";
-import { Transaction } from "../../../types/transaction";
+import { Transaction } from "../types";
 
 type TransactionHeaderProps = {
   setActiveOverlay: React.Dispatch<

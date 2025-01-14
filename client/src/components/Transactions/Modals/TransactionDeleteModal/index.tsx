@@ -5,7 +5,7 @@ import Modal from "../../../Global/Modal";
 import useModalController from "../../../Global/Modal/useModalController";
 import TransactionBaseModal from "../../Modals/TransactionBaseModal";
 import useTransactionStore from "../../../../zustand/transaction/transactionStore";
-import { RawTransaction, Transaction } from "../../../../types/transaction";
+import { RawTransaction, Transaction } from "../../types";
 import ConfirmModal from "../../../Global/ConfirmModal";
 
 type TransactionDeleteButtonProps = {

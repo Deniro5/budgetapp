@@ -1,9 +1,14 @@
 // src/types/Transaction.ts
+
+export enum TransactionType {
+  EXPENSE = "Expense",
+  INCOME = "Income",
+}
 export type Transaction = {
   _id: string;
   name: string;
   account: string;
-  type: string;
+  type: TransactionType;
   userId: string;
   amount: number;
   date: string;
@@ -12,6 +17,7 @@ export type Transaction = {
   vendor: string;
   updatedAt: Date;
   createdAt: Date;
+  tags: string[];
 };
 
 // src/types/Transaction.ts
@@ -28,4 +34,6 @@ export type TransactionFilter = {
   maxAmount?: number;
   type?: string;
   account?: string;
+  tag?: string;
+  category?: string;
 };

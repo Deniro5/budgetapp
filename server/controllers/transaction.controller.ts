@@ -15,8 +15,17 @@ export const createTransaction = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const { name, description, amount, type, date, account, category, vendor } =
-      req.body;
+    const {
+      name,
+      description,
+      amount,
+      type,
+      date,
+      account,
+      category,
+      vendor,
+      tags,
+    } = req.body;
 
     const newTransaction = new TransactionModel({
       userId,
@@ -28,6 +37,7 @@ export const createTransaction = async (req: CustomRequest, res: Response) => {
       account,
       category,
       vendor,
+      tags,
     });
 
     const savedTransaction = await newTransaction.save();
@@ -74,8 +84,9 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
       sort = "-date",
       startDate,
       endDate,
-      categories,
-      types,
+      category,
+      tag,
+      type,
       minAmount,
       maxAmount,
       accounts,
@@ -106,15 +117,20 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
     }
 
     // Category filter
-    if (categories) {
-      query.category = {
-        $in: Array.isArray(categories) ? categories : [categories],
+    if (category) {
+      query.category = category;
+    }
+
+    // Tags filter
+    if (tag) {
+      query.tags = {
+        $in: tag,
       };
     }
 
     // Type filter
-    if (types) {
-      query.type = { $in: Array.isArray(types) ? types : [types] };
+    if (type) {
+      query.type = type;
     }
 
     // Amount range filter
