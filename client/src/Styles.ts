@@ -6,7 +6,7 @@ import { COLORS, FONTSIZE, SPACING } from "./Theme";
 export const Card = styled.div`
   background: ${COLORS.pureWhite};
   border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
 `;
 
 export const Flex = styled.div`
@@ -52,11 +52,10 @@ export const BaseButton = styled.button`
 
 export const SecondaryButton = styled(BaseButton)`
   background: ${COLORS.pureWhite};
-  color: ${COLORS.font};
-  border: 1px solid ${COLORS.mediumGrey};
+  color: ${COLORS.primary};
+  border: 1px solid ${COLORS.primary};
   &:hover {
-    background: ${COLORS.lightGrey};
-    border: 1px solid ${COLORS.mediumGrey};
+    background: ${COLORS.lightPrimary};
   }
   gap: ${SPACING.spacing2x};
 `;
@@ -77,14 +76,14 @@ export const IconButton = styled.button`
   }
   color: ${COLORS.font};
   &:focus {
-    outline: none;
+    outline: ${COLORS.lightPrimary};
   }
 `;
 
 // -------------------- Forms --------------------------
 
 export const BaseInput = styled.input`
-  background: ${COLORS.lightGrey};
+  background: ${COLORS.pureWhite};
   border: 1px solid ${COLORS.darkGrey};
   border-radius: 4px;
   height: 44px;
@@ -97,7 +96,6 @@ export const BaseInput = styled.input`
 `;
 
 export const BaseSelect = styled.select`
-  background: ${COLORS.lightGrey};
   border: 1px solid ${COLORS.darkGrey};
   border-radius: 4px;
   height: 44px;
@@ -107,6 +105,13 @@ export const BaseSelect = styled.select`
   &::placeholder {
     color: ${COLORS.lightFont};
   }
+
+  box-sizing: border-box;
+
+  appearance: none; /* Remove native arrow */
+  background: ${COLORS.pureWhite}
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23777' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E")
+    no-repeat right ${SPACING.spacing3x} center;
 `;
 
 export const InputContainer = styled.div`

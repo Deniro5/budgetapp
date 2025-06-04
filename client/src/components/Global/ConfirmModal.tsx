@@ -2,7 +2,7 @@ import React from "react";
 import Modal from "./Modal";
 import styled from "styled-components";
 import { SPACING, FONTSIZE } from "../../Theme";
-import { BaseButton, SecondaryButton } from "../../Styles";
+import { BaseButton, SecondaryButton } from "../../styles";
 
 type ConfirmModalProps = {
   title?: string;

@@ -9,14 +9,18 @@ import {
   Row,
   SecondaryButton,
   BaseInput,
-} from "../../Styles";
+} from "../../styles";
 import { useState } from "react";
-import { dateToFormattedString, parseDate } from "../../utils";
+import {
+  dateToFormattedString,
+  formatDateToYYYYMMDD,
+  parseDate,
+} from "../../utils/DateUtils";
 
 type BaseCalendarProps = {
   isOpen: boolean;
   isRangeCalendar?: boolean;
-  handleSubmit: () => void;
+  handleSubmit: (startDate: string, endDate: string) => void;
   handleClose: () => void;
 };
 
@@ -67,6 +71,13 @@ function BaseCalendar({
 
   const isSubmitDisabled = () => !startDate && !endDate;
 
+  const saveDates = () => {
+    handleSubmit(
+      formatDateToYYYYMMDD(startDate),
+      formatDateToYYYYMMDD(endDate)
+    );
+  };
+
   return isOpen ? (
     <CalendarContainer>
       <Calendar
@@ -100,7 +111,7 @@ function BaseCalendar({
           </Row>
         )}
         <ButtonContainer>
-          <BaseButton disabled={isSubmitDisabled()} onClick={handleSubmit}>
+          <BaseButton disabled={isSubmitDisabled()} onClick={saveDates}>
             Save Changes
           </BaseButton>
           <SecondaryButton onClick={handleClose}>Cancel</SecondaryButton>

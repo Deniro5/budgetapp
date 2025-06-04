@@ -12,9 +12,13 @@ import {
   faSackDollar,
   faHandHoldingDollar,
   faChartLine,
+  faWallet,
+  faCreditCard,
+  faCreditCardAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { getFirstPath } from "../../utils";
+import { useEffect } from "react";
 
 type SidebarItem = {
   href: string;
@@ -44,10 +48,16 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
       isActive: firstPath === "transactions",
     },
     {
-      href: "/reports",
+      href: "/accounts",
       icon: faFileInvoiceDollar,
-      label: "Reports",
-      isActive: firstPath === "reports",
+      label: "Accounts",
+      isActive: firstPath === "accounts",
+    },
+    {
+      href: "/budget",
+      icon: faFileInvoiceDollar,
+      label: "Budget",
+      isActive: firstPath === "budget",
     },
     {
       href: "/savings",
@@ -100,15 +110,19 @@ const MenuItem = styled.div<{ isActive?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.pureWhite)};
+  color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.lightGrey)};
   padding: ${SPACING.spacing2x};
   border-radius: 4px;
   margin: 0;
   height: 32px;
+
+  path {
+    color: ${COLORS.lightGrey};
+  }
   &:hover {
-    color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.font)};
+    color: ${COLORS.pureWhite};
     path {
-      color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.font)};
+      color: ${COLORS.pureWhite};
     }
   }
   ${({ isActive }) =>
@@ -118,6 +132,9 @@ const MenuItem = styled.div<{ isActive?: boolean }>`
     path {
         color: ${COLORS.pureWhite};
     }
+    text-decoration:underline;
+    font-weight: 600;
+    text-underline-offset: 2px;
   `}
 `;
 

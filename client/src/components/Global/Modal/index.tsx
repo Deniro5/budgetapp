@@ -3,15 +3,16 @@ import styled from "styled-components";
 import { SPACING } from "../../../Theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
-import { IconButton, SecondaryButton } from "../../../Styles";
+import { IconButton, SecondaryButton } from "../../../styles";
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  width?: number;
 };
 
-function Modal({ isOpen, onClose, children }: ModalProps) {
+function Modal({ isOpen, onClose, children, width }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const handleClickOutside = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -26,9 +27,9 @@ function Modal({ isOpen, onClose, children }: ModalProps) {
   return (
     <>
       <StyledOverlay isOpen={isOpen} onClick={handleClickOutside} />
-      <StyledDialog isOpen={isOpen} ref={dialogRef}>
+      <StyledDialog isOpen={isOpen} ref={dialogRef} width={width}>
         <CloseButton onClick={onClose}>
-          <FontAwesomeIcon icon={faClose} height={16} width={16} />
+          <FontAwesomeIcon icon={faClose} height={20} width={20} />
         </CloseButton>
         {children}
       </StyledDialog>
@@ -47,11 +48,13 @@ const StyledOverlay = styled.div<{ isOpen: boolean }>`
   z-index: 999;
 `;
 
-const StyledDialog = styled.dialog<{ isOpen: boolean }>`
+const StyledDialog = styled.dialog<{
+  isOpen: boolean;
+  width: number | undefined;
+}>`
   position: absolute;
   top: 40%;
   transform: translateY(-40%);
-  background: white;
   border: none;
   padding: ${SPACING.spacing8x};
   box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
@@ -59,12 +62,15 @@ const StyledDialog = styled.dialog<{ isOpen: boolean }>`
   z-index: 1000;
   display: ${({ isOpen }) => (isOpen ? "block" : "none")};
   color: black;
+  width: ${({ width }) => width}px;
 `;
 
 const CloseButton = styled(IconButton)`
   position: absolute;
   top: 8px;
   right: 0px;
+  widht: 24px;
+  height: 24px;
 `;
 
 export default Modal;

@@ -11,8 +11,8 @@ const presetTransactionSchema: Schema = new Schema({
   account: { type: String, required: false },
   category: { type: String, required: false },
   vendor: { type: String, required: false },
-  //maybe tags later
-}); // Enable automatic createdAt and updatedAt fields);
+  tags: { type: [String], required: false },
+});
 
 // Create the Mongoose model
 const PresetTransactionModel: Model<any> = mongoose.model(

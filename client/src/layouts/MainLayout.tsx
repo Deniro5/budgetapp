@@ -2,17 +2,34 @@ import { Route, Routes } from "react-router";
 import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
 import { COLORS, SPACING } from "../Theme";
-import Dashboard from "../components/Dashboard";
-import { useState } from "react";
-import Transactions from "../pages/Transactions";
+import { useEffect, useState } from "react";
+import Transactions from "../pages/Transaction/Transactions";
 import Settings from "../pages/Settings";
+import DashboardPage from "../pages/Dashboard";
+import Accounts from "../pages/Accounts";
+import Budget from "../pages/Budget";
+import useInitialLoad from "../hooks/useInitialLoad";
 
 function MainLayout() {
+  useInitialLoad();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const toggleExpanded = () => {
     setIsExpanded((isExpanded) => !isExpanded);
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setIsExpanded(!isExpanded);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <AppContainer>
@@ -20,8 +37,10 @@ function MainLayout() {
 
       <ContentContainer isExpanded={isExpanded}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<DashboardPage />} />
           <Route path="/transactions" element={<Transactions />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/budget" element={<Budget />} />
           <Route path="/reports" element={<p> reports </p>} />
           <Route path="/savings" element={<p> savings </p>} />
           <Route path="/debts" element={<p> debts </p>} />
@@ -42,7 +61,7 @@ const ContentContainer = styled.div<{ isExpanded: boolean }>`
   width: ${({ isExpanded }) =>
     isExpanded ? "calc(100vw - 200px)" : "calc(100vw - 40px)"};
   height: 100vh;
-  background: white;
+  background: ${COLORS.background};
   overflow: hidden;
 `;
 

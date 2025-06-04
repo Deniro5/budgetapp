@@ -17,6 +17,11 @@ const userSchema = new mongoose.Schema({
       default: "CAD", // default currency
     },
     disabledCategories: { type: [String], required: false },
+    defaultAccount: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+      required: false,
+    },
   },
 });
 

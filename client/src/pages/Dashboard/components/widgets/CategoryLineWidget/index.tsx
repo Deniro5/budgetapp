@@ -1,0 +1,131 @@
+import DropdownList from "components/DropdownList/DropdownList";
+import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
+
+import React from "react";
+import {
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  ReferenceLine,
+} from "recharts";
+import { getAggregatedValue } from "../../../../../utils/DateUtils";
+import useBudgetStore from "store/budget/budgetStore";
+import useDashboardStore from "store/dashboard/dashboardStore";
+import { getUserTransactionCategories } from "store/user/userSelectors";
+import styled from "styled-components";
+import { Flex } from "styles";
+import { FONTSIZE, SPACING } from "theme";
+import { TransactionCategory } from "types/Transaction";
+import { getAggregatedCategoryBudgetLine } from "store/budget/budgetSelectors";
+
+type CategoryLineWidgetProps = {
+  category: TransactionCategory;
+  setCategory: React.Dispatch<React.SetStateAction<TransactionCategory>>;
+  startDate: string;
+  endDate: string;
+};
+
+const CategoryLineWidget = ({
+  category,
+  setCategory,
+  startDate,
+  endDate,
+}: CategoryLineWidgetProps) => {
+  const userTransactionCategories = getUserTransactionCategories();
+  const { categoryExpenseByDate } = useDashboardStore();
+
+  const ChartContent = () => {
+    if (!categoryExpenseByDate.length) {
+      return <p> no data</p>;
+    } else {
+      const budgetLineValue = getAggregatedCategoryBudgetLine(
+        startDate,
+        endDate,
+        category
+      );
+
+      return (
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart
+            data={categoryExpenseByDate}
+            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+          >
+            <YAxis
+              domain={[
+                0,
+                Math.max(
+                  200,
+                  budgetLineValue,
+                  ...categoryExpenseByDate.map((d) => d.expense)
+                ),
+              ]}
+            />
+
+            <XAxis dataKey="date" />
+            <Tooltip />
+
+            <Line
+              type="monotone"
+              dataKey="expense"
+              stroke="#ff7979"
+              strokeWidth={2}
+              dot={false}
+            />
+
+            {budgetLineValue > 0 && (
+              <ReferenceLine
+                y={budgetLineValue}
+                stroke="black"
+                strokeDasharray="5 5"
+                label={{
+                  value: `Aggregated Budget Limit - $${budgetLineValue}`,
+                  position: "center",
+                  fill: "black",
+                  dy: -10,
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              />
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+  };
+
+  return (
+    <>
+      <Header>
+        <Name> Budget by Category </Name>
+        <DropdownList
+          items={userTransactionCategories}
+          selected={category}
+          onSelect={setCategory}
+          placeholder="Select Category"
+          itemToString={(item: TransactionCategory) =>
+            transactionCategoryNameMap[item]
+          }
+          searchable
+        />
+      </Header>
+      <ChartContent />
+    </>
+  );
+};
+
+const Name = styled.h3`
+  margin: 0;
+  font-size: ${FONTSIZE.lg};
+`;
+
+const Header = styled(Flex)`
+  margin-bottom: ${SPACING.spacing6x};
+  justify-content: space-between;
+  border-bottom: 1px solid lightgrey;
+  padding-bottom: ${SPACING.spacing3x};
+`;
+
+export default CategoryLineWidget;

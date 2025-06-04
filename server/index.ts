@@ -7,6 +7,9 @@ import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import transactionRoutes from "./routes/transaction.routes";
 import presetTransactionRoutes from "./routes/presettransaction.routes";
+import accountRoutes from "./routes/account.routes";
+import budgetRoutes from "./routes/budget.routes";
+import TransactionModel from "./models/transaction.model";
 
 const app = express();
 
@@ -22,12 +25,13 @@ app.use(
 
 app.use(express.json());
 
+// Routes
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
-
-// Routes
 app.use("/transactions", transactionRoutes);
 app.use("/preset-transactions", presetTransactionRoutes);
+app.use("/accounts", accountRoutes);
+app.use("/budget", budgetRoutes);
 
 mongoose.connect(
   `mongodb+srv://deantowheed5:${process.env.DB_PASS}@cluster0.ewv8l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import useStore from "../../zustand/user/userStore";
-import { useNavigate } from "react-router-dom";
+import useStore from "../../store/user/userStore";
+import { useNavigate, useLocation } from "react-router-dom";
 
 type RouteProtectorProps = {
   children: React.ReactNode;
@@ -9,12 +9,13 @@ type RouteProtectorProps = {
 export default function RouteProtector({ children }: RouteProtectorProps) {
   const { isAuthenticated, user } = useStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!isAuthenticated || !user) {
       navigate("/login", { replace: true });
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, location.pathname]);
 
   return children;
 }

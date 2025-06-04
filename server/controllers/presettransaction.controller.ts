@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import PresetTransactionModel from "../models/transaction.model";
+import PresetTransactionModel from "../models/presettransaction.model";
 
 interface CustomRequest extends Request {
   userId?: string;
@@ -31,8 +31,17 @@ export const createPresetTransaction = async (
       return;
     }
 
-    const { name, description, amount, type, date, account, category, vendor } =
-      req.body;
+    const {
+      name,
+      description,
+      amount,
+      type,
+      date,
+      account,
+      category,
+      vendor,
+      tags,
+    } = req.body;
 
     const newTransaction = new PresetTransactionModel({
       name,
@@ -43,6 +52,7 @@ export const createPresetTransaction = async (
       account,
       category,
       vendor,
+      tags,
       userId,
     });
 

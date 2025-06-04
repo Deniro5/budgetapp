@@ -3,18 +3,21 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import { useEffect, useContext, useCallback } from "react";
 
-import useUserStore from "./zustand/user/userStore";
+import useUserStore from "./store/user/userStore";
 import RouteProtector from "./components/RouteProtector";
 import HomeRedirect from "./components/HomeRedirect";
 import Login from "./pages/Login";
+import SignUp from "./pages/Signup";
 
 const App = () => {
-  const { checkAuth } = useUserStore();
+  const { checkAuth, isCheckingAuth } = useUserStore();
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
-  return (
+  return isCheckingAuth ? (
+    <p> Checking Auth </p>
+  ) : (
     <Router>
       <Routes>
         <Route
@@ -22,6 +25,14 @@ const App = () => {
           element={
             <HomeRedirect>
               <Login />
+            </HomeRedirect>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <HomeRedirect>
+              <SignUp />
             </HomeRedirect>
           }
         />

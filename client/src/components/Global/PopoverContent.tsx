@@ -47,11 +47,13 @@ function PopoverContent({
 
 const PopoverContentContainer = styled.div<{ width: number }>`
   background: ${COLORS.pureWhite};
-  border: 1px solid ${COLORS.mediumGrey};
+  border: 1px solid ${COLORS.darkGrey};
   color: ${COLORS.font};
   width: ${({ width }) => width}px;
   border-radius: 4px;
   z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: hidden;
 `;
 
 const PopoverMenuItem = styled.div`

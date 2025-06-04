@@ -19,7 +19,19 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["webrtc"]
+    "types": ["webrtc"],
+
+    /* Aliases */
+    "baseUrl": "./",
+    "paths": {
+      "types/*": ["src/types/*"],
+      "store/*": ["src/store/*"],
+      "components/*": ["src/components/*"],
+      "constants/*": ["src/constants/*"],
+      "styles": ["src/styles"],
+      "theme": ["src/Theme"],
+      "utils": ["src/utils"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

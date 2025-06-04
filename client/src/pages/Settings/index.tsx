@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import useUserStore from "../../zustand/user/userStore";
+import useUserStore from "../../store/user/userStore";
 import {
   BaseButton,
   BaseCheckbox,
@@ -8,21 +8,32 @@ import {
   Flex,
   PageContainer,
   PageTitle,
-} from "../../Styles";
+} from "../../styles";
 import styled from "styled-components";
 import { SPACING, FONTSIZE } from "../../Theme";
-import { TRANSACTION_CATEGORIES } from "../../components/Transactions/constants";
-import { getUserPreferences } from "../../zustand/user/userSelectors";
+import { getUserPreferences } from "../../store/user/userSelectors";
 import { UserPreferences } from "../../types/user";
 import { useNavigate } from "react-router";
+import {
+  TransactionCategory,
+  TransactionCategoryNameMap,
+} from "types/Transaction";
+import {
+  getAccountids,
+  getAccountNameByIdMap,
+} from "store/account/accountSelectors";
+import DropdownList from "components/DropdownList/DropdownList";
 
 export default function Settings() {
   const navigate = useNavigate();
+  const accountIds = getAccountids();
+  const accountNameByIdMap = getAccountNameByIdMap();
   const { logout, updateUser } = useUserStore();
   const userPreferences = getUserPreferences();
   const [newPreferences, setNewPreferences] = useState<UserPreferences>({
     currency: userPreferences?.currency || "CAD",
     disabledCategories: userPreferences?.disabledCategories || ["Investments"],
+    defaultAccount: userPreferences?.defaultAccount || null,
   });
 
   const handleUpdateSettings = async () => {
@@ -49,7 +60,12 @@ export default function Settings() {
     });
   };
 
-  console.log(newPreferences?.disabledCategories);
+  const handleDefaultAccountChange = (accountId: string) => {
+    setNewPreferences({
+      ...newPreferences,
+      defaultAccount: accountId,
+    });
+  };
 
   return (
     <PageContainer>
@@ -57,7 +73,7 @@ export default function Settings() {
       <SettingRow>
         <SettingName>Enabled Categories</SettingName>
         <CategoryContainer>
-          {TRANSACTION_CATEGORIES.map((item) => (
+          {Object.values(TransactionCategory).map((item) => (
             <BaseCheckboxContainer
               onClick={() => handleCategoryChange(item)}
               key={item}
@@ -66,18 +82,21 @@ export default function Settings() {
                 checked={!newPreferences?.disabledCategories.includes(item)}
                 type="checkbox"
               />
-              {item}
+              {TransactionCategoryNameMap[item]}
             </BaseCheckboxContainer>
           ))}
         </CategoryContainer>
       </SettingRow>
       <SettingRow>
-        <SettingName>Currency</SettingName>
-        <BaseSelect name="frequency" value={"dae"}>
-          <option value="">Select frequency</option>
-          <option value="one-time">One-Time</option>
-          <option value="recurring">Recurring</option>
-        </BaseSelect>
+        <SettingName>Default Account</SettingName>
+        <DropdownList
+          items={accountIds}
+          selected={newPreferences.defaultAccount}
+          onSelect={handleDefaultAccountChange}
+          placeholder="Select Account"
+          itemToString={(item: string) => accountNameByIdMap[item]}
+          searchable
+        />
       </SettingRow>
       <BaseButton onClick={handleUpdateSettings}>Save Changes</BaseButton>
       <BaseButton onClick={logout}>Sign Out</BaseButton>

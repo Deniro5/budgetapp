@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
 import { sanitizeUsername } from "../../utils";
-import useStore from "../../zustand/user/userStore";
-import { Flex } from "../../Styles";
+import useStore from "../../store/user/userStore";
+import { Flex } from "../../styles";
 import { COLORS } from "../../Theme";
 
 export default function Login() {
