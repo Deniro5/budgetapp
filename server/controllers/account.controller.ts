@@ -31,13 +31,14 @@ export const createAccount = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const { name, institution, amount, type } = req.body;
+    const { name, institution, baselineAmount, baselineDate, type } = req.body;
 
     const newAccount = new AccountModel({
       userId,
       name,
       institution,
-      amount,
+      baselineAmount,
+      baselineDate,
       type,
     });
 
@@ -75,6 +76,63 @@ export const getAccountById = async (req: CustomRequest, res: Response) => {
   }
 };
 
+const getAccountBalanceAtDate = async ({
+  userId,
+  accountId,
+  baselineAmount,
+  baselineDate,
+  startDate,
+}: {
+  userId: string;
+  accountId: string;
+  baselineAmount: number;
+  baselineDate: string;
+  startDate: string;
+}): Promise<number> => {
+  if (startDate <= baselineDate) {
+    return baselineAmount;
+  }
+
+  const transactions = await TransactionModel.find({
+    userId,
+    account: accountId,
+    date: {
+      $gte: baselineDate,
+      $lt: startDate,
+    },
+  });
+
+  const delta = transactions.reduce((acc, cur) => {
+    return acc + (cur.type === "Income" ? cur.amount : -cur.amount);
+  }, 0);
+
+  return baselineAmount + delta;
+};
+
+const getAccountTransactionsFromStartToEnd = async ({
+  userId,
+  accountId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  accountId: string;
+  startDate: string;
+  endDate: string;
+}): Promise<any[]> => {
+  //if startDate is before the baseline date we dont want to include transactions from start-baseline. so use baseline as start in that case
+
+  const transactionsFromBaselineToEndDate = await TransactionModel.find({
+    userId,
+    account: accountId,
+    date: {
+      $gte: startDate,
+      $lte: endDate,
+    },
+  });
+  return transactionsFromBaselineToEndDate;
+};
+
 export const getAccountBalancesById = async (
   req: CustomRequest,
   res: Response
@@ -82,7 +140,7 @@ export const getAccountBalancesById = async (
   try {
     const { id } = req.params;
     const { userId } = req;
-    const { startDate, endDate } = req.query; // Expected as YYYY-MM-DD
+    const { startDate, endDate } = req.query;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
@@ -97,133 +155,79 @@ export const getAccountBalancesById = async (
       return;
     }
 
+    if (typeof startDate !== "string" || typeof endDate !== "string") {
+      res.status(400).json({ error: "Invalid date types" });
+      return;
+    }
+
+    const accounts = [];
+
     if (id === "All") {
-      const accounts = await AccountModel.find({ userId });
-      let transactionTotal = 0;
-      const allTransactions: { date: string; amount: number }[] = [];
-
-      for (const account of accounts) {
-        const { _id, baselineAmount, baselineDate } = account;
-
-        // Skip accounts where endDate is before baseline
-        if (endDate < baselineDate) continue;
-
-        let runningTotal = baselineAmount;
-
-        if (startDate > baselineDate) {
-          const baselineToStartQuery: any = {
-            userId,
-            account: _id,
-            date: {
-              $gte: baselineDate,
-              $lt: startDate,
-            },
-          };
-
-          const transactions = await TransactionModel.find(
-            baselineToStartQuery
-          );
-
-          const delta = transactions.reduce((acc, cur) => {
-            return acc + (cur.type === "Income" ? cur.amount : -cur.amount);
-          }, 0);
-
-          runningTotal += delta;
-        }
-        transactionTotal += runningTotal;
-
-        const laterStart = startDate < baselineDate ? baselineDate : startDate;
-
-        const transactionsBetweenStartAndEnd = await TransactionModel.find({
-          userId,
-          account: _id,
-          date: {
-            $gte: laterStart,
-            $lte: endDate,
-          },
-        });
-
-        console.log(transactionsBetweenStartAndEnd);
-
-        transactionsBetweenStartAndEnd.forEach((transaction) => {
-          const amount =
-            transaction.type === "Income"
-              ? transaction.amount
-              : -transaction.amount;
-          allTransactions.push({ date: transaction.date, amount });
-        });
+      const allAccounts = await AccountModel.find({ userId });
+      accounts.push(...allAccounts);
+    } else {
+      const account = await AccountModel.findOne({ _id: id, userId });
+      if (!account) {
+        res.status(404).json({ error: "Account not found or unauthorized" });
+        return;
       }
+      accounts.push(account);
     }
+    let transactionTotal = 0;
+    let allTransactionsAfterStartDate = [];
+    let earliestDate = null;
 
-    //get the baseline amount. If its One account just get the account. if its "All" then we need to take an aggregate
-    const account = await AccountModel.findOne({ _id: id, userId });
-    const baselineDate = account.baselineDate;
-
-    //if endDate is earlier than account.baselineDate then we cant show any data
-    if (endDate < baselineDate) {
-      res.json([]);
-      return;
-    }
-
-    //sum transactions from baselinedate to start date to get correct starting amount
-    let transactionTotalFromBaselineToStart = account.baselineAmount;
-    if (startDate > baselineDate) {
-      const baselineToStartquery: any = { userId };
-      baselineToStartquery.account = id === "All" ? undefined : id;
-      baselineToStartquery.date = {};
-      baselineToStartquery.date.$gte = baselineDate;
-      baselineToStartquery.date.$lt = startDate;
-
-      //TODO get this working with aggregate
-      const transactionsAfterBaselineBeforeStart = await TransactionModel.find(
-        baselineToStartquery
-      ).sort({
-        date: -1,
-        _id: -1,
+    for (const account of accounts) {
+      const { _id, baselineAmount, baselineDate } = account;
+      const accountBalanceAtStartDate = await getAccountBalanceAtDate({
+        userId,
+        accountId: _id,
+        baselineAmount,
+        baselineDate,
+        startDate,
       });
-
-      transactionTotalFromBaselineToStart +=
-        transactionsAfterBaselineBeforeStart.reduce(
-          (acc, cur) =>
-            acc + (cur.type === "Income" ? cur.amount : -cur.amount),
-          0
-        );
-    }
-
-    const laterStartDate = startDate < baselineDate ? baselineDate : startDate;
-
-    const laterStartToEndQuery: any = { userId };
-    laterStartToEndQuery.account = id === "All" ? undefined : id;
-    laterStartToEndQuery.date = {};
-    laterStartToEndQuery.date.$gte = laterStartDate;
-    laterStartToEndQuery.date.$lte = endDate;
-
-    const transactionsFromLatestStartDateToEndDate =
-      await TransactionModel.find(laterStartToEndQuery).sort({
-        date: 1,
-        _id: -1,
-      }); // Sort by date first, then by _id for uniqueness
-
-    if (!transactionsFromLatestStartDateToEndDate.length) {
-      res.json([]);
-      return;
-    }
-
-    let runningBalance = transactionTotalFromBaselineToStart;
-    const cumulativeBalances: { date: any; balance: number }[] = [];
-
-    transactionsFromLatestStartDateToEndDate.forEach(
-      ({ date, amount, type }: any) => {
-        runningBalance += type === "Income" ? amount : -amount; // Adjust balance
-        cumulativeBalances.push({ date, balance: runningBalance });
+      transactionTotal += accountBalanceAtStartDate;
+      const laterStartDate =
+        startDate < baselineDate ? baselineDate : startDate;
+      //keep track of the earliest date so we can use that as a starting point for the graph
+      if (!earliestDate || laterStartDate < earliestDate) {
+        earliestDate = laterStartDate;
       }
+      const transactionsFromLatestStartDateToEndDate =
+        await getAccountTransactionsFromStartToEnd({
+          userId,
+          accountId: _id,
+          startDate: laterStartDate,
+          endDate,
+        });
+      allTransactionsAfterStartDate.push(
+        ...transactionsFromLatestStartDateToEndDate
+      );
+    }
+    const sortedTransactionsAfterStartDate = allTransactionsAfterStartDate.sort(
+      (a: any, b: any) => (a.date > b.date ? 1 : -1)
     );
+    const startingBalance = transactionTotal;
+    const cumulativeBalances: { date: any; balance: number }[] = [];
+    console.log(sortedTransactionsAfterStartDate);
+
+    sortedTransactionsAfterStartDate.forEach(({ date, amount, type }: any) => {
+      transactionTotal += type === "Income" ? amount : -amount; // Adjust balance
+      cumulativeBalances.push({ date, balance: transactionTotal });
+    });
 
     // Ensure graph starts with correct initial balance
     cumulativeBalances.unshift({
-      date: start,
-      balance: transactionTotalFromBaselineToStart,
+      date: earliestDate,
+      balance: startingBalance,
     });
+
+    cumulativeBalances.push({
+      date: endDate,
+      balance: transactionTotal,
+    });
+
+    console.log(cumulativeBalances);
 
     res.json(cumulativeBalances);
   } catch (err) {

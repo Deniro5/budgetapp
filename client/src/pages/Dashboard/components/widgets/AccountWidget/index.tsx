@@ -34,7 +34,6 @@ type AccountWidgetProps = {
 };
 
 const AccountWidget = ({ id, setId }: AccountWidgetProps) => {
-  const account = getAccountById(id);
   const accountIds = getAccountids();
   const accountNameByIdMap = getAccountNameByIdMap();
   const { accountWithBalances } = useDashboardStore();
@@ -44,7 +43,7 @@ const AccountWidget = ({ id, setId }: AccountWidgetProps) => {
   };
 
   const ChartContent = () => {
-    if (!account || !accountWithBalances.length) {
+    if (!accountWithBalances.length) {
       return <b> No data to show.</b>;
     } else {
       return (
