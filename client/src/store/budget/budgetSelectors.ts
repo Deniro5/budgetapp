@@ -11,17 +11,6 @@ export const getTotalBudget = () =>
     return budgetValues.reduce((acc, cur) => acc + cur, 0);
   });
 
-export const getAggregatedTotalBudget = (startDate: string, endDate: string) =>
-  useBudgetStore((state: BudgetStore) => {
-    if (!state.budget.budgetCategories) return 0;
-
-    const budgetValues = Object.values(state.budget.budgetCategories);
-    return budgetValues.reduce(
-      (acc, cur) => acc + getAggregatedValue(startDate, endDate, cur),
-      0
-    );
-  });
-
 export const getAggregatedCategoryBudgetLine = (
   startDate: string,
   endDate: string,

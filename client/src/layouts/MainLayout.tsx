@@ -5,10 +5,11 @@ import { COLORS, SPACING } from "../Theme";
 import { useEffect, useState } from "react";
 import Transactions from "../pages/Transaction/Transactions";
 import Settings from "../pages/Settings";
-import DashboardPage from "../pages/Dashboard";
+
 import Accounts from "../pages/Accounts";
 import Budget from "../pages/Budget";
 import useInitialLoad from "../hooks/useInitialLoad";
+import { DashboardPage } from "../pages/Dashboard/DashboardPage";
 
 function MainLayout() {
   useInitialLoad();
@@ -58,11 +59,11 @@ const AppContainer = styled.div`
 const ContentContainer = styled.div<{ isExpanded: boolean }>`
   flex: 1;
   padding: ${SPACING.spacing8x};
+  margin-left: ${({ isExpanded }) => (isExpanded ? "200px" : "40px")};
   width: ${({ isExpanded }) =>
     isExpanded ? "calc(100vw - 200px)" : "calc(100vw - 40px)"};
   height: 100vh;
   background: ${COLORS.background};
-  overflow: hidden;
 `;
 
 export default MainLayout;

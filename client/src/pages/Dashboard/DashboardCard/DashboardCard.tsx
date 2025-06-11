@@ -1,20 +1,20 @@
 import React from "react";
 import styled from "styled-components";
 import { Card } from "styles";
-import { COLORS, FONTSIZE, SPACING } from "theme";
+import { FONTSIZE, SPACING } from "theme";
 
 type DashboardCardProps = {
   children: React.ReactNode;
   name?: string;
 };
-export default function DashboardCard({ children, name }: DashboardCardProps) {
+export const DashboardCard = ({ children, name }: DashboardCardProps) => {
   return (
     <Container>
       {name && <Name> {name}</Name>}
       {children}
     </Container>
   );
-}
+};
 
 const Container = styled(Card)`
   height: 100%;

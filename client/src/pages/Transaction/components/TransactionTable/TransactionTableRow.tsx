@@ -15,6 +15,7 @@ type TransactionTableRowProps = {
     e: React.MouseEvent<HTMLTableRowElement>,
     transaction: Transaction | null
   ) => void;
+  onDoubleClick: (transaction: Transaction | null) => void;
   isSelected: boolean;
 };
 
@@ -22,6 +23,7 @@ function TransactionTableRow({
   transaction,
   onClick,
   onRightClick,
+  onDoubleClick,
   isSelected,
 }: TransactionTableRowProps) {
   const { accountIdToNameMap } = useAccountStore();
@@ -41,11 +43,16 @@ function TransactionTableRow({
     onRightClick(e, transaction);
   };
 
+  const handleDoubleClick = () => {
+    onDoubleClick(transaction);
+  };
+
   return (
     <Container
       onContextMenu={handleContextMenu}
       isSelected={isSelected}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
     >
       <td> {transaction.vendor} </td>
       <td> {transaction.date} </td>

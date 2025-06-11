@@ -13,7 +13,7 @@ const COLORS = [
   "#9A9A9A",
 ];
 
-export default function TopCategoriesWidget() {
+export const TopCategoriesWidget = () => {
   const { transactionCategoriesByAmount } = useDashboardStore();
   const top5CategoriesByAmount = getTop5CategoriesByAmount();
 
@@ -79,4 +79,4 @@ export default function TopCategoriesWidget() {
       <Legend content={<CustomLegend />} />
     </PieChart>
   );
-}
+};

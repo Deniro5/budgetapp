@@ -1,7 +1,6 @@
 import DropdownList from "components/DropdownList/DropdownList";
 import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 
-import React from "react";
 import {
   XAxis,
   YAxis,
@@ -11,31 +10,29 @@ import {
   Line,
   ReferenceLine,
 } from "recharts";
-import { getAggregatedValue } from "../../../../../utils/DateUtils";
-import useBudgetStore from "store/budget/budgetStore";
-import useDashboardStore from "store/dashboard/dashboardStore";
 import { getUserTransactionCategories } from "store/user/userSelectors";
 import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING } from "theme";
 import { TransactionCategory } from "types/Transaction";
 import { getAggregatedCategoryBudgetLine } from "store/budget/budgetSelectors";
+import { useCategoryLineWidget } from "./useCategoryLineWidget";
 
 type CategoryLineWidgetProps = {
-  category: TransactionCategory;
-  setCategory: React.Dispatch<React.SetStateAction<TransactionCategory>>;
   startDate: string;
   endDate: string;
 };
 
-const CategoryLineWidget = ({
-  category,
-  setCategory,
+export const CategoryLineWidget = ({
   startDate,
   endDate,
 }: CategoryLineWidgetProps) => {
+  const { categoryExpenseByDate, category, setCategory } =
+    useCategoryLineWidget({
+      startDate,
+      endDate,
+    });
   const userTransactionCategories = getUserTransactionCategories();
-  const { categoryExpenseByDate } = useDashboardStore();
 
   const ChartContent = () => {
     if (!categoryExpenseByDate.length) {
@@ -81,7 +78,7 @@ const CategoryLineWidget = ({
                 stroke="black"
                 strokeDasharray="5 5"
                 label={{
-                  value: `Aggregated Budget Limit - $${budgetLineValue}`,
+                  value: `Aggregated Budget Limit : $${budgetLineValue}`,
                   position: "center",
                   fill: "black",
                   dy: -10,
@@ -127,5 +124,3 @@ const Header = styled(Flex)`
   border-bottom: 1px solid lightgrey;
   padding-bottom: ${SPACING.spacing3x};
 `;
-
-export default CategoryLineWidget;

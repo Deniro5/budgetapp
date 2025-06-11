@@ -5,9 +5,7 @@ import {
   getCurrentDateFormatted,
   getDateDaysAgoFormatted,
   getFirstDayOfMonthFormatted,
-  getLastDayOfMonthFormatted,
   getFirstDayOfYearFormatted,
-  getLastDayOfYearFormatted,
 } from "../../utils/DateUtils";
 
 type DatePopoverMenuProps = {
@@ -27,7 +25,7 @@ function DatePopoverMenu({
       label: "This Month",
       function: () => {
         setStartDate(getFirstDayOfMonthFormatted());
-        setEndDate(getLastDayOfMonthFormatted());
+        setEndDate(getCurrentDateFormatted());
         handleClose();
       },
     },
@@ -35,7 +33,7 @@ function DatePopoverMenu({
       label: "This Year",
       function: () => {
         setStartDate(getFirstDayOfYearFormatted());
-        setEndDate(getLastDayOfYearFormatted());
+        setEndDate(getCurrentDateFormatted());
         handleClose();
       },
     },

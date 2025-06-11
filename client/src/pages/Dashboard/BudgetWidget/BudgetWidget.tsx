@@ -20,43 +20,32 @@ import {
   TransactionCategory,
   TransactionCategoryNameMap,
 } from "types/Transaction";
+import { useBudgetWidget } from "./useBudgetWidget";
 
 type BudgetWidgetProps = {
   startDate: string;
   endDate: string;
 };
 
-const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
-  const categoriesWithBudget = getAggregatedCategoriesWithBudget(
-    startDate,
-    endDate
-  );
-
-  const totalBudget = getAggregatedTotalBudget(startDate, endDate);
-  const totalExpense = getTotalExpense();
-  const availableMoney = totalBudget - totalExpense;
-  const isWithinBudget = availableMoney > 0;
-
+export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
+  const { categoriesWithBudget, totalBudget, availableBudget } =
+    useBudgetWidget({ startDate, endDate });
+  const isWithinBudget = availableBudget > 0;
   return (
     <>
       <Header>
         <Name> Budget Status</Name>
         <InfoRow>
           <InfoSection>
-            {" "}
-            <Label>Budget Remaining:</Label>
-            <ChangeLabel isIncrease={isWithinBudget}>
-              ${availableMoney}
-            </ChangeLabel>
-          </InfoSection>
-          <InfoSection>
             <Label>Budget Total:</Label>
             <p>${totalBudget} </p>
           </InfoSection>
-
           <InfoSection>
-            <Label>Total Expenses:</Label>
-            <p>${totalExpense} </p>
+            {" "}
+            <Label>Budget Remaining:</Label>
+            <ChangeLabel isIncrease={isWithinBudget}>
+              ${availableBudget}
+            </ChangeLabel>
           </InfoSection>
         </InfoRow>
       </Header>
@@ -142,5 +131,3 @@ const InfoRow = styled(Flex)`
 const InfoSection = styled(Flex)`
   gap: ${SPACING.spacingBase};
 `;
-
-export default BudgetWidget;

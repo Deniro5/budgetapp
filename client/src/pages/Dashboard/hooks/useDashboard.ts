@@ -48,7 +48,6 @@ const useDashboard = ({ startDate, endDate }: useDashboardProps) => {
   //AccountWidget only
 
   useEffect(() => {
-    console.log("eyafiaehfeiu");
     const fetchData = async () => {
       const queryString = `startDate=${startDate}&endDate=${endDate}`;
       await fetchAccountWithBalances(accountWidgetId, queryString);

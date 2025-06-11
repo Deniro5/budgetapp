@@ -1,45 +1,42 @@
 import DropdownList from "components/DropdownList/DropdownList";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
-
-import React from "react";
 import {
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  ReferenceLine,
   AreaChart,
   Area,
 } from "recharts";
-import { getAggregatedValue } from "../../../../../utils/DateUtils";
-import useBudgetStore from "store/budget/budgetStore";
-import useDashboardStore from "store/dashboard/dashboardStore";
-import { getUserTransactionCategories } from "store/user/userSelectors";
+
 import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING } from "theme";
-import { TransactionCategory } from "types/Transaction";
-import { getAggregatedCategoryBudgetLine } from "store/budget/budgetSelectors";
+
 import {
-  getAccountById,
   getAccountids,
   getAccountNameByIdMap,
 } from "store/account/accountSelectors";
+import { useAccountWidget } from "./useAccountWidget";
+import { useState } from "react";
 
 type AccountWidgetProps = {
-  id: string;
-  setId: React.Dispatch<React.SetStateAction<string>>;
+  startDate: string;
+  endDate: string;
 };
 
-const AccountWidget = ({ id, setId }: AccountWidgetProps) => {
+export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
+  const [accountWidgetId, setAccountWidgetId] = useState("All");
+
+  const { accountWithBalances } = useAccountWidget({
+    startDate,
+    endDate,
+    accountWidgetId,
+  });
   const accountIds = getAccountids();
   const accountNameByIdMap = getAccountNameByIdMap();
-  const { accountWithBalances } = useDashboardStore();
 
   const handleAccountChange = (id: string) => {
-    setId(id);
+    setAccountWidgetId(id);
   };
 
   const ChartContent = () => {
@@ -81,9 +78,16 @@ const AccountWidget = ({ id, setId }: AccountWidgetProps) => {
     <>
       <Header>
         <Name> Account Status </Name>
+        <span>
+          {" "}
+          <b>
+            {" "}
+            {accountWithBalances[accountWithBalances.length - 1]?.balance || ""}
+          </b>
+        </span>
         <DropdownList
           items={["All", ...accountIds]}
-          selected={id}
+          selected={accountWidgetId}
           onSelect={handleAccountChange}
           placeholder="Select Account"
           itemToString={(item: string) => accountNameByIdMap[item] || item}
@@ -106,5 +110,3 @@ const Header = styled(Flex)`
   border-bottom: 1px solid lightgrey;
   padding-bottom: ${SPACING.spacing3x};
 `;
-
-export default AccountWidget;

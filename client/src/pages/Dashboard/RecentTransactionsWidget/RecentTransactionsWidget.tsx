@@ -1,23 +1,17 @@
-import useDashboardStore from "store/dashboard/dashboardStore";
-import TransactionTable from "../../../../Transaction/components/TransactionTable";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { useNavigate } from "react-router";
-import { BaseButton, Flex, SecondaryButton } from "styles";
+import { Flex, SecondaryButton } from "styles";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import TransactionAddModal from "../../../../Transaction/components/Modals/TransactionAddModal";
-import { Transaction } from "types/Transaction";
-import usePresetTransaction from "../../../../Transaction/hooks/usePresetTransaction";
+import TransactionTable from "../../../pages/Transaction/components/TransactionTable";
+import TransactionAddModal from "../../../pages/Transaction/components/Modals/TransactionAddModal";
+import { useRecentTransactionsWidget } from "./useRecentTransactionsWidget";
 
-export default function RecentTransactionsWidget() {
-  const {
-    recentTransactions,
-    recentTransactionsLoading,
-    recentTransactionsError,
-    addRecentTransaction,
-  } = useDashboardStore();
+export const RecentTransactionsWidget = () => {
+  const { recentTransactions, isLoading, error, refetch } =
+    useRecentTransactionsWidget();
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -26,9 +20,13 @@ export default function RecentTransactionsWidget() {
     setShowModal(true);
   };
 
-  const addTransactionCallback = (transaction: Transaction) => {
-    addRecentTransaction(transaction);
+  const addTransactionCallback = () => {
+    refetch();
   };
+
+  if (!recentTransactions?.length) {
+    return null;
+  }
 
   return (
     <>
@@ -41,8 +39,8 @@ export default function RecentTransactionsWidget() {
       </WidgetHeader>
       <TableContainer>
         <TransactionTable
-          loading={recentTransactionsLoading}
-          error={recentTransactionsError}
+          loading={isLoading}
+          error={error?.message || null}
           transactions={recentTransactions}
           sidebarTransactionId={null}
           setSidebarTransactionId={() => {}}
@@ -62,7 +60,7 @@ export default function RecentTransactionsWidget() {
       )}
     </>
   );
-}
+};
 
 const TableContainer = styled(Flex)`
   flex-direction: column;

@@ -144,6 +144,7 @@ const SidebarContainer = styled.div<{ isExpanded: boolean }>`
   display: flex;
   align-items: ${({ isExpanded }) => (isExpanded ? "flex-start" : "center")};
   flex-direction: column;
+  position: fixed;
   gap: ${SPACING.spacing4x};
   height: calc(100vh);
   width: ${({ isExpanded }) => (isExpanded ? "200px" : "40px")};

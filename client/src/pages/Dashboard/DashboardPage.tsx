@@ -1,27 +1,18 @@
 import { Flex, PageTitle } from "../../styles.ts";
 import styled from "styled-components";
 import { SPACING } from "theme";
-import DashboardCard from "./components/DashboardCard/index.tsx";
-import IncomeExpenseWidget from "./components/widgets/IncomeExpenseWidget/index.tsx";
-import RecentTransactionsWidget from "./components/widgets/RecentTransactionsWidget/index.tsx";
-import useDashboard from "../../pages/Dashboard/hooks/useDashboard.ts";
+import { DashboardCard } from "./DashboardCard/DashboardCard.tsx";
+import { IncomeExpenseWidget } from "./IncomeExpenseWidget/IncomeExpenseWidget.tsx";
+import { RecentTransactionsWidget } from "./RecentTransactionsWidget/RecentTransactionsWidget.tsx";
+
 import useCalendar from "../../hooks/useCalendar.ts";
 import DateMenu from "components/DateMenu/index.tsx";
-import CategoryLineWidget from "./components/widgets/CategoryLineWidget/index.tsx";
-import BudgetWidget from "./components/widgets/BudgetWidget/index.tsx";
-import AccountWidget from "./components/widgets/AccountWidget/index.tsx";
+import { CategoryLineWidget } from "./CategoryLineWidget/CategoryLineWidget.tsx";
+import { BudgetWidget } from "./BudgetWidget/BudgetWidget.tsx";
+import { AccountWidget } from "./AccountWidget/AccountWidget.tsx";
 
-function DashboardPage() {
+export const DashboardPage = () => {
   const { startDate, setStartDate, endDate, setEndDate } = useCalendar();
-  const {
-    categoryWidgetCategory,
-    setCategoryWidgetCategory,
-    accountWidgetId,
-    setAccountWidgetId,
-  } = useDashboard({
-    startDate,
-    endDate,
-  });
 
   return (
     <PageContainer>
@@ -37,12 +28,12 @@ function DashboardPage() {
       <DashboardContainer>
         <Column gridArea={"account"}>
           <DashboardCard>
-            <AccountWidget id={accountWidgetId} setId={setAccountWidgetId} />
+            <AccountWidget startDate={startDate} endDate={endDate} />
           </DashboardCard>
         </Column>
         <Column gridArea={"income"}>
           <DashboardCard>
-            <IncomeExpenseWidget />
+            <IncomeExpenseWidget startDate={startDate} endDate={endDate} />
           </DashboardCard>
         </Column>
         <Column gridArea={"budget"}>
@@ -52,12 +43,7 @@ function DashboardPage() {
         </Column>
         <Column gridArea="categoryline">
           <DashboardCard>
-            <CategoryLineWidget
-              category={categoryWidgetCategory}
-              setCategory={setCategoryWidgetCategory}
-              startDate={startDate}
-              endDate={endDate}
-            />
+            <CategoryLineWidget startDate={startDate} endDate={endDate} />
           </DashboardCard>
         </Column>
         <Column gridArea={"recent"}>
@@ -68,7 +54,7 @@ function DashboardPage() {
       </DashboardContainer>
     </PageContainer>
   );
-}
+};
 
 const PageContainer = styled.div`
   display: flex;
@@ -90,5 +76,3 @@ const DashboardContainer = styled.div`
 const Column = styled.div<{ gridArea: string }>`
   grid-area: ${({ gridArea }) => gridArea};
 `;
-
-export default DashboardPage;

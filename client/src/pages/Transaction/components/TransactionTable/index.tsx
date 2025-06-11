@@ -46,6 +46,11 @@ function TransactionTable({
     setContextMenuPosition({ top: e.clientY, left: e.clientX });
   };
 
+  const handleDoubleClick = (transaction: Transaction | null) => {
+    setActiveTransaction(transaction);
+    setActiveOverlay(TransactionOverlayType.EDIT);
+  };
+
   return (
     <TableWrapper>
       <ScrollableTable>
@@ -64,6 +69,7 @@ function TransactionTable({
               isSelected={transaction._id === sidebarTransactionId}
               onClick={setSidebarTransactionId}
               onRightClick={handleRightClick}
+              onDoubleClick={handleDoubleClick}
             />
           ))}
         </ScrollBody>

@@ -1,7 +1,3 @@
-import { faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { differenceInDays, format, parseISO } from "date-fns";
-import React from "react";
 import {
   AreaChart,
   Area,
@@ -11,26 +7,36 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { getNetIncome } from "store/dashboard/dashboardSelectors";
-import useDashboardStore from "store/dashboard/dashboardStore";
+
 import styled from "styled-components";
 import { Flex } from "styles";
 import { COLORS, FONTSIZE, SPACING } from "theme";
+import { useIncomeExpenseWidget } from "./useIncomeExpenseWidget";
 
-const IncomeExpenseWidget = () => {
-  const { totalIncomeAndExpenseByDate } = useDashboardStore();
-  const netIncome = getNetIncome();
+interface IncomeExpenseWidgetProps {
+  startDate: string;
+  endDate: string;
+}
+
+export const IncomeExpenseWidget = ({
+  startDate,
+  endDate,
+}: IncomeExpenseWidgetProps) => {
+  const { totalIncomeAndExpenseByDate, netIncome } = useIncomeExpenseWidget({
+    startDate,
+    endDate,
+  });
   const isIncrease = netIncome >= 0;
 
-  const data = totalIncomeAndExpenseByDate;
-  if (data.length === 0) return null; // Handle empty data case
+  if (!totalIncomeAndExpenseByDate || totalIncomeAndExpenseByDate.length === 0)
+    return null; // Handle empty data case
 
   return (
     <>
       <Header>
         <Name> Income / Expenses </Name>
         <ChangeLabel isIncrease={isIncrease}>
-          <FontAwesomeIcon icon={isIncrease ? faArrowUp : faArrowDown} /> $
-          {netIncome}
+          {isIncrease ? "+" : "-"} ${netIncome}
         </ChangeLabel>
       </Header>
       <ResponsiveContainer width="100%" height={350}>
@@ -87,4 +93,3 @@ const ChangeLabel = styled(Flex)<{ isIncrease: boolean }>`
   font-weight: bold;
   font-size: ${FONTSIZE.lg};
 `;
-export default IncomeExpenseWidget;

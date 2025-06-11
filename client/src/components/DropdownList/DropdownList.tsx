@@ -5,7 +5,6 @@ import { COLORS, FONTSIZE, SPACING } from "../../Theme";
 import { Popover } from "react-tiny-popover";
 import PopoverContent from "../Global/PopoverContent";
 import DropdownListItem from "./DropdownListItem";
-import { BaseSelect } from "styles";
 
 // Define props interface
 interface DropdownListProps<T> {
@@ -36,7 +35,6 @@ const DropdownList = <T,>({
 
   useEffect(() => {
     if (searchable) {
-      console.log(searchTerm);
       setFilteredItems(
         items.filter((item) =>
           itemToString(item).toLowerCase().includes(searchTerm.toLowerCase())

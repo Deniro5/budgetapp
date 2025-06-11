@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import AccountModel from "../models/account.model";
 import TransactionModel from "../models/transaction.model";
 import mongoose from "mongoose";
@@ -90,7 +90,7 @@ const getAccountBalanceAtDate = async ({
   startDate: string;
 }): Promise<number> => {
   if (startDate <= baselineDate) {
-    return baselineAmount;
+    return 0;
   }
 
   const transactions = await TransactionModel.find({
@@ -113,15 +113,17 @@ const getAccountTransactionsFromStartToEnd = async ({
   userId,
   accountId,
   startDate,
+  baselineDate,
+  baselineAmount,
   endDate,
 }: {
   userId: string;
   accountId: string;
   startDate: string;
+  baselineDate: string;
+  baselineAmount: number;
   endDate: string;
 }): Promise<any[]> => {
-  //if startDate is before the baseline date we dont want to include transactions from start-baseline. so use baseline as start in that case
-
   const transactionsFromBaselineToEndDate = await TransactionModel.find({
     userId,
     account: accountId,
@@ -130,6 +132,15 @@ const getAccountTransactionsFromStartToEnd = async ({
       $lte: endDate,
     },
   });
+  //add the baseline contribution as a transaction
+  if (startDate === baselineDate) {
+    transactionsFromBaselineToEndDate.unshift({
+      date: startDate,
+      amount: baselineAmount,
+      type: "Income",
+    });
+  }
+
   return transactionsFromBaselineToEndDate;
 };
 
@@ -198,6 +209,8 @@ export const getAccountBalancesById = async (
           userId,
           accountId: _id,
           startDate: laterStartDate,
+          baselineDate,
+          baselineAmount,
           endDate,
         });
       allTransactionsAfterStartDate.push(
@@ -208,13 +221,33 @@ export const getAccountBalancesById = async (
       (a: any, b: any) => (a.date > b.date ? 1 : -1)
     );
     const startingBalance = transactionTotal;
-    const cumulativeBalances: { date: any; balance: number }[] = [];
-    console.log(sortedTransactionsAfterStartDate);
+    const cumulativeBalancesMap: Record<string, number> = {};
 
-    sortedTransactionsAfterStartDate.forEach(({ date, amount, type }: any) => {
-      transactionTotal += type === "Income" ? amount : -amount; // Adjust balance
-      cumulativeBalances.push({ date, balance: transactionTotal });
-    });
+    sortedTransactionsAfterStartDate.forEach(
+      ({
+        date,
+        amount,
+        type,
+      }: {
+        date: string;
+        amount: number;
+        type: string;
+      }) => {
+        transactionTotal += type === "Income" ? amount : -amount; // Adjust balance
+        if (cumulativeBalancesMap[date]) {
+          cumulativeBalancesMap[date] = transactionTotal;
+        } else {
+          cumulativeBalancesMap[date] = transactionTotal;
+        }
+      }
+    );
+
+    const cumulativeBalances = Object.entries(cumulativeBalancesMap).map(
+      ([date, balance]) => ({
+        date,
+        balance,
+      })
+    );
 
     // Ensure graph starts with correct initial balance
     cumulativeBalances.unshift({
@@ -226,8 +259,6 @@ export const getAccountBalancesById = async (
       date: endDate,
       balance: transactionTotal,
     });
-
-    console.log(cumulativeBalances);
 
     res.json(cumulativeBalances);
   } catch (err) {
