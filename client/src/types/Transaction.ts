@@ -31,6 +31,7 @@ export enum TransactionCategory {
   Utilities = "utilities",
   WorkExpenses = "workexpenses",
   Other = "other",
+  Transfer = "transfer",
 }
 
 export const TransactionCategoryNameMap: Record<TransactionCategory, string> = {
@@ -59,6 +60,7 @@ export const TransactionCategoryNameMap: Record<TransactionCategory, string> = {
   [TransactionCategory.Utilities]: "Utilities",
   [TransactionCategory.WorkExpenses]: "Work Expenses",
   [TransactionCategory.Other]: "Other",
+  [TransactionCategory.Transfer]: "Transfer",
 };
 
 export type Transaction = {
@@ -93,4 +95,11 @@ export type TransactionFilter = {
   account?: string;
   tags?: string[];
   categories?: string[];
+};
+
+export type RawTransfer = {
+  sendingAccountId: string;
+  receivingAccountId: string;
+  date: string;
+  amount: number;
 };

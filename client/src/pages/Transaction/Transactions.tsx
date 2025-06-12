@@ -21,6 +21,7 @@ import PresetTransactionModal from "./components/Modals/PresetTransactionModal/i
 import TransactionCopyModal from "./components/Modals/TransactionCopyModal/index.tsx";
 
 import useCalendar from "../../hooks/useCalendar.ts";
+import TransferAddModal from "./components/Modals/TransferAddModal/index.tsx";
 
 export enum TransactionOverlayType {
   ADD = "add",
@@ -29,6 +30,9 @@ export enum TransactionOverlayType {
   CONTEXT = "context",
   PRESET = "preset",
   COPY = "copy",
+  ADD_TRANSFER = "addTransfer",
+  EDIT_TRANSFER = "editTransfer",
+  DELETE_TRANSFER = "deleteTransfer",
 }
 
 function Transactions() {
@@ -148,6 +152,9 @@ function Transactions() {
             left={contextMenuPosition.left}
           />
         )}
+      {activeOverlay === TransactionOverlayType.ADD_TRANSFER && (
+        <TransferAddModal onClose={handleCloseOverlay} />
+      )}
     </PageContainer>
   );
 }

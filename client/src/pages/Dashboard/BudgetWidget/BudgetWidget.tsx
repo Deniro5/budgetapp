@@ -8,11 +8,7 @@ import {
   ResponsiveContainer,
   LabelList,
 } from "recharts";
-import { getAggregatedTotalBudget } from "store/budget/budgetSelectors";
-import {
-  getAggregatedCategoriesWithBudget,
-  getTotalExpense,
-} from "store/dashboard/dashboardSelectors";
+
 import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING, COLORS } from "theme";

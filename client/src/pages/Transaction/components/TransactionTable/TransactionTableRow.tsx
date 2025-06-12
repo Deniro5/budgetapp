@@ -47,6 +47,11 @@ function TransactionTableRow({
     onDoubleClick(transaction);
   };
 
+  const transactionVendorName =
+    transaction.category === "transfer"
+      ? accountIdToNameMap[transaction.vendor]
+      : transaction.vendor;
+
   return (
     <Container
       onContextMenu={handleContextMenu}
@@ -54,7 +59,7 @@ function TransactionTableRow({
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <td> {transaction.vendor} </td>
+      <td> {transactionVendorName} </td>
       <td> {transaction.date} </td>
       <AmountTd transactionType={transaction.type}>
         {transaction.type === TransactionType.INCOME && "+"}

@@ -45,7 +45,7 @@ export default function AccountCard({
           </b>
         </Flex>
         <Flex>
-          <Label>Insitution: </Label>
+          <Label>Institution: </Label>
           <Text> {account.institution} </Text>
         </Flex>
         <Flex>
@@ -86,7 +86,7 @@ const AccountInfo = styled(Flex)`
 const Label = styled.h3`
   font-size: ${FONTSIZE.lg};
   font-weight: 600;
-  width: 82px;
+  width: 140px;
   margin: 0;
 `;
 

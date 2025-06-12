@@ -48,6 +48,11 @@ const TransactionSidebar = ({
     setActiveOverlay(TransactionOverlayType.DELETE);
   };
 
+  const transactionVendorName =
+    sidebarTransaction?.category === "transfer"
+      ? accountIdToNameMap[sidebarTransaction.vendor]
+      : sidebarTransaction?.vendor;
+
   const getSidebarContent = () => {
     return (
       <>
@@ -65,7 +70,7 @@ const TransactionSidebar = ({
         {sidebarTransaction ? (
           <>
             <Row>
-              <b> Vendor: </b> <span> {sidebarTransaction.vendor} </span>
+              <b> Vendor: </b> <span> {transactionVendorName} </span>
             </Row>
             <Row>
               <b> Date: </b> <span> {sidebarTransaction.date} </span>

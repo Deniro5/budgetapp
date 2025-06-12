@@ -5,7 +5,6 @@ import BudgetForm from "./components/BudgetForm/index.tsx";
 import { BudgetCategories } from "types/budget.ts";
 import useBudgetStore from "store/budget/budgetStore.ts";
 import useBudget from "./hooks/useBudget.ts";
-import { getTotalBudget } from "store/budget/budgetSelectors.ts";
 
 function Budget() {
   const { budget, updateBudget } = useBudgetStore();
@@ -13,9 +12,7 @@ function Budget() {
   const handleSubmit = (newBudgetCategories: BudgetCategories) => {
     updateBudget({ budgetCategories: newBudgetCategories });
   };
-
   useBudget();
-
   return (
     <PageContainer>
       <PageTitle> Budget </PageTitle>

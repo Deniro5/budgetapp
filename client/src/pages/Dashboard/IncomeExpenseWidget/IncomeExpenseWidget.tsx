@@ -6,7 +6,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { getNetIncome } from "store/dashboard/dashboardSelectors";
 
 import styled from "styled-components";
 import { Flex } from "styles";

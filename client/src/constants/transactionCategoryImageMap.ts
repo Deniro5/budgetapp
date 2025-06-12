@@ -1,4 +1,7 @@
 import {
+  faArrowAltCircleLeft,
+  faArrowRightRotate,
+  faArrowsLeftRight,
   faBriefcase,
   faBus,
   faCalendarDays,
@@ -50,6 +53,7 @@ export const transactionCategoryImageMap = {
   [TransactionCategory.Subscriptions]: faCalendarDays,
   [TransactionCategory.Transit]: faBus,
   [TransactionCategory.Travel]: faPlane,
+  [TransactionCategory.Transfer]: faArrowsLeftRight,
   [TransactionCategory.Utilities]: faFaucetDrip,
   [TransactionCategory.WorkExpenses]: faBriefcase,
   [TransactionCategory.Other]: faQuestion,

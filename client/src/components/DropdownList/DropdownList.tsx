@@ -36,9 +36,13 @@ const DropdownList = <T,>({
   useEffect(() => {
     if (searchable) {
       setFilteredItems(
-        items.filter((item) =>
-          itemToString(item).toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        items.filter((item) => {
+          const stringItem = itemToString(item);
+          if (typeof stringItem === "string") {
+            return stringItem.toLowerCase().includes(searchTerm.toLowerCase());
+          }
+          return false;
+        })
       );
     }
   }, [searchTerm, items, searchable, itemRenderer]);

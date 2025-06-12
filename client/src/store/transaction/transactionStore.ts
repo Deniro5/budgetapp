@@ -2,9 +2,11 @@ import axios from "axios";
 import { create } from "zustand";
 import {
   RawTransaction,
+  RawTransfer,
   Transaction,
   TransactionCategory,
 } from "types/Transaction";
+import { BASE_API_URL } from "../../constants";
 
 const API_BASE_URL = "http://localhost:8000/transactions"; // Replace with your API base URL
 export interface TransactionStore {
@@ -30,6 +32,10 @@ export interface TransactionStore {
     updatedTransaction: Partial<Transaction>
   ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
+  addTransfer: (
+    transaction: RawTransfer,
+    callback?: (transfer: any) => void
+  ) => Promise<void>;
 }
 
 const useTransactionStore = create<TransactionStore>((set, get) => ({
@@ -116,6 +122,26 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     } catch (error) {
       console.error("Error deleting transaction:", error);
       set({ error: "Failed to delete transaction" });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  // Add a new transaction
+  addTransfer: async (transfer, callback) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post<{ transactions: Transaction[] }>(
+        `${BASE_API_URL}/transfers`,
+        transfer
+      );
+      set({
+        transactions: [...response.data.transactions, ...get().transactions],
+        transactionCount: get().transactionCount + 2,
+      });
+      if (callback) callback(response.data);
+    } catch (error) {
+      console.error("Error adding transfer:", error);
+      set({ error: "Failed to add transfer" });
     } finally {
       set({ isLoading: false });
     }

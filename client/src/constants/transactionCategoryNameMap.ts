@@ -22,6 +22,7 @@ export const transactionCategoryNameMap: Record<TransactionCategory, string> = {
   [TransactionCategory.Salary]: "Salary",
   [TransactionCategory.Subscriptions]: "Subscriptions",
   [TransactionCategory.Transit]: "Transit",
+  [TransactionCategory.Transfer]: "Transfer",
   [TransactionCategory.Travel]: "Travel",
   [TransactionCategory.Utilities]: "Utilities",
   [TransactionCategory.WorkExpenses]: "Work Expenses",

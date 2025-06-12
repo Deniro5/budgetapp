@@ -16,6 +16,10 @@ function TransactionsHeader({ setActiveOverlay }: TransactionHeaderProps) {
     setActiveOverlay(TransactionOverlayType.ADD);
   };
 
+  const handleAddTransferClick = () => {
+    setActiveOverlay(TransactionOverlayType.ADD_TRANSFER);
+  };
+
   const handlePresetClick = () => {
     setActiveOverlay(TransactionOverlayType.PRESET);
   };
@@ -26,6 +30,10 @@ function TransactionsHeader({ setActiveOverlay }: TransactionHeaderProps) {
         <BaseButton onClick={handleAddClick}>
           <FontAwesomeIcon icon={faAdd} />
           Add Transaction{" "}
+        </BaseButton>
+        <BaseButton onClick={handleAddTransferClick}>
+          <FontAwesomeIcon icon={faAdd} />
+          Account Transfer
         </BaseButton>
         <SecondaryButton onClick={handlePresetClick}>
           <FontAwesomeIcon icon={faFolderPlus} />

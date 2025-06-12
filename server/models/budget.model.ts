@@ -5,6 +5,7 @@ const budgetSchema: Schema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the User
     budgetCategories: {
+      car: { type: Number, default: 0 },
       charity: { type: Number, default: 0 },
       childcare: { type: Number, default: 0 },
       education: { type: Number, default: 0 },
@@ -25,10 +26,12 @@ const budgetSchema: Schema = new Schema(
       salary: { type: Number, default: 0 },
       subscriptions: { type: Number, default: 0 },
       transit: { type: Number, default: 0 },
+
       travel: { type: Number, default: 0 },
       utilities: { type: Number, default: 0 },
       workexpenses: { type: Number, default: 0 },
       other: { type: Number, default: 0 },
+      transfer: { type: Number, default: 0 },
     },
   },
   { timestamps: true } // Adds createdAt and updatedAt fields

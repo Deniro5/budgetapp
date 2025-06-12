@@ -9,7 +9,7 @@ import transactionRoutes from "./routes/transaction.routes";
 import presetTransactionRoutes from "./routes/presettransaction.routes";
 import accountRoutes from "./routes/account.routes";
 import budgetRoutes from "./routes/budget.routes";
-import TransactionModel from "./models/transaction.model";
+import transferRoutes from "./routes/transfer.routes";
 
 const app = express();
 
@@ -29,6 +29,7 @@ app.use(express.json());
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/transactions", transactionRoutes);
+app.use("/transfers", transferRoutes);
 app.use("/preset-transactions", presetTransactionRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/budget", budgetRoutes);
