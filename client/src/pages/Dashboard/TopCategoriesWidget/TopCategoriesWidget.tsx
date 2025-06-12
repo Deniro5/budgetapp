@@ -1,7 +1,6 @@
 import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 import { PieChart, Pie, Cell, Tooltip, Legend, LegendProps } from "recharts";
-import { getTop5CategoriesByAmount } from "store/dashboard/dashboardSelectors";
-import useDashboardStore from "store/dashboard/dashboardStore";
+
 import { SPACING } from "theme";
 
 const COLORS = [
