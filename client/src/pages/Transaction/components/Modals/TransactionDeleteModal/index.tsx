@@ -1,6 +1,6 @@
 import Modal from "components/Global/Modal";
 import useTransactionStore from "store/transaction/transactionStore";
-import { Transaction } from "types/Transaction";
+import { Transaction, TransactionCategory } from "types/Transaction";
 import ConfirmModal from "components/Global/ConfirmModal";
 
 type TransactionDeleteButtonProps = {
@@ -12,19 +12,27 @@ function TransactionDeleteModal({
   transaction,
   onClose,
 }: TransactionDeleteButtonProps) {
-  const { deleteTransaction } = useTransactionStore();
+  const { deleteTransaction, deleteTransfer } = useTransactionStore();
+
+  const isTransfer = transaction.category === TransactionCategory.Transfer;
 
   const handleConfirm = () => {
-    deleteTransaction(transaction._id);
+    isTransfer
+      ? deleteTransfer(transaction._id)
+      : deleteTransaction(transaction._id);
     onClose();
   };
+
+  const text = isTransfer
+    ? "This transaction is part of a transfer. Deleting it will also delete the transaction that is paired with this one. Are you sure you want to proceed?"
+    : "Are you sure you want to delete this transaction?";
 
   return (
     <Modal isOpen={true} onClose={onClose}>
       <ConfirmModal
         handleCancel={onClose}
         handleConfirm={handleConfirm}
-        text="Are you sure you want to delete this transaction?"
+        text={text}
       />
     </Modal>
   );

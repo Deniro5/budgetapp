@@ -36,6 +36,7 @@ export interface TransactionStore {
     transaction: RawTransfer,
     callback?: (transfer: any) => void
   ) => Promise<void>;
+  deleteTransfer: (id: string) => Promise<void>;
 }
 
 const useTransactionStore = create<TransactionStore>((set, get) => ({
@@ -126,7 +127,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
-  // Add a new transaction
+  // Add a new transfer
   addTransfer: async (transfer, callback) => {
     set({ isLoading: true, error: null });
     try {
@@ -142,6 +143,28 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
     } catch (error) {
       console.error("Error adding transfer:", error);
       set({ error: "Failed to add transfer" });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  // Delete a transfer by transactionId
+  deleteTransfer: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.delete<{ deletedTransactionIds: string[] }>(
+        `${BASE_API_URL}/transfers/delete-by-transaction-id/${id}`
+      );
+      const filteredTransactions = get().transactions.filter(
+        (transaction) =>
+          !response.data.deletedTransactionIds.includes(transaction._id)
+      );
+      set({
+        transactions: filteredTransactions,
+        transactionCount: get().transactionCount - 1,
+      });
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      set({ error: "Failed to delete transaction" });
     } finally {
       set({ isLoading: false });
     }

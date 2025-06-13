@@ -62,8 +62,84 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
       .status(201)
       .json({ transactions: [receivingTransaction, sendingTransaction] });
   } catch (err) {
-    console.error("Error creating transaction:", err);
-    res.status(500).json({ error: "Failed to create transaction" });
+    console.error("Error creating transfer:", err);
+    res.status(500).json({ error: "Failed to create transfer" });
+  }
+};
+
+// Update
+export const updateTransferByTransactionId = async (
+  req: CustomRequest,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+    const updateData = req.body;
+    //sendingAccountId, receivingAccountId, date, amount
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const transferToUpdate = await TransferModel.findOne({
+      userId,
+      transactionIds: { $in: [id] },
+    });
+
+    if (!transferToUpdate) {
+      res.status(403).json({ error: "Transfer not found" });
+      return;
+    }
+
+    const updatedTransfer = await TransactionModel.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    );
+
+    res.json(updatedTransaction);
+  } catch (err) {
+    console.error("Error updating transaction:", err);
+    res.status(500).json({ error: "Failed to update transaction" });
+  }
+};
+
+// Delete
+export const deleteTransferByTransactionId = async (
+  req: CustomRequest,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const transferToDelete = await TransferModel.findOne({
+      userId,
+      transactionIds: { $in: [id] },
+    });
+
+    if (!transferToDelete) {
+      res.status(404).json({ error: "Transfer not found" });
+      return;
+    }
+
+    await TransactionModel.deleteMany({
+      _id: { $in: transferToDelete.transactionIds },
+      userId, // optional, to ensure only the user's transactions are deleted
+    });
+    await transferToDelete.deleteOne();
+
+    res.json({ deletedTransactionIds: transferToDelete.transactionIds });
+  } catch (err) {
+    console.error("Error deleting transfer:", err);
+    res.status(500).json({ error: "Failed to delete transfer" });
   }
 };
 

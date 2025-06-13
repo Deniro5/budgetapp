@@ -22,16 +22,20 @@ export default function ConfirmModal({
   handleCancel,
 }: ConfirmModalProps) {
   return (
-    <>
+    <Container>
       <Title> {title} </Title>
       <p> {text} </p>
       <ButtonContainer>
         <BaseButton onClick={handleConfirm}>{confirmText}</BaseButton>
         <SecondaryButton onClick={handleCancel}>{cancelText}</SecondaryButton>
       </ButtonContainer>
-    </>
+    </Container>
   );
 }
+
+const Container = styled.div`
+  max-width: 400px;
+`;
 
 const Title = styled.h2`
   text-align: center;
