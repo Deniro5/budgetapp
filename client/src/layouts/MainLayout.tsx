@@ -11,6 +11,12 @@ import Budget from "../pages/Budget";
 import useInitialLoad from "../hooks/useInitialLoad";
 import { DashboardPage } from "../pages/Dashboard/DashboardPage";
 
+const dashboardElement = <DashboardPage />;
+const transactionsElement = <Transactions />;
+const accountsElement = <Accounts />;
+const budgetElement = <Budget />;
+const settingsElement = <Settings />;
+
 function MainLayout() {
   useInitialLoad();
   const [isExpanded, setIsExpanded] = useState(true);
@@ -38,14 +44,14 @@ function MainLayout() {
 
       <ContentContainer isExpanded={isExpanded}>
         <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/accounts" element={<Accounts />} />
-          <Route path="/budget" element={<Budget />} />
+          <Route path="/" element={dashboardElement} />
+          <Route path="/transactions" element={transactionsElement} />
+          <Route path="/accounts" element={accountsElement} />
+          <Route path="/budget" element={budgetElement} />
           <Route path="/reports" element={<p> reports </p>} />
           <Route path="/savings" element={<p> savings </p>} />
           <Route path="/debts" element={<p> debts </p>} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings" element={settingsElement} />
         </Routes>
       </ContentContainer>
     </AppContainer>

@@ -9,6 +9,8 @@ interface CustomRequest extends Request {
 
 // Create
 export const createTransfer = async (req: CustomRequest, res: Response) => {
+  const session = await mongoose.startSession();
+
   try {
     const { userId } = req;
 
@@ -19,32 +21,41 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
 
     const { sendingAccountId, receivingAccountId, amount, date } = req.body;
 
-    const sendingTransaction = new TransactionModel({
-      userId,
-      description: "",
-      amount,
-      type: "Expense",
-      date,
-      account: sendingAccountId,
-      category: "transfer",
-      vendor: receivingAccountId,
-      tags: [],
-    });
+    let sendingTransaction, receivingTransaction, transfer;
 
-    const receivingTransaction = new TransactionModel({
-      userId,
-      description: "",
-      amount,
-      type: "Income",
-      date,
-      account: receivingAccountId,
-      category: "transfer",
-      vendor: sendingAccountId,
-      tags: [],
-    });
+    await session.withTransaction(async () => {
+      // Create sending transaction
+      sendingTransaction = new TransactionModel({
+        userId,
+        description: "",
+        amount,
+        type: "Expense",
+        date,
+        account: sendingAccountId,
+        category: "transfer",
+        vendor: receivingAccountId,
+        tags: [],
+      });
 
-    if (receivingTransaction && sendingTransaction) {
-      const transfer = new TransferModel({
+      // Create receiving transaction
+      receivingTransaction = new TransactionModel({
+        userId,
+        description: "",
+        amount,
+        type: "Income",
+        date,
+        account: receivingAccountId,
+        category: "transfer",
+        vendor: sendingAccountId,
+        tags: [],
+      });
+
+      // Save both transactions
+      await sendingTransaction.save({ session });
+      await receivingTransaction.save({ session });
+
+      // Create transfer document
+      transfer = new TransferModel({
         userId,
         sendingAccountId,
         receivingAccountId,
@@ -53,10 +64,9 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
         date,
       });
 
-      await receivingTransaction.save();
-      await sendingTransaction.save();
-      await transfer.save();
-    }
+      // Save transfer
+      await transfer.save({ session });
+    });
 
     res
       .status(201)
@@ -64,6 +74,8 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
   } catch (err) {
     console.error("Error creating transfer:", err);
     res.status(500).json({ error: "Failed to create transfer" });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -72,6 +84,7 @@ export const updateTransferByTransactionId = async (
   req: CustomRequest,
   res: Response
 ) => {
+  const session = await mongoose.startSession();
   try {
     const { id } = req.params;
     const { userId } = req;
@@ -93,16 +106,61 @@ export const updateTransferByTransactionId = async (
       return;
     }
 
-    const updatedTransfer = await TransactionModel.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    );
+    const transactions = await TransactionModel.find({
+      _id: { $in: transferToUpdate.transactionIds },
+    });
 
-    res.json(updatedTransaction);
+    // Separate by type
+    const receivingTransaction = transactions.find((t) => t.type === "Income");
+    const sendingTransaction = transactions.find((t) => t.type === "Expense");
+
+    if (!receivingTransaction || !sendingTransaction) {
+      res.status(400).json({
+        error: "Invalid transfer: missing income or expense transaction",
+      });
+      return;
+    }
+
+    let updatedReceivingTransaction = null;
+    let updatedSendingTransaction = null;
+
+    await session.withTransaction(async () => {
+      updatedReceivingTransaction = await TransactionModel.findByIdAndUpdate(
+        receivingTransaction._id,
+        {
+          date: updateData.date,
+          amount: updateData.amount,
+          account: updateData.receivingAccountId,
+          vendor: updateData.sendingAccountId,
+        },
+        { new: true }
+      );
+
+      updatedSendingTransaction = await TransactionModel.findByIdAndUpdate(
+        sendingTransaction._id,
+        {
+          date: updateData.date,
+          amount: updateData.amount,
+          account: updateData.sendingAccountId,
+          vendor: updateData.receivingAccountId,
+        },
+        { new: true }
+      );
+
+      await TransactionModel.findByIdAndUpdate(id, updateData, { new: true });
+    });
+
+    res.json({
+      updatedTransactions: [
+        updatedReceivingTransaction,
+        updatedSendingTransaction,
+      ],
+    });
   } catch (err) {
     console.error("Error updating transaction:", err);
     res.status(500).json({ error: "Failed to update transaction" });
+  } finally {
+    await session.endSession();
   }
 };
 
@@ -111,6 +169,8 @@ export const deleteTransferByTransactionId = async (
   req: CustomRequest,
   res: Response
 ) => {
+  const session = await mongoose.startSession();
+
   try {
     const { id } = req.params;
     const { userId } = req;
@@ -120,26 +180,40 @@ export const deleteTransferByTransactionId = async (
       return;
     }
 
-    const transferToDelete = await TransferModel.findOne({
-      userId,
-      transactionIds: { $in: [id] },
+    await session.withTransaction(async () => {
+      // Find the transfer that contains the transaction id
+      const transferToDelete = await TransferModel.findOne({
+        userId,
+        transactionIds: { $in: [id] },
+      }).session(session);
+
+      if (!transferToDelete) {
+        throw new Error("Transfer not found");
+      }
+
+      // Delete all transactions related to the transfer
+      await TransactionModel.deleteMany({
+        _id: { $in: transferToDelete.transactionIds },
+        userId,
+      }).session(session);
+
+      // Delete the transfer itself
+      await transferToDelete.deleteOne({ session });
+
+      // Send response here if you want to immediately end (optional)
+      res.json({ deletedTransactionIds: transferToDelete.transactionIds });
     });
-
-    if (!transferToDelete) {
-      res.status(404).json({ error: "Transfer not found" });
-      return;
-    }
-
-    await TransactionModel.deleteMany({
-      _id: { $in: transferToDelete.transactionIds },
-      userId, // optional, to ensure only the user's transactions are deleted
-    });
-    await transferToDelete.deleteOne();
-
-    res.json({ deletedTransactionIds: transferToDelete.transactionIds });
   } catch (err) {
     console.error("Error deleting transfer:", err);
-    res.status(500).json({ error: "Failed to delete transfer" });
+    if (!res.headersSent) {
+      if (err.message === "Transfer not found") {
+        res.status(404).json({ error: err.message });
+      } else {
+        res.status(500).json({ error: "Failed to delete transfer" });
+      }
+    }
+  } finally {
+    await session.endSession();
   }
 };
 

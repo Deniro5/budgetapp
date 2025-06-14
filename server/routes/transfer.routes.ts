@@ -12,16 +12,17 @@ import { verifyToken } from "../middleware/verifyToken";
 const router = express.Router();
 
 router.post("/", verifyToken, createTransfer);
+router.put(
+  "/update-by-transaction-id/:id",
+  verifyToken,
+  updateTransferByTransactionId
+);
 router.delete(
   "/delete-by-transaction-id/:id",
   verifyToken,
   deleteTransferByTransactionId
 );
-router.delete(
-  "/update-by-transaction-id/:id",
-  verifyToken,
-  updateTransferByTransactionId
-);
+
 // router.get("/", verifyToken, getTransfers);
 // router.get("/:id", verifyToken, getTransferById);
 // router.put("/:id", verifyToken, updateTransfer);

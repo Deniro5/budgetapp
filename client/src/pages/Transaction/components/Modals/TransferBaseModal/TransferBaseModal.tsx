@@ -21,7 +21,7 @@ import {
   getAccountNameByIdMap,
 } from "store/account/accountSelectors";
 
-type TransactionBaseModalProps = {
+type TransferBaseModalProps = {
   title?: string;
   confirmText?: string;
   onClose: () => void;
@@ -35,7 +35,7 @@ export default function TransferBaseModal({
   onSubmit,
   confirmText = "Confirm Transfer",
   initialTransfer,
-}: TransactionBaseModalProps) {
+}: TransferBaseModalProps) {
   const accountIds = getAccountids();
   const accountNameByIdMap = getAccountNameByIdMap();
   const userPreferences = getUserPreferences();
@@ -58,14 +58,19 @@ export default function TransferBaseModal({
     },
   });
 
+  console.log(initialTransfer);
+
+  const receivingAccountId = watch("receivingAccountId");
   useEffect(() => {
     register("sendingAccountId", {
       required: "Sending account is required",
+      validate: (value) =>
+        value !== receivingAccountId || "Accounts cannot be the same",
     });
     register("receivingAccountId", {
       required: "Receiving account is required",
     });
-  }, [register]);
+  }, [register, receivingAccountId]);
 
   const currentValues = watch();
 

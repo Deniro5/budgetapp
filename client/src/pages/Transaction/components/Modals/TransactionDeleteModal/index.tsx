@@ -12,13 +12,14 @@ function TransactionDeleteModal({
   transaction,
   onClose,
 }: TransactionDeleteButtonProps) {
-  const { deleteTransaction, deleteTransfer } = useTransactionStore();
+  const { deleteTransaction, deleteTransferByTransactionId } =
+    useTransactionStore();
 
   const isTransfer = transaction.category === TransactionCategory.Transfer;
 
   const handleConfirm = () => {
     isTransfer
-      ? deleteTransfer(transaction._id)
+      ? deleteTransferByTransactionId(transaction._id)
       : deleteTransaction(transaction._id);
     onClose();
   };

@@ -36,7 +36,11 @@ export interface TransactionStore {
     transaction: RawTransfer,
     callback?: (transfer: any) => void
   ) => Promise<void>;
-  deleteTransfer: (id: string) => Promise<void>;
+  updateTransferByTransactionId: (
+    id: string,
+    updatedTransfer: RawTransfer
+  ) => Promise<void>;
+  deleteTransferByTransactionId: (id: string) => Promise<void>;
 }
 
 const useTransactionStore = create<TransactionStore>((set, get) => ({
@@ -147,8 +151,38 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
+
+  updateTransferByTransactionId: async (id, updatedTransfer) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.put<{ updatedTransactions: Transaction[] }>(
+        `${BASE_API_URL}/transfers/update-by-transaction-id/${id}`,
+        updatedTransfer
+      );
+      //remove the old transactions with the same ids and replace them with the new ones
+      const responseTransactions = response.data.updatedTransactions;
+      const responseTransactionsById = responseTransactions.reduce(
+        (acc: Record<string, Transaction>, transaction) => {
+          acc[transaction._id] = transaction;
+          return acc;
+        },
+        {}
+      );
+      const updatedTransactions = get().transactions.map((transaction) => {
+        const matchingResponseTransaction =
+          responseTransactionsById[transaction._id];
+        return matchingResponseTransaction ?? transaction;
+      });
+      set({ transactions: updatedTransactions });
+    } catch (error) {
+      console.error("Error updating transfer:", error);
+      set({ error: "Failed to update transfer" });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
   // Delete a transfer by transactionId
-  deleteTransfer: async (id) => {
+  deleteTransferByTransactionId: async (id) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.delete<{ deletedTransactionIds: string[] }>(
@@ -160,7 +194,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
       );
       set({
         transactions: filteredTransactions,
-        transactionCount: get().transactionCount - 1,
+        transactionCount: get().transactionCount - 2,
       });
     } catch (error) {
       console.error("Error deleting transaction:", error);
