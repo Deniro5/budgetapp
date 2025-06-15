@@ -267,6 +267,35 @@ export const getAccountBalancesById = async (
   }
 };
 
+const getAccountTransactionTotalAfterBaseline = async ({
+  userId,
+  accountId,
+  baselineDate,
+}: {
+  userId: string;
+  accountId: string;
+  baselineDate: string;
+}) => {
+  const transactions = await TransactionModel.find({
+    userId,
+    account: accountId,
+    date: {
+      $gte: baselineDate,
+      $lte: new Date().toISOString().split("T")[0], //todays date in yyyy-mm-dd
+    },
+  });
+
+  console.log(baselineDate);
+  console.log(new Date().toISOString().split("T")[0]);
+  const transactionTotal = transactions.reduce((total, transaction) => {
+    return (
+      total +
+      (transaction.type === "Income" ? transaction.amount : -transaction.amount)
+    );
+  }, 0);
+  return transactionTotal;
+};
+
 //Read
 export const getAccounts = async (req: CustomRequest, res: Response) => {
   try {
@@ -279,8 +308,26 @@ export const getAccounts = async (req: CustomRequest, res: Response) => {
 
     // Build the query object
     const query: any = { userId };
+    let accounts = await AccountModel.find(query).sort({ date: -1, _id: -1 }); // Sort by date first, then by _id for uniqueness
 
-    const accounts = await AccountModel.find(query).sort({ date: -1, _id: -1 }); // Sort by date first, then by _id for uniqueness
+    const includeBalance = req.query.includeBalance === "true";
+
+    if (includeBalance) {
+      accounts = await Promise.all(
+        accounts.map(async (account) => {
+          const transactionTotal =
+            (await getAccountTransactionTotalAfterBaseline({
+              userId,
+              accountId: account._id,
+              baselineDate: account.baselineDate,
+            })) + account.baselineAmount;
+          return {
+            ...account.toObject(),
+            balance: transactionTotal,
+          };
+        })
+      );
+    }
 
     res.json(accounts);
   } catch (err) {

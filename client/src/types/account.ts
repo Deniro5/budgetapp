@@ -20,3 +20,7 @@ export type Account = {
   baselineAmount: number;
   baselineDate: string;
 };
+
+export type AccountWithBalance = Account & {
+  balance: number;
+};

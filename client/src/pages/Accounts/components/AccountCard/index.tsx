@@ -3,18 +3,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 import { Card, DeleteButton, Divider, Flex, SecondaryButton } from "styles";
 import { FONTSIZE, SPACING } from "theme";
-import { Account } from "types/account";
+import { Account, AccountWithBalance } from "types/account";
 import { AccountOverlayType } from "../..";
 
 type AccountCardProps = {
-  account: Account;
+  account: AccountWithBalance;
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<AccountOverlayType | null>
   >;
   setActiveAccount: React.Dispatch<React.SetStateAction<Account | null>>;
 };
 
-export default function AccountCard({
+export default function accountAccountCard({
   account,
   setActiveAccount,
   setActiveOverlay,
@@ -33,15 +33,9 @@ export default function AccountCard({
       <StyledDivider />
       <AccountInfo>
         <Flex>
-          <Label> Baseline Amount: </Label>
+          <Label> Balance: </Label>
           <b>
-            <Text> ${account.baselineAmount} </Text>
-          </b>
-        </Flex>
-        <Flex>
-          <Label> Baseline Date: </Label>
-          <b>
-            <Text> {account.baselineDate} </Text>
+            <Text> ${account.balance} </Text>
           </b>
         </Flex>
         <Flex>

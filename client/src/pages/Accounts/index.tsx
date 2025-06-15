@@ -19,7 +19,7 @@ export enum AccountOverlayType {
 }
 
 function Accounts() {
-  const { accounts } = useAccountStore();
+  const { accountsWithBalance } = useAccountStore();
   const [activeAccount, setActiveAccount] = useState<Account | null>(null);
   const [activeOverlay, setActiveOverlay] = useState<AccountOverlayType | null>(
     null
@@ -35,15 +35,15 @@ function Accounts() {
       <AccountsHeader setActiveOverlay={setActiveOverlay} />
       <PageColumnFlexContainer>
         <ContentContainer>
-          {!accounts.length && (
+          {!accountsWithBalance.length && (
             <>
               {" "}
               You currently have no accounts. Click the "Add Account" button in
               the top right corner to make your first account.{" "}
             </>
           )}
-          {accounts &&
-            accounts.map((account) => (
+          {accountsWithBalance &&
+            accountsWithBalance.map((account) => (
               <AccountCard
                 setActiveOverlay={setActiveOverlay}
                 setActiveAccount={setActiveAccount}

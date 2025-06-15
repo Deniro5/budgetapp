@@ -6,7 +6,7 @@ import usePresetTransactionStore from "store/presetTransaction/presetTransaction
 const useInitialLoad = () => {
   const { fetchBudget } = useBudgetStore();
   const { fetchPresetTransactions } = usePresetTransactionStore();
-  const { fetchAccounts } = useAccountStore();
+  const { fetchAccountsWithBalance } = useAccountStore();
 
   //Other widgets
 
@@ -14,7 +14,7 @@ const useInitialLoad = () => {
     const fetchData = async () => {
       await fetchBudget();
       await fetchPresetTransactions();
-      await fetchAccounts();
+      await fetchAccountsWithBalance();
     };
 
     fetchData();

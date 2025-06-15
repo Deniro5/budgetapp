@@ -1,6 +1,6 @@
 import axios from "axios";
 import { create } from "zustand";
-import { Account } from "types/account";
+import { Account, AccountWithBalance } from "types/account";
 
 const API_BASE_URL = "http://localhost:8000/accounts"; // Replace with your actual API URL
 
@@ -12,11 +12,13 @@ const getAccountIdToNameMap = (accounts: Account[]) =>
 
 export interface AccountStore {
   accounts: Account[];
+  accountsWithBalance: AccountWithBalance[];
   accountIdToNameMap: Record<string, string>;
   isLoading: boolean;
   error: string | null;
 
   fetchAccounts: () => Promise<void>;
+  fetchAccountsWithBalance: () => Promise<void>;
   addAccount: (account: Omit<Account, "_id">) => Promise<void>;
   updateAccount: (
     id: string,
@@ -27,6 +29,7 @@ export interface AccountStore {
 
 const useAccountStore = create<AccountStore>((set, get) => ({
   accounts: [],
+  accountsWithBalance: [], //TODO: merge the accounts / accountsWithBalance logic correctly
   accountIdToNameMap: {},
   isLoading: false,
   error: null,
@@ -39,6 +42,27 @@ const useAccountStore = create<AccountStore>((set, get) => ({
       const accounts = response.data;
       set({
         accounts,
+        accountIdToNameMap: getAccountIdToNameMap(accounts),
+      });
+    } catch (error) {
+      console.error("Error fetching accounts:", error);
+      set({ error: "Failed to fetch accounts" });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchAccountsWithBalance: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get<AccountWithBalance[]>(
+        `${API_BASE_URL}?includeBalance=true`
+      );
+      const accounts = response.data;
+
+      console.log(accounts);
+      set({
+        accountsWithBalance: accounts,
         accountIdToNameMap: getAccountIdToNameMap(accounts),
       });
     } catch (error) {
