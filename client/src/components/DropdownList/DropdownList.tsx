@@ -49,7 +49,12 @@ const DropdownList = <T,>({
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
-  const handleSelect = (item: T) => {
+  const handleSelect = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    item: T
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
     onSelect(item);
     setIsOpen(false);
   };
@@ -83,7 +88,7 @@ const DropdownList = <T,>({
             <ScrollableContainer>
               {filteredItems.length > 0 ? (
                 filteredItems.map((item, index) => (
-                  <Item key={index} onClick={() => handleSelect(item)}>
+                  <Item key={index} onClick={(e) => handleSelect(e, item)}>
                     {itemRenderer ? (
                       itemRenderer(item)
                     ) : (

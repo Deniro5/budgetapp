@@ -3,6 +3,8 @@ import { SPACING } from "theme";
 import TransactionFilterTag from "./TransactionFilterTag";
 import { TransactionFilter } from "types/Transaction";
 import { formatCamelCaseToTitleCase } from "utils";
+import useAccountStore from "store/account/accountStore";
+import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 
 type TransactionFilterRowProps = {
   filter: TransactionFilter;
@@ -13,9 +15,23 @@ function TransactionFilterRow({
   filter,
   setFilter,
 }: TransactionFilterRowProps) {
+  const { accountIdToNameMap } = useAccountStore();
   const removeFilter = (filterName: keyof TransactionFilter) => {
     setFilter({ ...filter, [filterName]: undefined });
     console.log(filter);
+  };
+
+  const getFilterLabel = (key: keyof TransactionFilter) => {
+    let label: string | number | string[];
+    if (key === "account") {
+      label = accountIdToNameMap[filter[key]!] || "";
+    } else if (key === "category") {
+      label = transactionCategoryNameMap[filter[key]!];
+    } else {
+      label = filter[key] || "";
+    }
+
+    return `${formatCamelCaseToTitleCase(key)} : ${label}`;
   };
 
   return (
@@ -25,7 +41,7 @@ function TransactionFilterRow({
         const key = filterName as keyof TransactionFilter;
         return filter[key] ? (
           <TransactionFilterTag
-            name={`${formatCamelCaseToTitleCase(filterName)} : ${filter[key]}`}
+            name={getFilterLabel(key)}
             onClick={() => removeFilter(key)}
           />
         ) : null;

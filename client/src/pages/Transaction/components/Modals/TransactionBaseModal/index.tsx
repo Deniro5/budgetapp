@@ -23,16 +23,13 @@ import {
   getUserTransactionCategories,
 } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
-import { getPresetTransactions } from "store/presetTransaction/presetTransactionSelectors";
 import { PresetTransaction } from "types/presetTransaction";
 import { useEffect, useState } from "react";
 import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
 import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
-
-import {
-  getAccountids,
-  getAccountNameByIdMap,
-} from "store/account/accountSelectors";
+import AccountDropdown from "components/AccountDropdown/AccountDropdown";
+import usePresetTransactionStore from "store/presetTransaction/presetTransactionStore";
+import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 
 type TransactionBaseModalProps = {
   title: string;
@@ -53,11 +50,10 @@ export default function TransactionBaseModal({
   initialTransaction,
   disableValidation,
 }: TransactionBaseModalProps) {
-  const accountIds = getAccountids();
-  const accountNameByIdMap = getAccountNameByIdMap();
+  const { presetTransactions } = usePresetTransactionStore();
   const userPreferences = getUserPreferences();
   const userTransactionCategories = getUserTransactionCategories();
-  const presetTransactions = getPresetTransactions();
+
   const [currentPreset, setCurrentPreset] = useState<PresetTransaction | null>(
     null
   );
@@ -74,17 +70,19 @@ export default function TransactionBaseModal({
   } = useForm<RawTransaction>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
-    defaultValues: initialTransaction || {
-      name: "",
-      description: "",
-      vendor: "",
-      amount: undefined,
-      type: undefined,
-      date: new Date().toISOString().split("T")[0],
-      account: userPreferences?.defaultAccount || undefined,
-      category: undefined,
-      tags: [],
-    },
+    defaultValues: initialTransaction
+      ? { ...initialTransaction, account: initialTransaction.account }
+      : {
+          name: "",
+          description: "",
+          vendor: "",
+          amount: undefined,
+          type: undefined,
+          date: new Date().toISOString().split("T")[0],
+          account: userPreferences?.defaultAccount || undefined,
+          category: undefined,
+          tags: [],
+        },
   });
 
   useEffect(() => {
@@ -127,7 +125,6 @@ export default function TransactionBaseModal({
   const presetToString = (presetTransaction: PresetTransaction) =>
     presetTransaction.name;
 
-  console.log(userPreferences);
   return (
     <>
       <Title>{title}</Title>
@@ -233,13 +230,9 @@ export default function TransactionBaseModal({
           </InputContainer>
           <InputContainer>
             <InputLabel>Account</InputLabel>
-            <DropdownList
-              items={accountIds}
-              selected={currentValues.account}
-              onSelect={handleAccountChange}
-              placeholder="Select Account"
-              itemToString={(item: string) => accountNameByIdMap[item]}
-              searchable
+            <AccountDropdown
+              selectedAccountId={currentValues.account?._id}
+              handleAccountChange={handleAccountChange}
             />
             {errors.account && (
               <ErrorMessage>{errors.account.message}</ErrorMessage>
@@ -247,15 +240,9 @@ export default function TransactionBaseModal({
           </InputContainer>
           <InputContainer>
             <InputLabel>Category</InputLabel>
-            <DropdownList
-              items={userTransactionCategories}
-              selected={currentValues.category}
-              onSelect={handleCategoryChange}
-              placeholder="Select Category"
-              itemToString={(item: TransactionCategory) =>
-                transactionCategoryNameMap[item]
-              }
-              searchable
+            <CategoryDropdown
+              selectedCategory={currentValues.category}
+              handleCategoryChange={handleCategoryChange}
             />
             {errors.category && (
               <ErrorMessage>{errors.category.message}</ErrorMessage>

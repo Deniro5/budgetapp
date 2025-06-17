@@ -1,6 +1,3 @@
-import DropdownList from "components/DropdownList/DropdownList";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
-
 import {
   XAxis,
   YAxis,
@@ -10,13 +7,13 @@ import {
   Line,
   ReferenceLine,
 } from "recharts";
-import { getUserTransactionCategories } from "store/user/userSelectors";
 import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING } from "theme";
 import { TransactionCategory } from "types/Transaction";
 import { getAggregatedCategoryBudgetLine } from "store/budget/budgetSelectors";
 import { useCategoryLineWidget } from "./useCategoryLineWidget";
+import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 
 type CategoryLineWidgetProps = {
   startDate: string;
@@ -32,7 +29,10 @@ export const CategoryLineWidget = ({
       startDate,
       endDate,
     });
-  const userTransactionCategories = getUserTransactionCategories();
+
+  const handleSetCategory = (category: TransactionCategory) => {
+    setCategory(category);
+  };
 
   const ChartContent = () => {
     if (!categoryExpenseByDate.length) {
@@ -97,15 +97,9 @@ export const CategoryLineWidget = ({
     <>
       <Header>
         <Name> Budget by Category </Name>
-        <DropdownList
-          items={userTransactionCategories}
-          selected={category}
-          onSelect={setCategory}
-          placeholder="Select Category"
-          itemToString={(item: TransactionCategory) =>
-            transactionCategoryNameMap[item]
-          }
-          searchable
+        <CategoryDropdown
+          selectedCategory={category}
+          handleCategoryChange={handleSetCategory}
         />
       </Header>
       <ChartContent />

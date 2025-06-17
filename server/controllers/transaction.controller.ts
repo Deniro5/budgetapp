@@ -61,7 +61,10 @@ export const getTransactionById = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const transaction = await TransactionModel.findOne({ _id: id, userId });
+    const transaction = await TransactionModel.findOne({
+      _id: id,
+      userId,
+    }).populate({ path: "account", select: "name _id" });
 
     if (!transaction) {
       res.status(404).json({ error: "Transaction not found or unauthorized" });
@@ -86,12 +89,12 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
       sort = "-date",
       startDate,
       endDate,
-      categories,
+      category,
       tags,
       type,
       minAmount,
       maxAmount,
-      accounts,
+      account,
     } = req.query;
 
     if (!userId) {
@@ -118,10 +121,8 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
     }
 
     // Category filter
-    if (categories && categories.length) {
-      query.category = {
-        $in: categories,
-      };
+    if (category) {
+      query.category = category;
     }
 
     // Tags filter
@@ -143,9 +144,9 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
       if (maxAmount) query.amount.$lte = Number(maxAmount);
     }
 
-    // Account filter
-    if (accounts) {
-      query.account = { $in: Array.isArray(accounts) ? accounts : [accounts] };
+    // Account filter. setup for array eventually but now just filter by one account
+    if (account) {
+      query.account = { $in: Array.isArray(account) ? account : [account] };
     }
 
     const transactionCount = await TransactionModel.countDocuments(query);
@@ -153,7 +154,8 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
     const transactions = await TransactionModel.find(query)
       .sort({ date: -1, _id: -1 }) // Sort by date first, then by _id for uniqueness
       .skip(Number(offset)) // Skip `offset` number of documents
-      .limit(Number(limit)); // Limit the number of results
+      .limit(Number(limit)) // Limit the number of results
+      .populate({ path: "account", select: "name _id" });
 
     res.json({ transactions, transactionCount });
   } catch (err) {
@@ -174,7 +176,10 @@ export const updateTransaction = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const transaction = await TransactionModel.findOne({ _id: id, userId });
+    const transaction = await TransactionModel.findOne({
+      _id: id,
+      userId,
+    });
 
     if (!transaction) {
       res
@@ -187,7 +192,7 @@ export const updateTransaction = async (req: CustomRequest, res: Response) => {
       id,
       updateData,
       { new: true }
-    );
+    ).populate({ path: "account", select: "name _id" });
 
     res.json(updatedTransaction);
   } catch (err) {

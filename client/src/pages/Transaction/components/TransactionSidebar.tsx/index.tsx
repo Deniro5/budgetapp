@@ -7,7 +7,7 @@ import {
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { BaseButton, DeleteButton, Divider } from "styles";
-import { Transaction } from "types/Transaction";
+import { Transaction, TransactionCategory } from "types/Transaction";
 import { format } from "date-fns";
 import { getTransactionById } from "store/transaction/transactionSelectors";
 import { TransactionOverlayType } from "../../Transactions";
@@ -33,13 +33,19 @@ const TransactionSidebar = ({
   const [isExpanded, setIsExpanded] = useState(true);
   const { accountIdToNameMap } = useAccountStore();
   const sidebarTransaction = getTransactionById(sidebarTransactionId);
+  const isTransfer =
+    sidebarTransaction?.category === TransactionCategory.Transfer;
 
   const toggleExpanded = () => setIsExpanded((isExpanded) => !isExpanded);
 
   const handleEditClick = () => {
     if (!sidebarTransaction) return;
     setActiveTransaction(sidebarTransaction);
-    setActiveOverlay(TransactionOverlayType.EDIT);
+    setActiveOverlay(
+      isTransfer
+        ? TransactionOverlayType.EDIT_TRANSFER
+        : TransactionOverlayType.EDIT
+    );
   };
 
   const handleDeleteClick = () => {
@@ -76,8 +82,7 @@ const TransactionSidebar = ({
               <b> Date: </b> <span> {sidebarTransaction.date} </span>
             </Row>
             <Row>
-              <b> Account: </b>{" "}
-              <span>{accountIdToNameMap[sidebarTransaction.account]}</span>
+              <b> Account: </b> <span>{sidebarTransaction.account.name}</span>
             </Row>
             <Row>
               <b> Amount: </b>{" "}
@@ -94,18 +99,21 @@ const TransactionSidebar = ({
               </span>
             </Row>
             <Divider />
-
-            <Row>
-              <b> Tags: </b>{" "}
-              {sidebarTransaction.tags.map((tag) => (
-                <span> {tag} </span>
-              ))}
-            </Row>
-            <Row>
-              <b> Description: </b>{" "}
-              <span> {sidebarTransaction.description} </span>
-            </Row>
-            <Divider />
+            {!isTransfer && (
+              <>
+                <Row>
+                  <b> Tags: </b>{" "}
+                  {sidebarTransaction.tags.map((tag) => (
+                    <span> {tag} </span>
+                  ))}
+                </Row>
+                <Row>
+                  <b> Description: </b>{" "}
+                  <span> {sidebarTransaction.description} </span>
+                </Row>
+                <Divider />
+              </>
+            )}
             <Row>
               <b> Created: </b>{" "}
               <span>
@@ -123,10 +131,10 @@ const TransactionSidebar = ({
             <ButtonContainer>
               <BaseButton onClick={handleEditClick}>
                 {" "}
-                Edit Transaction{" "}
+                Edit {isTransfer ? "Transfer" : "Transaction"}
               </BaseButton>
               <DeleteButton onClick={handleDeleteClick}>
-                Delete Transaction
+                Delete {isTransfer ? "Transfer" : "Transaction"}
               </DeleteButton>
             </ButtonContainer>
           </>

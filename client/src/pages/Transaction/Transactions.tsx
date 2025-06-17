@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
 import { useState } from "react";
 import useTransaction from "./hooks/useTransaction.ts";
-import usePresetTransaction from "./hooks/usePresetTransaction.ts";
+
 import { Transaction } from "types/Transaction";
 import { TransactionFilter } from "src/types/Transaction.ts";
 import TransactionAddModal from "./components/Modals/TransactionAddModal/index.tsx";
@@ -65,8 +65,6 @@ function Transactions() {
       startDate,
       endDate,
     });
-
-  usePresetTransaction();
 
   const handleCloseOverlay = () => {
     setActiveOverlay(null);

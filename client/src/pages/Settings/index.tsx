@@ -1,10 +1,9 @@
-import React, { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import useUserStore from "../../store/user/userStore";
 import {
   BaseButton,
   BaseCheckbox,
   BaseCheckboxContainer,
-  BaseSelect,
   Flex,
   PageContainer,
   PageTitle,
@@ -18,16 +17,12 @@ import {
   TransactionCategory,
   TransactionCategoryNameMap,
 } from "types/Transaction";
-import {
-  getAccountids,
-  getAccountNameByIdMap,
-} from "store/account/accountSelectors";
-import DropdownList from "components/DropdownList/DropdownList";
+
+import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 
 export default function Settings() {
   const navigate = useNavigate();
-  const accountIds = getAccountids();
-  const accountNameByIdMap = getAccountNameByIdMap();
+
   const { logout, updateUser } = useUserStore();
   const userPreferences = getUserPreferences();
   const [newPreferences, setNewPreferences] = useState<UserPreferences>({
@@ -89,13 +84,9 @@ export default function Settings() {
       </SettingRow>
       <SettingRow>
         <SettingName>Default Account</SettingName>
-        <DropdownList
-          items={accountIds}
-          selected={newPreferences.defaultAccount}
-          onSelect={handleDefaultAccountChange}
-          placeholder="Select Account"
-          itemToString={(item: string) => accountNameByIdMap[item]}
-          searchable
+        <AccountDropdown
+          selectedAccountId={newPreferences.defaultAccount}
+          handleAccountChange={handleDefaultAccountChange}
         />
       </SettingRow>
       <BaseButton onClick={handleUpdateSettings}>Save Changes</BaseButton>

@@ -8,7 +8,6 @@ import {
   SecondaryButton,
 } from "styles";
 import { useForm } from "react-hook-form";
-import DropdownList from "components/DropdownList/DropdownList";
 
 import { RawTransfer } from "types/Transaction";
 import { getUserPreferences } from "store/user/userSelectors";
@@ -16,10 +15,7 @@ import { SPACING, FONTSIZE, COLORS } from "theme";
 
 import { useEffect } from "react";
 
-import {
-  getAccountids,
-  getAccountNameByIdMap,
-} from "store/account/accountSelectors";
+import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 
 type TransferBaseModalProps = {
   title?: string;
@@ -36,8 +32,6 @@ export default function TransferBaseModal({
   confirmText = "Confirm Transfer",
   initialTransfer,
 }: TransferBaseModalProps) {
-  const accountIds = getAccountids();
-  const accountNameByIdMap = getAccountNameByIdMap();
   const userPreferences = getUserPreferences();
 
   const {
@@ -57,8 +51,6 @@ export default function TransferBaseModal({
       date: new Date().toISOString().split("T")[0],
     },
   });
-
-  console.log(initialTransfer);
 
   const receivingAccountId = watch("receivingAccountId");
   useEffect(() => {
@@ -95,28 +87,24 @@ export default function TransferBaseModal({
         <Row>
           <InputContainer>
             <InputLabel>Sending Account</InputLabel>
-            <DropdownList
-              items={accountIds}
-              selected={currentValues.sendingAccountId}
-              onSelect={handleSendingAccountChange}
+            <AccountDropdown
+              selectedAccountId={currentValues.sendingAccountId}
+              handleAccountChange={handleSendingAccountChange}
               placeholder="Select Sending Account"
-              itemToString={(item: string) => accountNameByIdMap[item]}
-              searchable
             />
+
             {errors.sendingAccountId && (
               <ErrorMessage>{errors.sendingAccountId.message}</ErrorMessage>
             )}
           </InputContainer>
           <InputContainer>
             <InputLabel>Receiving Account</InputLabel>
-            <DropdownList
-              items={accountIds}
-              selected={currentValues.receivingAccountId}
-              onSelect={handleReceivingAccountChange}
+            <AccountDropdown
+              selectedAccountId={currentValues.receivingAccountId}
+              handleAccountChange={handleReceivingAccountChange}
               placeholder="Select Receiving Account"
-              itemToString={(item: string) => accountNameByIdMap[item]}
-              searchable
             />
+
             {errors.receivingAccountId && (
               <ErrorMessage>{errors.receivingAccountId.message}</ErrorMessage>
             )}

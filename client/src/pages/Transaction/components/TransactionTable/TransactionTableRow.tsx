@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { transactionCategoryImageMap } from "constants/transactionCategoryImageMap";
 import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
-import { getAccountNameByIdMap } from "store/account/accountSelectors";
 import useAccountStore from "store/account/accountStore";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
@@ -74,8 +73,7 @@ function TransactionTableRow({
         />
         {transactionCategoryNameMap[transaction.category]}
       </CategoryTd>
-
-      <td> {accountIdToNameMap[transaction.account]} </td>
+      <td> {transaction.account.name} </td>
     </Container>
   );
 }

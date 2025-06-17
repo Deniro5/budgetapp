@@ -10,9 +10,15 @@ import {
   BaseInput,
   Row,
 } from "styles";
-import { TransactionFilter, TransactionType } from "types/Transaction";
+import {
+  TransactionCategory,
+  TransactionFilter,
+  TransactionType,
+} from "types/Transaction";
 import { ChangeEvent, useState } from "react";
 import TagInput from "components/Global/TagInput";
+import AccountDropdown from "components/AccountDropdown/AccountDropdown";
+import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 
 type TransactionFilterPopoverMenuProps = {
   filter: TransactionFilter;
@@ -26,8 +32,6 @@ function TransactionFilterPopoverMenu({
   handleClose,
 }: TransactionFilterPopoverMenuProps) {
   const [tempFilter, setTempFilter] = useState(filter);
-
-  console.log(tempFilter);
 
   const handleFilterChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -89,28 +93,35 @@ function TransactionFilterPopoverMenu({
           </InputContainer>
           <InputContainer>
             <InputLabel>Account</InputLabel>
-            <BaseInput
-              value={tempFilter.account}
-              onChange={(e) => handleFilterChange(e, "account")}
-              placeholder="Enter type"
-            />
-          </InputContainer>
-        </Row>
-
-        <Row>
-          <InputContainer>
-            <InputLabel>Categories</InputLabel>
-            <TagInput
-              placeholder="Add Categories"
-              value={tempFilter.categories || []}
-              setValue={(tags: string[]) =>
-                handleTagInputChange(tags, "categories")
+            <AccountDropdown
+              selectedAccountId={tempFilter.account || null}
+              handleAccountChange={(account: string) =>
+                handleFilterChange(
+                  {
+                    target: { value: account },
+                  } as ChangeEvent<HTMLInputElement>,
+                  "account"
+                )
               }
             />
           </InputContainer>
         </Row>
 
         <Row>
+          <InputContainer>
+            <InputLabel>Category</InputLabel>
+            <CategoryDropdown
+              selectedCategory={tempFilter.category || null}
+              handleCategoryChange={(category: TransactionCategory) =>
+                handleFilterChange(
+                  {
+                    target: { value: category },
+                  } as ChangeEvent<HTMLInputElement>,
+                  "category"
+                )
+              }
+            />
+          </InputContainer>
           <InputContainer>
             <InputLabel>Tags</InputLabel>
             <TagInput

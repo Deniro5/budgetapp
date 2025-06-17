@@ -66,7 +66,10 @@ export const TransactionCategoryNameMap: Record<TransactionCategory, string> = {
 export type Transaction = {
   _id: string;
   name: string;
-  account: string;
+  account: {
+    _id: string;
+    name: string;
+  };
   type: TransactionType;
   userId: string;
   amount: number;
@@ -82,8 +85,10 @@ export type Transaction = {
 // src/types/Transaction.ts
 export type RawTransaction = Omit<
   Transaction,
-  "_id" | "userId" | "createdAt" | "updatedAt"
->;
+  "_id" | "userId" | "createdAt" | "updatedAt" | "account"
+> & {
+  account: string;
+};
 
 export type TransactionFilter = {
   search?: string;
@@ -94,7 +99,7 @@ export type TransactionFilter = {
   type?: string;
   account?: string;
   tags?: string[];
-  categories?: string[];
+  category?: TransactionCategory;
 };
 
 export type RawTransfer = {

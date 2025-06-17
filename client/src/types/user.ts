@@ -8,5 +8,8 @@ export type User = {
 export type UserPreferences = {
   currency: string; //change to currency type
   disabledCategories: string[];
-  defaultAccount: string | null;
+  defaultAccount: {
+    _id: string;
+    name: string;
+  };
 };

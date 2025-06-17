@@ -1,4 +1,3 @@
-import DropdownList from "components/DropdownList/DropdownList";
 import {
   XAxis,
   YAxis,
@@ -12,12 +11,10 @@ import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING } from "theme";
 
-import {
-  getAccountids,
-  getAccountNameByIdMap,
-} from "store/account/accountSelectors";
+import { getAccountids } from "store/account/accountSelectors";
 import { useAccountWidget } from "./useAccountWidget";
 import { useState } from "react";
+import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 
 type AccountWidgetProps = {
   startDate: string;
@@ -33,7 +30,6 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
     accountWidgetId,
   });
   const accountIds = getAccountids();
-  const accountNameByIdMap = getAccountNameByIdMap();
 
   const handleAccountChange = (id: string) => {
     setAccountWidgetId(id);
@@ -85,13 +81,10 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
             {accountWithBalances[accountWithBalances.length - 1]?.balance || ""}
           </b>
         </span>
-        <DropdownList
-          items={["All", ...accountIds]}
-          selected={accountWidgetId}
-          onSelect={handleAccountChange}
-          placeholder="Select Account"
-          itemToString={(item: string) => accountNameByIdMap[item] || item}
-          searchable
+        <AccountDropdown
+          accountsList={["All", ...accountIds]}
+          selectedAccountId={accountWidgetId}
+          handleAccountChange={handleAccountChange}
         />
       </Header>
       <ChartContent />
