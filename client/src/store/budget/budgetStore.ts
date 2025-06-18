@@ -25,7 +25,6 @@ const useBudgetStore = create<BudgetStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.get<BudgetType>(API_BASE_URL);
-      console.log(response);
       set({ budget: response.data });
     } catch (error) {
       console.error("Error fetching budget:", error);

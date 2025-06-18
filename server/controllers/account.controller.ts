@@ -285,8 +285,6 @@ const getAccountTransactionTotalAfterBaseline = async ({
     },
   });
 
-  console.log(baselineDate);
-  console.log(new Date().toISOString().split("T")[0]);
   const transactionTotal = transactions.reduce((total, transaction) => {
     return (
       total +

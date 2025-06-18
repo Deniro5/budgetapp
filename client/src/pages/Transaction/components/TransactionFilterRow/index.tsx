@@ -17,7 +17,6 @@ function TransactionFilterRow({
   const { accountIdToNameMap } = useAccountStore();
   const removeFilter = (filterName: keyof TransactionFilter) => {
     setFilter({ ...filter, [filterName]: undefined });
-    console.log(filter);
   };
 
   const getFilterLabel = (key: keyof TransactionFilter) => {

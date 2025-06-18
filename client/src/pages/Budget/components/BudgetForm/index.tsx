@@ -21,7 +21,6 @@ export default function BudgetForm({
   initialBudgetCategories,
   onSubmit,
 }: BudgetProps) {
-  console.log(defaultValues);
   const {
     register,
     handleSubmit,

@@ -24,7 +24,6 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
     useBudgetWidget({ startDate, endDate });
   const isWithinBudget = availableBudget > 0;
 
-  console.log("i rerendered");
   return (
     <>
       <Header>

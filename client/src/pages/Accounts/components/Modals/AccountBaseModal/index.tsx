@@ -28,7 +28,6 @@ export default function AccountBaseModal({
   confirmText = "Add Account",
   initialAccount,
 }: AccountBaseModalProps) {
-  console.log(initialAccount);
   const {
     register,
     handleSubmit,

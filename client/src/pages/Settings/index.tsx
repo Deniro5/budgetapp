@@ -23,14 +23,12 @@ export default function Settings() {
   const { logout, updateUser } = useUserStore();
   const userPreferences = getUserPreferences();
 
-  console.log(getUserPreferences());
   const [newPreferences, setNewPreferences] = useState<RawUserPreferences>({
     currency: userPreferences?.currency || "CAD",
     disabledCategories: userPreferences?.disabledCategories || [],
     defaultAccount: userPreferences?.defaultAccount?._id || null,
   });
 
-  console.log(newPreferences);
   const handleUpdateSettings = async () => {
     const success = await updateUser({
       preferences: newPreferences,
