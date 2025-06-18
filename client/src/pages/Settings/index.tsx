@@ -11,12 +11,9 @@ import {
 import styled from "styled-components";
 import { SPACING, FONTSIZE } from "../../Theme";
 import { getUserPreferences } from "../../store/user/userSelectors";
-import { UserPreferences } from "../../types/user";
+import { RawUserPreferences } from "../../types/user";
 import { useNavigate } from "react-router";
-import {
-  TransactionCategory,
-  TransactionCategoryNameMap,
-} from "types/Transaction";
+import { budgetOnlyCategories, TransactionCategory } from "types/Transaction";
 
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 
@@ -25,12 +22,15 @@ export default function Settings() {
 
   const { logout, updateUser } = useUserStore();
   const userPreferences = getUserPreferences();
-  const [newPreferences, setNewPreferences] = useState<UserPreferences>({
+
+  console.log(getUserPreferences());
+  const [newPreferences, setNewPreferences] = useState<RawUserPreferences>({
     currency: userPreferences?.currency || "CAD",
-    disabledCategories: userPreferences?.disabledCategories || ["Investments"],
-    defaultAccount: userPreferences?.defaultAccount || null,
+    disabledCategories: userPreferences?.disabledCategories || [],
+    defaultAccount: userPreferences?.defaultAccount?._id || null,
   });
 
+  console.log(newPreferences);
   const handleUpdateSettings = async () => {
     const success = await updateUser({
       preferences: newPreferences,
@@ -39,7 +39,7 @@ export default function Settings() {
     if (success) navigate("/");
   };
 
-  const handleCategoryChange = (category: string) => {
+  const handleCategoryChange = (category: TransactionCategory) => {
     const updatedDisabledCategories = [...newPreferences.disabledCategories];
 
     const categoryIndex = updatedDisabledCategories.findIndex(
@@ -68,7 +68,7 @@ export default function Settings() {
       <SettingRow>
         <SettingName>Enabled Categories</SettingName>
         <CategoryContainer>
-          {Object.values(TransactionCategory).map((item) => (
+          {Object.values(budgetOnlyCategories).map((item) => (
             <BaseCheckboxContainer
               onClick={() => handleCategoryChange(item)}
               key={item}
@@ -77,7 +77,7 @@ export default function Settings() {
                 checked={!newPreferences?.disabledCategories.includes(item)}
                 type="checkbox"
               />
-              {TransactionCategoryNameMap[item]}
+              {item}
             </BaseCheckboxContainer>
           ))}
         </CategoryContainer>

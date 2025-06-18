@@ -257,6 +257,8 @@ export const getTransactionCategoriesByAmount = async (
       };
     }
 
+    matchConditions.category = { $ne: "Transfer" };
+
     const categoryTotals = await TransactionModel.aggregate([
       {
         $match: matchConditions,
@@ -325,8 +327,14 @@ export const getTotalIncomeAndExpense = async (
       if (endDate) matchConditions.date.$lte = endDate;
     }
 
-    if (category) matchConditions.category = category;
-
+    if (category) {
+      matchConditions.$and = [
+        { category: category },
+        { category: { $ne: "Transfer" } },
+      ];
+    } else {
+      matchConditions.category = { $ne: "Transfer" };
+    }
     // Fetch and sort transactions by date
     const transactions = await TransactionModel.find(matchConditions).sort({
       date: 1,

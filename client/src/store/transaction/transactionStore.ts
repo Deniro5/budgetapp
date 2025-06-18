@@ -29,7 +29,7 @@ export interface TransactionStore {
   ) => Promise<void>;
   updateTransaction: (
     id: string,
-    updatedTransaction: Partial<Transaction>
+    updatedTransaction: RawTransaction
   ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   addTransfer: (

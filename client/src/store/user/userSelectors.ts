@@ -1,4 +1,4 @@
-import { TransactionCategory } from "types/Transaction";
+import { budgetOnlyCategories } from "types/Transaction";
 import useUserStore from "./userStore";
 import { UserStore } from "./userStore";
 
@@ -7,7 +7,7 @@ export const getUserPreferences = () =>
 
 export const getUserTransactionCategories = () =>
   useUserStore((state: UserStore) =>
-    Object.values(TransactionCategory).filter(
+    Object.values(budgetOnlyCategories).filter(
       (category) =>
         !state.user?.preferences.disabledCategories.includes(category)
     )

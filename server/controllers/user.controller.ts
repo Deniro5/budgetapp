@@ -6,6 +6,9 @@ const handleUpdate = async (req: Request, res: Response) => {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
+    }).populate({
+      path: "preferences.defaultAccount",
+      select: "name _id",
     });
 
     if (!user) {

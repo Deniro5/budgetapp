@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import TransactionModel from "../models/transaction.model";
 import TransferModel from "../models/transfer.model";
-import mongoose from "mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
 interface CustomRequest extends Request {
   userId?: string;
@@ -21,7 +21,9 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
 
     const { sendingAccountId, receivingAccountId, amount, date } = req.body;
 
-    let sendingTransaction, receivingTransaction, transfer;
+    let sendingTransaction: any = null;
+    let receivingTransaction: any | null = null;
+    let transfer: any | null = null;
 
     await session.withTransaction(async () => {
       // Create sending transaction
@@ -67,6 +69,17 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
       // Save transfer
       await transfer.save({ session });
     });
+
+    if (sendingTransaction && receivingTransaction) {
+      await sendingTransaction.populate({
+        path: "account",
+        select: "name _id",
+      });
+      await receivingTransaction.populate({
+        path: "account",
+        select: "name _id",
+      });
+    }
 
     res
       .status(201)

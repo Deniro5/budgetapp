@@ -27,10 +27,10 @@ export default function TransactionEditModal({
       sendingAccountId:
         transaction.type === "Income"
           ? transaction.vendor
-          : transaction.account,
+          : transaction.account._id,
       receivingAccountId:
         transaction.type === "Income"
-          ? transaction.account
+          ? transaction.account._id
           : transaction.vendor,
     };
   };

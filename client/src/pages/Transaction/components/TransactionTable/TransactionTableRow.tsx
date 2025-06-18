@@ -1,10 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { transactionCategoryImageMap } from "constants/transactionCategoryImageMap";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
+import { transactionCategoryImageMap } from "../../constants/transactionCategoryImageMap";
+
 import useAccountStore from "store/account/accountStore";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
-import { Transaction, TransactionType } from "types/Transaction";
+import {
+  Transaction,
+  TransactionCategory,
+  TransactionType,
+} from "types/Transaction";
 import { getDollarValue } from "utils";
 
 type TransactionTableRowProps = {
@@ -47,7 +51,7 @@ function TransactionTableRow({
   };
 
   const transactionVendorName =
-    transaction.category === "transfer"
+    transaction.category === TransactionCategory.Transfer
       ? accountIdToNameMap[transaction.vendor]
       : transaction.vendor;
 
@@ -69,9 +73,8 @@ function TransactionTableRow({
           icon={transactionCategoryImageMap[transaction.category]}
           width={20}
           height={20}
-          fill={COLORS.primary}
         />
-        {transactionCategoryNameMap[transaction.category]}
+        {transaction.category}
       </CategoryTd>
       <td> {transaction.account.name} </td>
     </Container>

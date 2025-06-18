@@ -1,4 +1,3 @@
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 import { PieChart, Pie, Cell, Tooltip, Legend, LegendProps } from "recharts";
 
 import { SPACING } from "theme";
@@ -46,11 +45,7 @@ export const TopCategoriesWidget = () => {
             />
             {/*  TODO fix this type error */}
             <span>
-              <b>
-                {transactionCategoryNameMap[entry.payload?.name] ||
-                  entry.payload?.name}
-              </b>{" "}
-              - ${entry.payload?.value}
+              <b>{entry.payload?.name}</b> - ${entry.payload?.value}
             </span>
           </div>
         ))}

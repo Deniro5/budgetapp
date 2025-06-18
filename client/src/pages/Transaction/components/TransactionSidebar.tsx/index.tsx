@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { getTransactionById } from "store/transaction/transactionSelectors";
 import { TransactionOverlayType } from "../../Transactions";
 import { getDollarValue } from "utils";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
+
 import useAccountStore from "store/account/accountStore";
 
 type TransactionSidebarProps = {
@@ -55,7 +55,7 @@ const TransactionSidebar = ({
   };
 
   const transactionVendorName =
-    sidebarTransaction?.category === "transfer"
+    sidebarTransaction?.category === TransactionCategory.Transfer
       ? accountIdToNameMap[sidebarTransaction.vendor]
       : sidebarTransaction?.vendor;
 
@@ -92,11 +92,7 @@ const TransactionSidebar = ({
               <b> Type: </b> <span> {sidebarTransaction.type} </span>
             </Row>
             <Row>
-              <b> Category: </b>{" "}
-              <span>
-                {" "}
-                {transactionCategoryNameMap[sidebarTransaction.category]}{" "}
-              </span>
+              <b> Category: </b> <span> {sidebarTransaction.category} </span>
             </Row>
             <Divider />
             {!isTransfer && (

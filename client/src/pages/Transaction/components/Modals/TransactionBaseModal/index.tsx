@@ -15,6 +15,7 @@ import TagInput from "components/Global/TagInput";
 
 import {
   RawTransaction,
+  Transaction,
   TransactionCategory,
   TransactionType,
 } from "types/Transaction";
@@ -26,7 +27,7 @@ import { SPACING, FONTSIZE, COLORS } from "theme";
 import { PresetTransaction } from "types/presetTransaction";
 import { useEffect, useState } from "react";
 import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
+
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import usePresetTransactionStore from "store/presetTransaction/presetTransactionStore";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
@@ -37,7 +38,7 @@ type TransactionBaseModalProps = {
   confirmText?: string;
   onClose: () => void;
   onSubmit: (transaction: RawTransaction) => void;
-  initialTransaction?: RawTransaction | null;
+  initialTransaction?: Transaction;
   disableValidation?: boolean; //disable required validation
 };
 
@@ -52,7 +53,6 @@ export default function TransactionBaseModal({
 }: TransactionBaseModalProps) {
   const { presetTransactions } = usePresetTransactionStore();
   const userPreferences = getUserPreferences();
-  const userTransactionCategories = getUserTransactionCategories();
 
   const [currentPreset, setCurrentPreset] = useState<PresetTransaction | null>(
     null
@@ -70,19 +70,20 @@ export default function TransactionBaseModal({
   } = useForm<RawTransaction>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
-    defaultValues: initialTransaction
-      ? { ...initialTransaction, account: initialTransaction.account }
-      : {
-          name: "",
-          description: "",
-          vendor: "",
-          amount: undefined,
-          type: undefined,
-          date: new Date().toISOString().split("T")[0],
-          account: userPreferences?.defaultAccount || undefined,
-          category: undefined,
-          tags: [],
-        },
+    defaultValues: {
+      name: initialTransaction?.name,
+      description: initialTransaction?.description,
+      vendor: initialTransaction?.vendor,
+      amount: initialTransaction?.amount,
+      type: initialTransaction?.type,
+      date: initialTransaction?.date || new Date().toISOString().split("T")[0],
+      account:
+        initialTransaction?.account._id ||
+        userPreferences?.defaultAccount?._id ||
+        undefined,
+      category: initialTransaction?.category,
+      tags: initialTransaction?.tags || [],
+    },
   });
 
   useEffect(() => {
@@ -231,7 +232,7 @@ export default function TransactionBaseModal({
           <InputContainer>
             <InputLabel>Account</InputLabel>
             <AccountDropdown
-              selectedAccountId={currentValues.account?._id}
+              selectedAccountId={currentValues.account}
               handleAccountChange={handleAccountChange}
             />
             {errors.account && (

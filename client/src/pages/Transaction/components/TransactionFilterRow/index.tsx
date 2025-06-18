@@ -4,7 +4,6 @@ import TransactionFilterTag from "./TransactionFilterTag";
 import { TransactionFilter } from "types/Transaction";
 import { formatCamelCaseToTitleCase } from "utils";
 import useAccountStore from "store/account/accountStore";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 
 type TransactionFilterRowProps = {
   filter: TransactionFilter;
@@ -25,8 +24,6 @@ function TransactionFilterRow({
     let label: string | number | string[];
     if (key === "account") {
       label = accountIdToNameMap[filter[key]!] || "";
-    } else if (key === "category") {
-      label = transactionCategoryNameMap[filter[key]!];
     } else {
       label = filter[key] || "";
     }

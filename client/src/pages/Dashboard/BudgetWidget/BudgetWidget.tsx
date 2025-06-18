@@ -1,4 +1,3 @@
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 import {
   BarChart,
   Bar,
@@ -12,10 +11,7 @@ import {
 import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING, COLORS } from "theme";
-import {
-  TransactionCategory,
-  TransactionCategoryNameMap,
-} from "types/Transaction";
+import { TransactionCategory } from "types/Transaction";
 import { useBudgetWidget } from "./useBudgetWidget";
 
 type BudgetWidgetProps = {
@@ -59,9 +55,7 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
             angle={-45}
             textAnchor="end"
             height={80}
-            tickFormatter={(category: TransactionCategory) =>
-              TransactionCategoryNameMap[category] || category
-            }
+            tickFormatter={(category: TransactionCategory) => category}
           />
 
           <Tooltip
@@ -72,9 +66,7 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
                 return [props.payload.rawBudget, "Budget Limit"];
               return [value, name];
             }}
-            labelFormatter={(label: TransactionCategory) =>
-              transactionCategoryNameMap[label] || label
-            }
+            labelFormatter={(label: TransactionCategory) => label}
           />
           <Legend />
           <Bar dataKey="totalAmount" fill="#4285F4" name="Spent">

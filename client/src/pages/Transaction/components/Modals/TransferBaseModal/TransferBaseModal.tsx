@@ -45,7 +45,7 @@ export default function TransferBaseModal({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
     defaultValues: initialTransfer || {
-      sendingAccountId: userPreferences?.defaultAccount || undefined,
+      sendingAccountId: userPreferences?.defaultAccount?._id || undefined,
       receivingAccountId: undefined,
       amount: undefined,
       date: new Date().toISOString().split("T")[0],

@@ -1,4 +1,3 @@
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { PresetTransaction } from "types/presetTransaction";
@@ -17,9 +16,7 @@ export default function PresetTransactionMenuItem({
     { label: "Date", value: presetTransaction.date },
     {
       label: "Category",
-      value: presetTransaction.category
-        ? transactionCategoryNameMap[presetTransaction.category]
-        : "",
+      value: presetTransaction.category,
     },
     { label: "Description", value: presetTransaction.description },
     { label: "Vendor", value: presetTransaction.vendor },

@@ -5,63 +5,41 @@ export enum TransactionType {
   INCOME = "Income",
 }
 
+//typescript doesnt support union of enums so keep two separate
 export enum TransactionCategory {
-  Car = "car",
-  Charity = "charity",
-  Childcare = "childcare",
-  Education = "education",
-  Entertainment = "entertainment",
-  Food = "food",
-  Gas = "gas",
-  Gifts = "gifts",
-  Groceries = "groceries",
-  HealthAndFitness = "healthandfitness",
-  Hobbies = "hobbies",
-  HomeImprovement = "homeimprovement",
-  Housing = "housing",
-  Insurance = "insurance",
-  Internet = "internet",
-  PersonalCare = "personalcare",
-  Pets = "pets",
-  Phone = "phone",
-  Salary = "salary",
-  Subscriptions = "subscriptions",
-  Transit = "transit",
-  Travel = "travel",
-  Utilities = "utilities",
-  WorkExpenses = "workexpenses",
-  Other = "other",
-  Transfer = "transfer",
+  Car = "Car",
+  Charity = "Charity",
+  Childcare = "Childcare",
+  Education = "Education",
+  Entertainment = "Entertainment",
+  Food = "Food",
+  Gas = "Gas",
+  Gifts = "Gifts",
+  Groceries = "Groceries",
+  HealthAndFitness = "Health & Fitness",
+  Hobbies = "Hobbies",
+  HomeImprovement = "Home Improvement",
+  Housing = "Housing",
+  Insurance = "Insurance",
+  Internet = "Internet",
+  PersonalCare = "Personal Care",
+  Pets = "Pets",
+  Phone = "Phone",
+  Salary = "Salary",
+  Subscriptions = "Subscriptions",
+  Transit = "Transit",
+  Travel = "Travel",
+  Utilities = "Utilities",
+  WorkExpenses = "Work Expenses",
+  Other = "Other",
+
+  // Not a budget category
+  Transfer = "Transfer",
 }
 
-export const TransactionCategoryNameMap: Record<TransactionCategory, string> = {
-  [TransactionCategory.Car]: "Car",
-  [TransactionCategory.Charity]: "Charity",
-  [TransactionCategory.Childcare]: "Childcare",
-  [TransactionCategory.Education]: "Education",
-  [TransactionCategory.Entertainment]: "Entertainment",
-  [TransactionCategory.Food]: "Food",
-  [TransactionCategory.Gas]: "Gas",
-  [TransactionCategory.Gifts]: "Gifts",
-  [TransactionCategory.Groceries]: "Groceries",
-  [TransactionCategory.HealthAndFitness]: "Health & Fitness",
-  [TransactionCategory.Hobbies]: "Hobbies",
-  [TransactionCategory.HomeImprovement]: "Home Improvement",
-  [TransactionCategory.Housing]: "Housing",
-  [TransactionCategory.Insurance]: "Insurance",
-  [TransactionCategory.Internet]: "Internet",
-  [TransactionCategory.PersonalCare]: "Personal Care",
-  [TransactionCategory.Pets]: "Pets",
-  [TransactionCategory.Phone]: "Phone",
-  [TransactionCategory.Salary]: "Salary",
-  [TransactionCategory.Subscriptions]: "Subscriptions",
-  [TransactionCategory.Transit]: "Transit",
-  [TransactionCategory.Travel]: "Travel",
-  [TransactionCategory.Utilities]: "Utilities",
-  [TransactionCategory.WorkExpenses]: "Work Expenses",
-  [TransactionCategory.Other]: "Other",
-  [TransactionCategory.Transfer]: "Transfer",
-};
+export const budgetOnlyCategories = Object.values(TransactionCategory).filter(
+  (cat) => cat !== TransactionCategory.Transfer
+);
 
 export type Transaction = {
   _id: string;
@@ -99,7 +77,7 @@ export type TransactionFilter = {
   type?: string;
   account?: string;
   tags?: string[];
-  category?: TransactionCategory;
+  category?: string;
 };
 
 export type RawTransfer = {

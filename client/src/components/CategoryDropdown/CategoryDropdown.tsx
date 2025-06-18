@@ -1,7 +1,6 @@
 import DropdownList from "components/DropdownList/DropdownList";
 import { getUserTransactionCategories } from "store/user/userSelectors";
 import { TransactionCategory } from "types/Transaction";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
 
 interface CategoryDropdownProps {
   selectedCategory: TransactionCategory | null;
@@ -24,9 +23,7 @@ export default function CategoryDropdown({
       selected={selectedCategory}
       onSelect={handleCategoryChange}
       placeholder={placeholder || "Select Category"}
-      itemToString={(item: TransactionCategory) =>
-        transactionCategoryNameMap[item]
-      }
+      itemToString={(item: TransactionCategory) => item}
       searchable
     />
   );

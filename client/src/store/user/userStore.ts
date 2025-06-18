@@ -1,6 +1,6 @@
 // store.ts
 import { create } from "zustand";
-import { User } from "../../types/user";
+import { RawUser, RawUserPreferences, User } from "../../types/user";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
@@ -11,7 +11,8 @@ export interface UserStore {
   isAuthenticated: boolean;
   setUser: (user: User) => void;
   refetchUser: (id: string) => void;
-  updateUser: (newFields: Partial<User>) => Promise<boolean>;
+  updateUser: (newFields: Partial<RawUser>) => Promise<boolean>;
+
   login: (username: string, password: string) => Promise<boolean>;
   signup: (username: string, password: string) => Promise<boolean>;
   logout: () => void;

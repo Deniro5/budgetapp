@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { BaseButton, BaseInput, InputContainer, InputLabel } from "styles";
 import { SPACING } from "theme";
 import { BudgetCategories } from "types/budget";
-import { transactionCategoryNameMap } from "constants/transactionCategoryNameMap";
-import { TransactionCategory } from "types/Transaction";
+
+import { budgetOnlyCategories, TransactionCategory } from "types/Transaction";
 import { getTotalBudget } from "store/budget/budgetSelectors";
 
 type BudgetProps = {
@@ -12,10 +12,16 @@ type BudgetProps = {
   onSubmit: (transaction: BudgetCategories) => void;
 };
 
+const defaultValues = budgetOnlyCategories.reduce((acc, cur) => {
+  acc[cur as TransactionCategory] = 0;
+  return acc;
+}, {} as Record<TransactionCategory, number>);
+
 export default function BudgetForm({
   initialBudgetCategories,
   onSubmit,
 }: BudgetProps) {
+  console.log(defaultValues);
   const {
     register,
     handleSubmit,
@@ -24,7 +30,10 @@ export default function BudgetForm({
   } = useForm<BudgetCategories>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
-    defaultValues: initialBudgetCategories,
+    defaultValues: {
+      ...defaultValues,
+      ...initialBudgetCategories,
+    },
   });
 
   const totalBudget = getTotalBudget();
@@ -37,11 +46,11 @@ export default function BudgetForm({
     <>
       <form onSubmit={handleSubmit(onSubmitForm)}>
         <FormContainer>
-          {Object.keys(initialBudgetCategories).map((budgetItem) => {
+          {Object.keys(defaultValues).map((budgetItem) => {
             const category = budgetItem as TransactionCategory;
             return (
               <InputContainer key={category}>
-                <InputLabel>{transactionCategoryNameMap[category]}:</InputLabel>
+                <InputLabel>{category}:</InputLabel>
                 <BaseInput
                   type="number"
                   {...register(category, {
