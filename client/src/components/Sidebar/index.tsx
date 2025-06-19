@@ -66,10 +66,10 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
       isActive: firstPath === "savings",
     },
     {
-      href: "/debts",
+      href: "/investments",
       icon: faHandHoldingDollar,
-      label: "Debts",
-      isActive: firstPath === "debts",
+      label: "Investments",
+      isActive: firstPath === "investments",
     },
     {
       href: "/settings",

@@ -10,6 +10,7 @@ import presetTransactionRoutes from "./routes/presettransaction.routes";
 import accountRoutes from "./routes/account.routes";
 import budgetRoutes from "./routes/budget.routes";
 import transferRoutes from "./routes/transfer.routes";
+import investmentRoutes from "./routes/investment.routes";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/transfers", transferRoutes);
 app.use("/preset-transactions", presetTransactionRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/budget", budgetRoutes);
+app.use("/investments", investmentRoutes);
 
 mongoose.connect(
   `mongodb+srv://deantowheed5:${process.env.DB_PASS}@cluster0.ewv8l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`

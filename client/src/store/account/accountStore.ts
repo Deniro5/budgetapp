@@ -59,8 +59,6 @@ const useAccountStore = create<AccountStore>((set, get) => ({
         `${API_BASE_URL}?includeBalance=true`
       );
       const accounts = response.data;
-
-      console.log(accounts);
       set({
         accountsWithBalance: accounts,
         accountIdToNameMap: getAccountIdToNameMap(accounts),

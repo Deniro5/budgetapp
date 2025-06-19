@@ -1,20 +1,20 @@
 import axios from "axios";
 import { create } from "zustand";
-import { RawTransaction, Transaction } from "types/Transaction";
+import { PresetTransaction, RawPresetTransaction } from "types/Transaction";
 
 const API_BASE_URL = "http://localhost:8000/preset-transactions"; // Replace with your API base URL
 
 export interface PresetTransactionStore {
-  presetTransactions: Transaction[];
+  presetTransactions: PresetTransaction[];
   isLoading: boolean;
   error: string | null;
   hasLoaded: boolean;
 
   fetchPresetTransactions: () => Promise<void>;
-  addPresetTransaction: (transaction: RawTransaction) => Promise<void>;
+  addPresetTransaction: (transaction: RawPresetTransaction) => Promise<void>;
   updatePresetTransaction: (
     id: string,
-    updatedTransaction: Partial<Transaction>
+    updatedTransaction: Partial<PresetTransaction>
   ) => Promise<void>;
   deletePresetTransaction: (id: string) => Promise<void>;
 }
@@ -30,7 +30,7 @@ const usePresetTransactionStore = create<PresetTransactionStore>(
     fetchPresetTransactions: async () => {
       set({ isLoading: true, error: null });
       try {
-        const response = await axios.get<Transaction[]>(API_BASE_URL);
+        const response = await axios.get<PresetTransaction[]>(API_BASE_URL);
         set({ presetTransactions: response.data });
       } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -44,7 +44,7 @@ const usePresetTransactionStore = create<PresetTransactionStore>(
     addPresetTransaction: async (transaction) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await axios.post<Transaction>(
+        const response = await axios.post<PresetTransaction>(
           API_BASE_URL,
           transaction
         );
@@ -63,7 +63,7 @@ const usePresetTransactionStore = create<PresetTransactionStore>(
     updatePresetTransaction: async (id, updatedTransaction) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await axios.put<Transaction>(
+        const response = await axios.put<PresetTransaction>(
           `${API_BASE_URL}/${id}`,
           updatedTransaction
         );

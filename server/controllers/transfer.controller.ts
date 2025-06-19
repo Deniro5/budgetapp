@@ -201,7 +201,7 @@ export const deleteTransferByTransactionId = async (
       }).session(session);
 
       if (!transferToDelete) {
-        throw new Error("Transfer not found");
+        res.status(403).json({ error: "Transfer not found" });
       }
 
       // Delete all transactions related to the transfer
@@ -218,13 +218,7 @@ export const deleteTransferByTransactionId = async (
     });
   } catch (err) {
     console.error("Error deleting transfer:", err);
-    if (!res.headersSent) {
-      if (err.message === "Transfer not found") {
-        res.status(404).json({ error: err.message });
-      } else {
-        res.status(500).json({ error: "Failed to delete transfer" });
-      }
-    }
+    res.status(500).json({ error: "Failed to delete transfer" });
   } finally {
     await session.endSession();
   }

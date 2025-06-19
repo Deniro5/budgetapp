@@ -1,11 +1,11 @@
 import Modal from "components/Global/Modal";
 import TransactionBaseModal from "../TransactionBaseModal";
-import { RawTransaction, Transaction } from "types/Transaction";
+import { PresetTransaction, RawPresetTransaction } from "types/Transaction";
 import usePresetTransactionStore from "store/presetTransaction/presetTransactionStore";
 
 type PresetTransactionModalProps = {
   onClose: () => void;
-  initialTransaction?: Transaction | null;
+  initialTransaction?: PresetTransaction | null;
 };
 
 export default function PresetTransactionModal({
@@ -14,7 +14,7 @@ export default function PresetTransactionModal({
 }: PresetTransactionModalProps) {
   const { addPresetTransaction } = usePresetTransactionStore();
 
-  const handleModalSubmit = (transaction: RawTransaction) => {
+  const handleModalSubmit = (transaction: RawPresetTransaction) => {
     addPresetTransaction(transaction);
   };
 
@@ -24,7 +24,7 @@ export default function PresetTransactionModal({
         title="Add Preset Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransaction={initialTransaction}
+        initialTransaction={undefined}
         showPresetNameField={true}
         disableValidation={true}
       />

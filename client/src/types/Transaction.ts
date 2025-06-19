@@ -33,7 +33,7 @@ export enum TransactionCategory {
   WorkExpenses = "Work Expenses",
   Other = "Other",
 
-  // Not a budget category
+  // Not a budget
   Transfer = "Transfer",
 }
 
@@ -85,4 +85,22 @@ export type RawTransfer = {
   receivingAccountId: string;
   date: string;
   amount: number;
+};
+
+export type PresetTransaction = {
+  _id: string;
+  name: string;
+  account?: string;
+  type?: TransactionType;
+  userId: string;
+  amount?: number;
+  date?: string;
+  category?: TransactionCategory;
+  description?: string;
+  vendor?: string;
+  tags?: string[];
+};
+
+export type RawPresetTransaction = Omit<PresetTransaction, "_id" | "userId"> & {
+  account?: string;
 };

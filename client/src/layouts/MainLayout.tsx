@@ -10,13 +10,15 @@ import Accounts from "../pages/Accounts";
 import Budget from "../pages/Budget";
 import useInitialLoad from "../hooks/useInitialLoad";
 import { DashboardPage } from "../pages/Dashboard/DashboardPage";
+import { InvestmentsPage } from "../pages/Investments/InvestmentsPage";
 
-const dashboardElement = <DashboardPage />;
-const transactionsElement = <Transactions />;
 const accountsElement = <Accounts />;
 const budgetElement = <Budget />;
+const dashboardElement = <DashboardPage />;
+const investmentsElement = <InvestmentsPage />;
 const settingsElement = <Settings />;
 
+const transactionsElement = <Transactions />;
 function MainLayout() {
   useInitialLoad();
   const [isExpanded, setIsExpanded] = useState(true);
@@ -52,6 +54,7 @@ function MainLayout() {
           <Route path="/savings" element={<p> savings </p>} />
           <Route path="/debts" element={<p> debts </p>} />
           <Route path="/settings" element={settingsElement} />
+          <Route path="/investments" element={investmentsElement} />
         </Routes>
       </ContentContainer>
     </AppContainer>

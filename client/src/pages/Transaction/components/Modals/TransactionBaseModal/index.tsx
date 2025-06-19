@@ -18,13 +18,10 @@ import {
   Transaction,
   TransactionCategory,
   TransactionType,
+  PresetTransaction,
 } from "types/Transaction";
-import {
-  getUserPreferences,
-  getUserTransactionCategories,
-} from "store/user/userSelectors";
+import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
-import { PresetTransaction } from "types/presetTransaction";
 import { useEffect, useState } from "react";
 import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
 
@@ -78,7 +75,7 @@ export default function TransactionBaseModal({
       type: initialTransaction?.type,
       date: initialTransaction?.date || new Date().toISOString().split("T")[0],
       account:
-        initialTransaction?.account._id ||
+        initialTransaction?.account?._id ||
         userPreferences?.defaultAccount?._id ||
         undefined,
       category: initialTransaction?.category,
