@@ -77,7 +77,7 @@ export const SearchDropdown = <T,>({
         <BaseInput
           type="text"
           placeholder={placeholder}
-          value={value || (selected && itemToString(selected)) || ""}
+          value={hasFocus ? value : (selected && itemToString(selected)) || ""}
           onChange={(e) => setValue(e.target.value)}
           ref={searchRef}
           onFocus={() => setHasFocus(true)}

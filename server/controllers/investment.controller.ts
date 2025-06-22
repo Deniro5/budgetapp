@@ -7,6 +7,71 @@ interface CustomRequest extends Request {
 }
 
 // Create
+export const createInvestment = async (req: CustomRequest, res: Response) => {
+  try {
+    const { userId } = req;
+
+    console.log;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    // Count existing transactions for the user
+    const investmentCount = await InvestmentModel.countDocuments({
+      userId,
+    });
+
+    if (investmentCount >= 10) {
+      res.status(400).json({
+        error:
+          "Investment limit reached (10). Please delete an existing investment and try again",
+      });
+      return;
+    }
+
+    const { asset, account, date, quantity, price } = req.body;
+
+    const newInvestment = new InvestmentModel({
+      asset,
+      account,
+      date,
+      quantity,
+      price,
+      userId,
+    });
+
+    const savedInvestment = await newInvestment.save();
+
+    res.status(201).json(savedInvestment);
+  } catch (err) {
+    console.error("Error creating investment:", err);
+    res.status(500).json({ error: "Failed to create investment" });
+  }
+};
+
+export const getInvestments = async (req: CustomRequest, res: Response) => {
+  try {
+    const { userId } = req;
+    const { limit = 20 } = req.query;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    // Query object with only userId
+    const query = { userId };
+
+    const investments = await InvestmentModel.find(query).limit(Number(limit));
+
+    res.json(investments);
+  } catch (err) {
+    console.error("Error fetching investments:", err);
+    res.status(500).json({ error: "Failed to fetch investments" });
+  }
+};
 export const searchStocks = async (req: CustomRequest, res: Response) => {
   try {
     const { userId } = req;
@@ -37,48 +102,5 @@ export const searchStocks = async (req: CustomRequest, res: Response) => {
   } catch (err) {
     console.error("Error fetching search results:", err);
     res.status(500).json({ error: "Failed to fetch search results" });
-  }
-};
-
-// Create
-export const createInvestment = async (req: CustomRequest, res: Response) => {
-  try {
-    const { userId } = req;
-
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    // Count existing transactions for the user
-    const investmentCount = await InvestmentModel.countDocuments({
-      userId,
-    });
-
-    if (investmentCount >= 10) {
-      res.status(400).json({
-        error:
-          "Investment limit reached (10). Please delete an existing investment and try again",
-      });
-      return;
-    }
-
-    const { symbol, account, date, quantity, price } = req.body;
-
-    const newInvestment = new InvestmentModel({
-      symbol,
-      account,
-      date,
-      quantity,
-      price,
-      userId,
-    });
-
-    const savedInvestment = await newInvestment.save();
-
-    res.status(201).json(savedInvestment);
-  } catch (err) {
-    console.error("Error creating investment:", err);
-    res.status(500).json({ error: "Failed to create investment" });
   }
 };

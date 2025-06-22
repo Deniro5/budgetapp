@@ -11,36 +11,30 @@ import { useForm } from "react-hook-form";
 
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 
 import Modal from "components/Global/Modal";
-import { InvestmentSearchResult, RawInvestment } from "types/investment";
+import { Asset, RawInvestment } from "types/investment";
 import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
-import { useInvestmentSearch } from "../hooks/useInvestmentSearch";
-import InvestmentSearchResultMenuItem from "./InvestmentSearchResultMenuItem";
+import { useAssetSearch } from "../hooks/useAssetSearch";
+import AssetMenuItem from "./AssetMenuItem";
 
 type AddInvestmentModalProps = {
   onClose: () => void;
   onSubmit: (investment: RawInvestment) => void;
 };
 
-const investmentSearchResultRenderer = (
-  investmentSearchResult: InvestmentSearchResult
-) => (
-  <InvestmentSearchResultMenuItem
-    investmentSearchResult={investmentSearchResult}
-  />
+const investmentSearchResultRenderer = (asset: Asset) => (
+  <AssetMenuItem asset={asset} />
 );
 
 export default function AddInvestmentModal({
   onClose,
   onSubmit,
 }: AddInvestmentModalProps) {
-  const { results, input, setInput } = useInvestmentSearch();
-  const [selectedInvestment, setSelectedInvestment] =
-    useState<InvestmentSearchResult | null>(null);
+  const { results, input, setInput } = useAssetSearch();
   const userPreferences = getUserPreferences();
 
   const {
@@ -54,7 +48,7 @@ export default function AddInvestmentModal({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
     defaultValues: {
-      symbol: undefined,
+      asset: undefined,
       quantity: 0,
       price: 0,
       date: new Date().toISOString().split("T")[0],
@@ -66,10 +60,15 @@ export default function AddInvestmentModal({
     register("account", {
       required: "Account is required",
     });
+    register("asset", {
+      required: "Symbol is required",
+    });
   }, [register]);
 
   const currentValues = watch();
-
+  const handleAssetChange = (asset: Asset) => {
+    setValue("asset", asset, { shouldValidate: true });
+  };
   const handleAccountChange = (accountId: string) => {
     setValue("account", accountId, { shouldValidate: true });
   };
@@ -92,14 +91,17 @@ export default function AddInvestmentModal({
               value={input}
               setValue={setInput}
               items={results}
-              placeholder="Enter symbol"
-              selected={selectedInvestment}
-              onSelect={function (item: InvestmentSearchResult): void {
-                setSelectedInvestment(item);
+              placeholder="Select Investment"
+              selected={currentValues.asset}
+              onSelect={function (item: Asset): void {
+                handleAssetChange(item);
               }}
               itemRenderer={investmentSearchResultRenderer}
-              itemToString={(item: InvestmentSearchResult) => item?.symbol}
+              itemToString={({ symbol, name }) => `${name} - ${symbol}`}
             />
+            {errors.asset && (
+              <ErrorMessage>{errors.asset.message}</ErrorMessage>
+            )}
           </InputContainer>
         </Row>
         <Row>

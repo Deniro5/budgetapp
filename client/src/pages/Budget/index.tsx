@@ -14,7 +14,6 @@ function Budget() {
   };
   useBudget();
 
-  console.log(budget);
   return (
     <PageContainer>
       <PageTitle> Budget </PageTitle>

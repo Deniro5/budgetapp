@@ -1,22 +1,20 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
-import { InvestmentSearchResult } from "types/investment";
+import { Asset } from "types/investment";
 
-type InvestmentSearchResultMenuItemProps = {
-  investmentSearchResult: InvestmentSearchResult;
+type AssetMenuItemProps = {
+  asset: Asset;
 };
 
-export default function InvestmentSearchResultMenuItem({
-  investmentSearchResult,
-}: InvestmentSearchResultMenuItemProps) {
+export default function AssetMenuItem({ asset }: AssetMenuItemProps) {
   const fields = [
-    { label: "Name", value: investmentSearchResult.name },
-    { label: "Exchange", value: investmentSearchResult.exchange },
+    { label: "Name", value: asset.name },
+    { label: "Exchange", value: asset.exchange },
   ].filter(({ value }) => !!value);
 
   return (
     <Container>
-      <Name> {investmentSearchResult.symbol} </Name>
+      <Name> {asset.symbol} </Name>
       <FieldsContainer>
         {fields.map(({ label, value }) => (
           <FieldContainer key={label}>

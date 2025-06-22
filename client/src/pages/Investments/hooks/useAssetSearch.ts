@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
-import { InvestmentSearchResult } from "types/investment";
+import { Asset } from "types/investment";
 
-export const useInvestmentSearch = () => {
+export const useAssetSearch = () => {
   const [input, setInput] = useState("");
   const [debouncedInput, setDebouncedInput] = useState("");
 
@@ -17,9 +17,9 @@ export const useInvestmentSearch = () => {
   }, [input]);
 
   const query = useQuery({
-    queryKey: ["investmentSearch", debouncedInput],
+    queryKey: ["assetSearch", debouncedInput],
     queryFn: async () => {
-      const res = await axios.get<InvestmentSearchResult[]>(
+      const res = await axios.get<Asset[]>(
         `${BASE_API_URL}/investments/search`,
         {
           params: { q: debouncedInput },
