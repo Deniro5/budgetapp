@@ -15,31 +15,36 @@ import {
   SecondaryButton,
 } from "styles";
 import { FONTSIZE, SPACING } from "theme";
-import { Investment } from "types/investment";
+import { Asset, Investment, RawInvestment } from "types/investment";
 import { InvestmentsOverlayType } from "../InvestmentsPage";
 import { AssetChart } from "./AssetChart/AssetChart";
+import { roundTo2Decimals } from "utils";
 
 type InvestmentCardProps = {
   investment: Investment;
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<InvestmentsOverlayType | null>
   >;
-  setActiveInvestment: React.Dispatch<React.SetStateAction<Investment | null>>;
+  setPresetValues: React.Dispatch<React.SetStateAction<Partial<RawInvestment>>>;
 };
 
 export function InvestmentCard({
   investment,
   setActiveOverlay,
-  setActiveInvestment,
+  setPresetValues,
 }: InvestmentCardProps) {
   const handleBuyClick = () => {
     setActiveOverlay(InvestmentsOverlayType.ADD);
-    setActiveInvestment(investment);
+    setPresetValues({ asset: investment.asset });
   };
 
   const handleSellClick = () => {
     setActiveOverlay(InvestmentsOverlayType.SELL);
-    setActiveInvestment(investment);
+    setPresetValues({
+      asset: investment.asset,
+      quantity: investment.quantity,
+      price: investment.price,
+    });
   };
 
   return (
@@ -49,7 +54,7 @@ export function InvestmentCard({
           <SymbolText> {investment.asset.symbol} </SymbolText>-
           <NameText>{investment.asset.name}</NameText>
         </InvestmentName>
-        <Price>${investment.price}</Price>
+        <Price>${roundTo2Decimals(investment.price)}</Price>
       </InvestmentHeader>
       <StyledDivider />
       <AssetChart />
@@ -57,23 +62,31 @@ export function InvestmentCard({
       <InvestmentInfo>
         <Flex>
           <Label>Quantity: </Label>
-          <Text>${investment.quantity} </Text>
+          <Text>{investment.quantity} </Text>
         </Flex>
         <Flex>
           <Label>Average Cost: </Label>
-          <Text> ${investment.price} </Text>
+          <Text> ${roundTo2Decimals(investment.price)} </Text>
         </Flex>
         <Flex>
           <Label>Total Cost: </Label>
-          <Text> ${investment.price * investment.quantity} </Text>
+          <Text>
+            {" "}
+            ${roundTo2Decimals(investment.price * investment.quantity)}{" "}
+          </Text>
         </Flex>
         <Flex>
           <Label>Total Value: </Label>
-          <Text>${investment.quantity * investment.price} </Text>
+          <Text>
+            ${roundTo2Decimals(investment.quantity * investment.price)}{" "}
+          </Text>
         </Flex>
         <Flex>
           <Label>Total Gain/Loss: </Label>
-          <Text> ${investment.price * investment.quantity} </Text>
+          <Text>
+            {" "}
+            ${roundTo2Decimals(investment.price * investment.quantity)}{" "}
+          </Text>
         </Flex>
       </InvestmentInfo>
       <ButtonContainer>

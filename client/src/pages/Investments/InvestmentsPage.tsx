@@ -4,12 +4,13 @@ import { useState } from "react";
 
 import { InvestmentsHeader } from "./InvestmentsHeader/InvestmentsHeader.tsx";
 import AddInvestmentModal from "./AddInvestmentModal/AddInvestmentModal.tsx";
-import { RawInvestment } from "types/investment.ts";
+import { Asset, RawInvestment } from "types/investment.ts";
 import { useCreateInvestment } from "./hooks/useCreateInvestment.ts";
 import { useFetchInvestments } from "./hooks/useFetchInvestments.ts";
 import { InvestmentCard } from "./InvestmentCard/InvestmentCard.tsx";
 import styled from "styled-components";
 import { SPACING } from "theme";
+import SellInvestmentModal from "./SellInvestmentModal/SellInvestmentModal.tsx";
 
 export enum InvestmentsOverlayType {
   ADD = "add",
@@ -18,15 +19,16 @@ export enum InvestmentsOverlayType {
 
 export const InvestmentsPage = () => {
   const { mutate } = useCreateInvestment();
-  const { results } = useFetchInvestments();
+  const { results, currentInvestmentsQuantityMap } = useFetchInvestments();
   const [activeOverlay, setActiveOverlay] =
     useState<InvestmentsOverlayType | null>(null);
+  const [presetValues, setPresetValues] = useState<Partial<RawInvestment>>({});
 
   const handleCloseOverlay = () => {
     setActiveOverlay(null);
   };
 
-  const handleAddInvestment = (investment: RawInvestment) => {
+  const handleInvestmentSubmit = (investment: RawInvestment) => {
     mutate(investment);
   };
 
@@ -34,25 +36,31 @@ export const InvestmentsPage = () => {
     <PageContainer>
       <InvestmentsHeader setActiveOverlay={setActiveOverlay} />
       <InvestmentCardContainer>
-        {" "}
         {results.map((investment) => (
-          <InvestmentCard investment={investment} />
-        ))}{" "}
-        {results.map((investment) => (
-          <InvestmentCard investment={investment} />
-        ))}{" "}
-        {results.map((investment) => (
-          <InvestmentCard investment={investment} />
-        ))}{" "}
-        {results.map((investment) => (
-          <InvestmentCard investment={investment} />
-        ))}{" "}
+          <InvestmentCard
+            setActiveOverlay={setActiveOverlay}
+            setPresetValues={setPresetValues}
+            investment={investment}
+          />
+        ))}
       </InvestmentCardContainer>
 
       {activeOverlay === InvestmentsOverlayType.ADD && (
         <AddInvestmentModal
           onClose={handleCloseOverlay}
-          onSubmit={handleAddInvestment}
+          onSubmit={handleInvestmentSubmit}
+          presetValues={presetValues}
+          currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
+        />
+      )}
+
+      {activeOverlay === InvestmentsOverlayType.SELL && (
+        <SellInvestmentModal
+          onClose={handleCloseOverlay}
+          onSubmit={handleInvestmentSubmit}
+          presetValues={presetValues}
+          assetsList={results.map((investment) => investment.asset)}
+          currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
         />
       )}
     </PageContainer>

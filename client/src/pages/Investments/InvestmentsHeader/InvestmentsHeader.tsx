@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import { BaseButton, PageTitle } from "styles";
+import { BaseButton, PageTitle, SecondaryButton } from "styles";
 import { SPACING } from "theme";
-import { faAdd } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { InvestmentsOverlayType } from "../InvestmentsPage";
@@ -19,6 +19,10 @@ export const InvestmentsHeader = ({
     setActiveOverlay(InvestmentsOverlayType.ADD);
   };
 
+  const handleSellClick = () => {
+    setActiveOverlay(InvestmentsOverlayType.SELL);
+  };
+
   return (
     <Container>
       <PageTitle> Investments </PageTitle>
@@ -27,6 +31,10 @@ export const InvestmentsHeader = ({
           <FontAwesomeIcon icon={faAdd} />
           Add Investment
         </BaseButton>
+        <SecondaryButton onClick={handleSellClick}>
+          {" "}
+          <FontAwesomeIcon icon={faMoneyBill} /> Sell Investment
+        </SecondaryButton>
       </ButtonContainer>
     </Container>
   );

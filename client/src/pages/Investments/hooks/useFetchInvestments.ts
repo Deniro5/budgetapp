@@ -13,9 +13,16 @@ export const useFetchInvestments = () => {
     enabled: true,
   });
 
+  const currentInvestmentsQuantityMap: Record<string, number> = {};
+  query.data?.forEach((investment: Investment) => {
+    currentInvestmentsQuantityMap[investment.asset.symbol] =
+      investment.quantity;
+  });
+
   return {
     results: query.data ?? [],
     isLoading: query.isLoading,
     error: query.error,
+    currentInvestmentsQuantityMap,
   };
 };

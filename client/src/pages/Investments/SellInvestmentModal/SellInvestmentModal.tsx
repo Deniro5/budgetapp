@@ -1,38 +1,49 @@
-import { RawInvestment } from "types/investment";
+import { Asset, RawInvestment } from "types/investment";
 
 import { useAssetSearch } from "../hooks/useAssetSearch";
 import { BaseInvestmentModal } from "../BaseInvestmentModal/BaseInvestmentModal";
+import { useState } from "react";
+import { useSearchDropdown } from "components/SearchDropdown/hooks/useSearchDropdown";
 
-type AddInvestmentModalProps = {
+type SellInvestmentModalProps = {
   onClose: () => void;
   onSubmit: (investment: RawInvestment) => void;
   presetValues: Partial<RawInvestment>;
+  assetsList: Asset[];
   currentInvestmentsQuantityMap: Record<string, number>;
 };
 
-export default function AddInvestmentModal({
+const assetToString = (asset: Asset) => {
+  return `${asset.name} (${asset.symbol})`;
+};
+
+export default function SellInvestmentModal({
   onClose,
   onSubmit,
   presetValues,
+  assetsList,
   currentInvestmentsQuantityMap,
-}: AddInvestmentModalProps) {
-  const { results, input, setInput } = useAssetSearch();
-
+}: SellInvestmentModalProps) {
+  const { input, setInput, results } = useSearchDropdown({
+    items: assetsList,
+    itemToString: assetToString,
+  });
   const onSubmitForm = (data: RawInvestment) => {
-    onSubmit(data);
+    onSubmit({ ...data, quantity: -data.quantity });
     onClose();
   };
 
   return (
     <BaseInvestmentModal
-      title="Add Investment"
+      title="Sell Investment"
       onClose={onClose}
       onSubmit={onSubmitForm}
       presetValues={presetValues}
-      assetsList={results}
       input={input}
       setInput={setInput}
+      assetsList={results}
       currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
+      isSellModal
     />
   );
 }

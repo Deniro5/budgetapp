@@ -11,7 +11,6 @@ export function getFirstPath() {
 
 //Date
 
-
 //Auth
 
 export function sanitizeUsername(username: string) {
@@ -42,4 +41,10 @@ export function formatCamelCaseToTitleCase(input: string) {
 
 export function isAlphanumeric(key: string) {
   return /^[a-zA-Z0-9]$/.test(key);
+}
+
+//number formatting
+
+export function roundTo2Decimals(num: number) {
+  return Math.round(num * 100) / 100;
 }
