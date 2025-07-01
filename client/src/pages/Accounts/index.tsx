@@ -6,7 +6,7 @@ import { useState } from "react";
 import AccountsHeader from "./components/AccountsHeader/index.tsx";
 import { Account } from "types/account.ts";
 import AccountAddModal from "./components/Modals/AccountAddModal/index.tsx";
-import useAccount from "./hooks/useAccount.ts";
+
 import useAccountStore from "store/account/accountStore.ts";
 import AccountCard from "./components/AccountCard/index.tsx";
 import AccountEditModal from "./components/Modals/AccountEditModal/index.tsx";
@@ -19,7 +19,7 @@ export enum AccountOverlayType {
 }
 
 function Accounts() {
-  const { accountsWithBalance } = useAccountStore();
+  const { accounts } = useAccountStore();
   const [activeAccount, setActiveAccount] = useState<Account | null>(null);
   const [activeOverlay, setActiveOverlay] = useState<AccountOverlayType | null>(
     null
@@ -35,15 +35,15 @@ function Accounts() {
       <AccountsHeader setActiveOverlay={setActiveOverlay} />
       <PageColumnFlexContainer>
         <ContentContainer>
-          {!accountsWithBalance.length && (
+          {!accounts.length && (
             <>
               {" "}
               You currently have no accounts. Click the "Add Account" button in
               the top right corner to make your first account.{" "}
             </>
           )}
-          {accountsWithBalance &&
-            accountsWithBalance.map((account) => (
+          {accounts &&
+            accounts.map((account) => (
               <AccountCard
                 setActiveOverlay={setActiveOverlay}
                 setActiveAccount={setActiveAccount}

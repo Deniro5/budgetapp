@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { COLORS, SPACING } from "../../Theme";
-import { useState } from "react";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBorderAll,
@@ -12,13 +12,9 @@ import {
   faSackDollar,
   faHandHoldingDollar,
   faChartLine,
-  faWallet,
-  faCreditCard,
-  faCreditCardAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { getFirstPath } from "../../utils";
-import { useEffect } from "react";
 
 type SidebarItem = {
   href: string;

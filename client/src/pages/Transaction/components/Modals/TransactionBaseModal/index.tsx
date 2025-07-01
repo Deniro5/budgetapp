@@ -28,28 +28,31 @@ import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import usePresetTransactionStore from "store/presetTransaction/presetTransactionStore";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
+import { getAccountBalanceByIdMap } from "store/account/accountSelectors";
+import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
+import useAccountStore from "store/account/accountStore";
 
 type TransactionBaseModalProps = {
   title: string;
-  showPresetNameField?: boolean;
   confirmText?: string;
   onClose: () => void;
-  onSubmit: (transaction: RawTransaction) => void;
+  onSubmit: (transaction: RawTransaction, callback?: () => void) => void;
+  isPresetModal?: boolean;
   initialTransaction?: Transaction;
-  disableValidation?: boolean; //disable required validation
 };
 
 export default function TransactionBaseModal({
-  showPresetNameField,
   title,
   onClose,
   onSubmit,
   confirmText = "Add Transaction",
+  isPresetModal,
   initialTransaction,
-  disableValidation,
 }: TransactionBaseModalProps) {
   const { presetTransactions } = usePresetTransactionStore();
+  const { updateLocalAccountBalanceById } = useAccountStore();
   const userPreferences = getUserPreferences();
+  const accountBalanceByIdMap = getAccountBalanceByIdMap();
 
   const [currentPreset, setCurrentPreset] = useState<PresetTransaction | null>(
     null
@@ -85,12 +88,12 @@ export default function TransactionBaseModal({
 
   useEffect(() => {
     register("category", {
-      required: disableValidation ? false : "Category is required",
+      required: isPresetModal ? false : "Category is required",
     });
     register("account", {
-      required: disableValidation ? false : "Account is required",
+      required: isPresetModal ? false : "Account is required",
     });
-  }, [register, disableValidation]);
+  }, [register, isPresetModal]);
 
   const currentValues = watch();
 
@@ -111,11 +114,6 @@ export default function TransactionBaseModal({
     reset({ ...currentValues, ...preset });
   };
 
-  const onSubmitForm = (data: RawTransaction) => {
-    onSubmit(data);
-    onClose();
-  };
-
   const presetRenderer = (presetTransaction: PresetTransaction) => (
     <PresetTransactionMenuItem presetTransaction={presetTransaction} />
   );
@@ -123,11 +121,27 @@ export default function TransactionBaseModal({
   const presetToString = (presetTransaction: PresetTransaction) =>
     presetTransaction.name;
 
+  const currentBalance = accountBalanceByIdMap[currentValues.account || ""];
+  const afterBalance =
+    currentBalance && currentValues.amount
+      ? currentBalance +
+        ((initialTransaction?.amount || 0) - currentValues.amount)
+      : undefined;
+
+  const onSubmitForm = async (data: RawTransaction) => {
+    isPresetModal
+      ? onSubmit(data)
+      : onSubmit(data, () =>
+          updateLocalAccountBalanceById(data.account, afterBalance || 0)
+        );
+    onClose();
+  };
+
   return (
     <>
       <Title>{title}</Title>
       <form onSubmit={handleSubmit(onSubmitForm)}>
-        {!showPresetNameField && (
+        {!isPresetModal && (
           <>
             <Row>
               <InputContainer>
@@ -148,7 +162,7 @@ export default function TransactionBaseModal({
           </>
         )}
 
-        {showPresetNameField && (
+        {isPresetModal && (
           <>
             <Row>
               <InputContainer>
@@ -174,7 +188,7 @@ export default function TransactionBaseModal({
             <InputLabel>Vendor</InputLabel>
             <BaseInput
               {...register("vendor", {
-                required: disableValidation ? false : "Vendor is required",
+                required: isPresetModal ? false : "Vendor is required",
                 pattern: {
                   value: /^[a-zA-Z0-9 ]*$/,
                   message: "Alphanumeric values only",
@@ -191,7 +205,7 @@ export default function TransactionBaseModal({
             <InputLabel>Amount</InputLabel>
             <BaseInput
               {...register("amount", {
-                required: disableValidation ? false : "Amount is required",
+                required: isPresetModal ? false : "Amount is required",
                 validate: (value) => !isNaN(value) || "Invalid number",
                 onChange: () => clearErrors("amount"),
               })}
@@ -219,7 +233,7 @@ export default function TransactionBaseModal({
             <InputLabel>Date</InputLabel>
             <BaseInput
               {...register("date", {
-                required: disableValidation ? false : "Date is required",
+                required: isPresetModal ? false : "Date is required",
                 onChange: () => clearErrors("date"),
               })}
               type="date"
@@ -288,6 +302,12 @@ export default function TransactionBaseModal({
           </InputContainer>
         </Row>
 
+        {!isPresetModal && (
+          <BalanceSummaryFooter
+            currentBalance={currentBalance}
+            afterBalance={afterBalance}
+          />
+        )}
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>
           <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>

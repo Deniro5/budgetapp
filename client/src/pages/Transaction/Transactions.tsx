@@ -24,6 +24,7 @@ import useCalendar from "../../hooks/useCalendar.ts";
 import TransferAddModal from "./components/Modals/TransferAddModal/index.tsx";
 import TransferEditModal from "./components/Modals/TransferEditModal/TransferEditModal.tsx";
 import { TransferCopyModal } from "./components/Modals/TransferCopyModal/TransferCopyModal.tsx";
+import usePresetTransactions from "./hooks/usePresetTransaction.ts";
 
 export enum TransactionOverlayType {
   ADD = "add",
@@ -37,9 +38,12 @@ export enum TransactionOverlayType {
   COPY_TRANSFER = "copyTransfer",
 }
 
+export type View = "Transactions" | "Preset";
+
 function Transactions() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<TransactionFilter>({});
+  const [view, setView] = useState<View>("Transactions");
 
   const [sidebarTransactionId, setSidebarTransactionId] = useState<
     string | null
@@ -64,7 +68,21 @@ function Transactions() {
       filter,
       startDate,
       endDate,
+      view,
     });
+
+  const {
+    presetTransactions,
+    presetTransactionCount,
+    loadMore: loadMorePreset,
+    isLoading: isLoadingPreset,
+    error: errorPreset,
+  } = usePresetTransactions({
+    search,
+    filter,
+    startDate,
+    endDate,
+  });
 
   const handleCloseOverlay = () => {
     setActiveOverlay(null);
@@ -73,10 +91,23 @@ function Transactions() {
 
   const hasFilters = Object.values(filter).some((val) => !!val);
 
+  const currentTransactions =
+    view === "Transactions" ? transactions : presetTransactions;
+  const currentLoading = view === "Transactions" ? isLoading : isLoadingPreset;
+  const currentError = view === "Transactions" ? error : errorPreset;
+  const currentCount =
+    view === "Transactions" ? transactionCount : presetTransactionCount;
+  const currentLoadMore = view === "Transactions" ? loadMore : loadMorePreset;
+
+  console.log(presetTransactions);
   return (
     <PageContainer>
-      <TransactionsHeader setActiveOverlay={setActiveOverlay} />
-      {}
+      <TransactionsHeader
+        setActiveOverlay={setActiveOverlay}
+        setView={setView}
+        view={view}
+      />
+
       <PageColumnFlexContainer
         gap={hasFilters ? SPACING.spacing4x : SPACING.spacing9x}
       >
@@ -97,10 +128,10 @@ function Transactions() {
         <ContentContainer>
           <TableFlexContainer hasFilters={hasFilters}>
             <TransactionTable
-              transactions={transactions}
-              loading={isLoading}
-              loadMore={loadMore}
-              error={error}
+              transactions={currentTransactions}
+              loading={currentLoading}
+              loadMore={currentLoadMore}
+              error={currentError}
               sidebarTransactionId={sidebarTransactionId}
               setSidebarTransactionId={setSidebarTransactionId}
               setActiveTransaction={setActiveTransaction}
@@ -108,10 +139,12 @@ function Transactions() {
               setContextMenuPosition={setContextMenuPosition}
             />
             <TransactionCount>
-              Showing {transactions.length} of {transactionCount} Transactions
+              Showing {currentTransactions.length} of {currentCount}{" "}
+              Transactions
             </TransactionCount>
           </TableFlexContainer>
           <TransactionSidebar
+            activeTransaction={activeTransaction}
             sidebarTransactionId={sidebarTransactionId}
             setActiveTransaction={setActiveTransaction}
             setActiveOverlay={setActiveOverlay}

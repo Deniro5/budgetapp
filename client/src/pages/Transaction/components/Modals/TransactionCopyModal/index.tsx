@@ -14,8 +14,11 @@ export default function TransactionAddModal({
 }: TransactionCopyModalProps) {
   const { addTransaction } = useTransactionStore();
 
-  const handleModalSubmit = (transaction: RawTransaction) => {
-    addTransaction(transaction);
+  const handleModalSubmit = (
+    transaction: RawTransaction,
+    callback?: () => void
+  ) => {
+    addTransaction(transaction, callback);
   };
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>

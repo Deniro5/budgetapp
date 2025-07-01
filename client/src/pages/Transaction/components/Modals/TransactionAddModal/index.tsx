@@ -14,8 +14,13 @@ export default function TransactionAddModal({
 }: TransactionAddModalProps) {
   const { addTransaction } = useTransactionStore();
 
-  const handleModalSubmit = (transaction: RawTransaction) => {
-    addTransaction(transaction, addTransactionCallback);
+  //NOTE: addTransactionCallback is not used, And this will prevent recentTransactions from getting latest
+  //This should probably be much easier to fix when tanstack is used
+  const handleModalSubmit = (
+    transaction: RawTransaction,
+    callback?: () => void
+  ) => {
+    addTransaction(transaction, callback);
   };
 
   return (

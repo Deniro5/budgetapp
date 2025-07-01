@@ -17,6 +17,14 @@ export const getAccountNameByIdMap = () =>
     }, {});
   });
 
+export const getAccountBalanceByIdMap = () =>
+  useAccountStore((state: AccountStore) => {
+    return state.accounts.reduce((acc: Record<string, number>, cur) => {
+      acc[cur._id] = cur.balance;
+      return acc;
+    }, {});
+  });
+
 export const getAccountids = () =>
   useAccountStore((state: AccountStore) =>
     state.accounts.map((account) => account._id)

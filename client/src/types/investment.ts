@@ -1,5 +1,5 @@
 export type Investment = {
-  asset: Asset;
+  asset: AssetWithPrice;
   quantity: number;
   price: number;
   date: string;
@@ -19,4 +19,8 @@ export type Asset = {
   symbol: string;
   name: string;
   exchange: string;
+};
+
+export type AssetWithPrice = Asset & {
+  history: { date: string; price: number }[];
 };

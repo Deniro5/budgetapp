@@ -1,17 +1,24 @@
 import styled from "styled-components";
-import { BaseButton, PageTitle, SecondaryButton } from "styles";
+import { BaseButton, Flex, PageTitle, SecondaryButton } from "styles";
 import { SPACING } from "theme";
 import { faAdd, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { TransactionOverlayType } from "../../Transactions";
+import { TransactionOverlayType, View } from "../../Transactions";
+import { Toggle } from "components/Toggle/Toggle";
 
 type TransactionHeaderProps = {
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<TransactionOverlayType | null>
   >;
+  view: View;
+  setView: React.Dispatch<React.SetStateAction<View>>;
 };
 
-function TransactionsHeader({ setActiveOverlay }: TransactionHeaderProps) {
+function TransactionsHeader({
+  setActiveOverlay,
+  view,
+  setView,
+}: TransactionHeaderProps) {
   const handleAddClick = () => {
     setActiveOverlay(TransactionOverlayType.ADD);
   };
@@ -25,7 +32,16 @@ function TransactionsHeader({ setActiveOverlay }: TransactionHeaderProps) {
   };
   return (
     <Container>
-      <PageTitle> Transactions </PageTitle>
+      <Flex>
+        <PageTitle> Transactions </PageTitle>
+        <Toggle
+          onChange={() =>
+            setView(view === "Transactions" ? "Preset" : "Transactions")
+          }
+          checked={view === "Preset"}
+          label="View Presets"
+        />
+      </Flex>
       <ButtonContainer>
         <BaseButton onClick={handleAddClick}>
           <FontAwesomeIcon icon={faAdd} />
@@ -37,7 +53,7 @@ function TransactionsHeader({ setActiveOverlay }: TransactionHeaderProps) {
         </BaseButton>
         <SecondaryButton onClick={handlePresetClick}>
           <FontAwesomeIcon icon={faFolderPlus} />
-          Manage Preset Transactions{" "}
+          Add Preset Transaction
         </SecondaryButton>
       </ButtonContainer>
     </Container>

@@ -1,13 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import useTransactionStore from "../../../store/transaction/transactionStore";
 import { TransactionFilter } from "types/Transaction";
-
-type useTransactionProps = {
-  search: string;
-  filter: TransactionFilter;
-  startDate: string;
-  endDate: string;
-};
+import { View } from "../Transactions";
 
 export default function useTransaction({
   search,

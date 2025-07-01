@@ -6,6 +6,7 @@ const API_BASE_URL = "http://localhost:8000/preset-transactions"; // Replace wit
 
 export interface PresetTransactionStore {
   presetTransactions: PresetTransaction[];
+  presetTransactionCount: number;
   isLoading: boolean;
   error: string | null;
   hasLoaded: boolean;
@@ -22,6 +23,7 @@ export interface PresetTransactionStore {
 const usePresetTransactionStore = create<PresetTransactionStore>(
   (set, get) => ({
     presetTransactions: [],
+    presetTransactionCount: 0,
     isLoading: false,
     error: null,
     hasLoaded: false,

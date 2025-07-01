@@ -25,8 +25,7 @@ export default function PresetTransactionModal({
         onClose={onClose}
         onSubmit={handleModalSubmit}
         initialTransaction={undefined}
-        showPresetNameField={true}
-        disableValidation={true}
+        isPresetModal
       />
     </Modal>
   );

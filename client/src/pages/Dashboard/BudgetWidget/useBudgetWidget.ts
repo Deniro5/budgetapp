@@ -97,7 +97,7 @@ export const useBudgetWidget = ({
 
     const lastDate =
       totalIncomeAndExpenseByDate[totalIncomeAndExpenseByDate.length - 1];
-    return totalBudget - lastDate.expense;
+    return totalBudget - (lastDate?.expense ?? 0);
   };
 
   const categoriesWithBudget = getAggregatedCategoriesWithBudget();

@@ -13,7 +13,7 @@ import { getDollarValue } from "utils";
 
 type TransactionTableRowProps = {
   transaction: Transaction;
-  onClick: (transactionId: string | null) => void;
+  onClick: (transaction: Transaction | null) => void;
   onRightClick: (
     e: React.MouseEvent<HTMLTableRowElement>,
     transaction: Transaction | null
@@ -36,7 +36,7 @@ function TransactionTableRow({
       onClick(null);
       return;
     }
-    onClick(transaction._id);
+    onClick(transaction);
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {

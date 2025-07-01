@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import InvestmentModel from "../models/investment.model";
 import { SampleStocks } from "../data/sample-stocks";
 import mongoose from "mongoose";
 
 interface CustomRequest extends Request {
   userId?: string;
+  investments?: any;
 }
 
 // Create
@@ -14,19 +15,6 @@ export const createInvestment = async (req: CustomRequest, res: Response) => {
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    // Count existing transactions for the user
-    const investmentCount = await InvestmentModel.countDocuments({
-      userId,
-    });
-
-    if (investmentCount >= 10) {
-      res.status(400).json({
-        error:
-          "Investment limit reached (10). Please delete an existing investment and try again",
-      });
       return;
     }
 
@@ -50,10 +38,36 @@ export const createInvestment = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const getInvestments = async (req: CustomRequest, res: Response) => {
+export const getAllInvestments = async (req: CustomRequest, res: Response) => {
   try {
     const { userId } = req;
-    const { limit = 20 } = req.query;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    // Build the query object
+    const query: any = { userId };
+    const investments = await InvestmentModel.find(query).sort({
+      date: -1,
+      _id: -1,
+    }); // Sort by date first, then by _id for uniqueness
+
+    res.json(investments);
+  } catch (err) {
+    console.error("Error fetching accounts:", err);
+    res.status(500).json({ error: "Failed to fetch accounts" });
+  }
+};
+
+export const getCurrentAggregatedInvestments = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
@@ -62,7 +76,7 @@ export const getInvestments = async (req: CustomRequest, res: Response) => {
 
     const aggregatedInvestments = await InvestmentModel.aggregate([
       {
-        $match: { userId: new mongoose.Types.ObjectId(userId) }, // Optional filter
+        $match: { userId: new mongoose.Types.ObjectId(userId) },
       },
       {
         $group: {
@@ -76,6 +90,9 @@ export const getInvestments = async (req: CustomRequest, res: Response) => {
           totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
           entries: { $push: "$$ROOT" },
         },
+      },
+      {
+        $match: { totalQuantity: { $gt: 0 } },
       },
       {
         $project: {
@@ -98,8 +115,8 @@ export const getInvestments = async (req: CustomRequest, res: Response) => {
         },
       },
     ]);
-
-    res.json(aggregatedInvestments);
+    req.investments = aggregatedInvestments;
+    next();
   } catch (err) {
     console.error("Error fetching investments:", err);
     res.status(500).json({ error: "Failed to fetch investments" });

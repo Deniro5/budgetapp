@@ -1,21 +1,9 @@
-import {
-  faAdd,
-  faMoneyBill,
-  faPencil,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
-import {
-  BaseButton,
-  Card,
-  DeleteButton,
-  Divider,
-  Flex,
-  SecondaryButton,
-} from "styles";
+import { BaseButton, Card, Divider, Flex, SecondaryButton } from "styles";
 import { FONTSIZE, SPACING } from "theme";
-import { Asset, Investment, RawInvestment } from "types/investment";
+import { Investment, RawInvestment } from "types/investment";
 import { InvestmentsOverlayType } from "../InvestmentsPage";
 import { AssetChart } from "./AssetChart/AssetChart";
 import { roundTo2Decimals } from "utils";
@@ -28,22 +16,29 @@ type InvestmentCardProps = {
   setPresetValues: React.Dispatch<React.SetStateAction<Partial<RawInvestment>>>;
 };
 
-export function InvestmentCard({
+export const InvestmentCard = ({
   investment,
   setActiveOverlay,
   setPresetValues,
-}: InvestmentCardProps) {
+}: InvestmentCardProps) => {
+  const { asset, quantity, price } = investment;
+  const { symbol, name, history } = asset;
+  const currentPrice = history[history.length - 1].price;
+  const totalCost = roundTo2Decimals(price * quantity);
+  const totalValue = roundTo2Decimals(quantity * currentPrice);
+  const totalGainLoss = roundTo2Decimals(totalValue - totalCost);
+
   const handleBuyClick = () => {
     setActiveOverlay(InvestmentsOverlayType.ADD);
-    setPresetValues({ asset: investment.asset });
+    setPresetValues({ asset, price: currentPrice });
   };
 
   const handleSellClick = () => {
     setActiveOverlay(InvestmentsOverlayType.SELL);
     setPresetValues({
-      asset: investment.asset,
-      quantity: investment.quantity,
-      price: investment.price,
+      asset,
+      quantity,
+      price: currentPrice,
     });
   };
 
@@ -51,58 +46,47 @@ export function InvestmentCard({
     <Container>
       <InvestmentHeader>
         <InvestmentName>
-          <SymbolText> {investment.asset.symbol} </SymbolText>-
-          <NameText>{investment.asset.name}</NameText>
+          <SymbolText> {symbol} </SymbolText>-<NameText>{name}</NameText>
         </InvestmentName>
-        <Price>${roundTo2Decimals(investment.price)}</Price>
+        <Price>${roundTo2Decimals(currentPrice)}</Price>
       </InvestmentHeader>
       <StyledDivider />
-      <AssetChart />
+      <AssetChart asset={asset} />
       <StyledDivider />
       <InvestmentInfo>
         <Flex>
           <Label>Quantity: </Label>
-          <Text>{investment.quantity} </Text>
+          <Text>{quantity}</Text>
         </Flex>
         <Flex>
           <Label>Average Cost: </Label>
-          <Text> ${roundTo2Decimals(investment.price)} </Text>
+          <Text>${roundTo2Decimals(price)}</Text>
         </Flex>
         <Flex>
           <Label>Total Cost: </Label>
-          <Text>
-            {" "}
-            ${roundTo2Decimals(investment.price * investment.quantity)}{" "}
-          </Text>
+          <Text>${totalCost}</Text>
         </Flex>
         <Flex>
           <Label>Total Value: </Label>
-          <Text>
-            ${roundTo2Decimals(investment.quantity * investment.price)}{" "}
-          </Text>
+          <Text>${totalValue}</Text>
         </Flex>
         <Flex>
           <Label>Total Gain/Loss: </Label>
-          <Text>
-            {" "}
-            ${roundTo2Decimals(investment.price * investment.quantity)}{" "}
-          </Text>
+          <Text>${totalGainLoss}</Text>
         </Flex>
       </InvestmentInfo>
       <ButtonContainer>
         <BaseButton onClick={handleBuyClick}>
           <FontAwesomeIcon icon={faAdd} />
-          Buy more {investment.asset.symbol}
+          Buy more {symbol}
         </BaseButton>
         <SecondaryButton onClick={handleSellClick}>
-          {" "}
-          <FontAwesomeIcon icon={faMoneyBill} /> Sell {investment.asset.symbol}
+          <FontAwesomeIcon icon={faMoneyBill} /> Sell {symbol}
         </SecondaryButton>
       </ButtonContainer>
     </Container>
   );
-}
-
+};
 const Container = styled(Card)`
   padding: ${SPACING.spacing6x};
   max-width: 750px;

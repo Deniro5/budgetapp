@@ -11,10 +11,12 @@ import { InvestmentCard } from "./InvestmentCard/InvestmentCard.tsx";
 import styled from "styled-components";
 import { SPACING } from "theme";
 import SellInvestmentModal from "./SellInvestmentModal/SellInvestmentModal.tsx";
+import { InvestmentHistoryModal } from "./InvestmentHistoryModal/InvestmentHistoryModal.tsx";
 
 export enum InvestmentsOverlayType {
   ADD = "add",
   SELL = "sell",
+  HISTORY = "history",
 }
 
 export const InvestmentsPage = () => {
@@ -62,6 +64,10 @@ export const InvestmentsPage = () => {
           assetsList={results.map((investment) => investment.asset)}
           currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
         />
+      )}
+
+      {activeOverlay === InvestmentsOverlayType.HISTORY && (
+        <InvestmentHistoryModal onClose={handleCloseOverlay} />
       )}
     </PageContainer>
   );

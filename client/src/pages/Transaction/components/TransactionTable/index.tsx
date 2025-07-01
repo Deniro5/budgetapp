@@ -3,7 +3,6 @@ import { COLORS, FONTSIZE, SPACING } from "theme";
 import TransactionTableRow from "./TransactionTableRow";
 import { Transaction } from "types/Transaction";
 import { TransactionOverlayType } from "../../Transactions";
-import { useEffect, useRef } from "react";
 import { Waypoint } from "react-waypoint";
 
 type TransactionTableProps = {
@@ -67,7 +66,7 @@ function TransactionTable({
               key={index}
               transaction={transaction}
               isSelected={transaction._id === sidebarTransactionId}
-              onClick={setSidebarTransactionId}
+              onClick={setActiveTransaction}
               onRightClick={handleRightClick}
               onDoubleClick={handleDoubleClick}
             />

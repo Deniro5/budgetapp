@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
-import { PresetTransaction } from "types/presetTransaction";
-
+import { PresetTransaction } from "types/Transaction";
 type PresetTransactionMenuItemProps = {
   presetTransaction: PresetTransaction;
 };

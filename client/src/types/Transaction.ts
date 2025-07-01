@@ -90,7 +90,10 @@ export type RawTransfer = {
 export type PresetTransaction = {
   _id: string;
   name: string;
-  account?: string;
+  account?: {
+    _id: string;
+    name: string;
+  };
   type?: TransactionType;
   userId: string;
   amount?: number;
@@ -99,6 +102,8 @@ export type PresetTransaction = {
   description?: string;
   vendor?: string;
   tags?: string[];
+  updatedAt: Date;
+  createdAt: Date;
 };
 
 export type RawPresetTransaction = Omit<PresetTransaction, "_id" | "userId"> & {

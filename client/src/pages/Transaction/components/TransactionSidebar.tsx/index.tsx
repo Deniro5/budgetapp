@@ -7,7 +7,11 @@ import {
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { BaseButton, DeleteButton, Divider } from "styles";
-import { Transaction, TransactionCategory } from "types/Transaction";
+import {
+  PresetTransaction,
+  Transaction,
+  TransactionCategory,
+} from "types/Transaction";
 import { format } from "date-fns";
 import { getTransactionById } from "store/transaction/transactionSelectors";
 import { TransactionOverlayType } from "../../Transactions";
@@ -17,6 +21,7 @@ import useAccountStore from "store/account/accountStore";
 
 type TransactionSidebarProps = {
   sidebarTransactionId: string | null;
+  activeTransaction: Transaction | PresetTransaction;
   setActiveTransaction: React.Dispatch<
     React.SetStateAction<Transaction | null>
   >;
@@ -27,12 +32,13 @@ type TransactionSidebarProps = {
 
 const TransactionSidebar = ({
   sidebarTransactionId,
+  activeTransaction,
   setActiveTransaction,
   setActiveOverlay,
 }: TransactionSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { accountIdToNameMap } = useAccountStore();
-  const sidebarTransaction = getTransactionById(sidebarTransactionId);
+  const sidebarTransaction = activeTransaction;
   const isTransfer =
     sidebarTransaction?.category === TransactionCategory.Transfer;
 
@@ -40,7 +46,6 @@ const TransactionSidebar = ({
 
   const handleEditClick = () => {
     if (!sidebarTransaction) return;
-    setActiveTransaction(sidebarTransaction);
     setActiveOverlay(
       isTransfer
         ? TransactionOverlayType.EDIT_TRANSFER
@@ -50,13 +55,12 @@ const TransactionSidebar = ({
 
   const handleDeleteClick = () => {
     if (!sidebarTransaction) return;
-    setActiveTransaction(sidebarTransaction);
     setActiveOverlay(TransactionOverlayType.DELETE);
   };
 
   const transactionVendorName =
     sidebarTransaction?.category === TransactionCategory.Transfer
-      ? accountIdToNameMap[sidebarTransaction.vendor]
+      ? accountIdToNameMap[sidebarTransaction?.vendor || ""]
       : sidebarTransaction?.vendor;
 
   const getSidebarContent = () => {
@@ -82,11 +86,11 @@ const TransactionSidebar = ({
               <b> Date: </b> <span> {sidebarTransaction.date} </span>
             </Row>
             <Row>
-              <b> Account: </b> <span>{sidebarTransaction.account.name}</span>
+              <b> Account: </b> <span>{sidebarTransaction?.account?.name}</span>
             </Row>
             <Row>
               <b> Amount: </b>{" "}
-              <span>{getDollarValue(sidebarTransaction.amount)}</span>
+              <span>{getDollarValue(sidebarTransaction?.amount || 0)}</span>
             </Row>
             <Row>
               <b> Type: </b> <span> {sidebarTransaction.type} </span>
@@ -99,9 +103,8 @@ const TransactionSidebar = ({
               <>
                 <Row>
                   <b> Tags: </b>{" "}
-                  {sidebarTransaction.tags.map((tag) => (
-                    <span> {tag} </span>
-                  ))}
+                  {sidebarTransaction.tags &&
+                    sidebarTransaction.tags.map((tag) => <span> {tag} </span>)}
                 </Row>
                 <Row>
                   <b> Description: </b>{" "}

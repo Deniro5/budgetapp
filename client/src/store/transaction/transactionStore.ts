@@ -25,11 +25,12 @@ export interface TransactionStore {
   ) => Promise<void>;
   addTransaction: (
     transaction: RawTransaction,
-    callback?: (transaction: Transaction) => void
+    callback?: () => void
   ) => Promise<void>;
   updateTransaction: (
     id: string,
-    updatedTransaction: RawTransaction
+    updatedTransaction: RawTransaction,
+    callback?: () => void
   ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   addTransfer: (
@@ -83,7 +84,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         transactions: [response.data, ...get().transactions],
         transactionCount: get().transactionCount + 1,
       });
-      if (callback) callback(response.data);
+      if (callback) callback();
     } catch (error) {
       console.error("Error adding transaction:", error);
       set({ error: "Failed to add transaction" });
@@ -93,7 +94,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
   },
 
   // Update a transaction by ID
-  updateTransaction: async (id, updatedTransaction) => {
+  updateTransaction: async (id, updatedTransaction, callback) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.put<Transaction>(
@@ -104,6 +105,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
         transaction._id === id ? response.data : transaction
       );
       set({ transactions: updatedTransactions });
+      if (callback) callback();
     } catch (error) {
       console.error("Error updating transaction:", error);
       set({ error: "Failed to update transaction" });

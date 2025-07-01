@@ -1,7 +1,17 @@
 import styled from "styled-components";
-import { BaseButton, PageTitle, SecondaryButton } from "styles";
+import {
+  BaseButton,
+  Flex,
+  IconButton,
+  PageTitle,
+  SecondaryButton,
+} from "styles";
 import { SPACING } from "theme";
-import { faAdd, faMoneyBill } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAdd,
+  faMoneyBill,
+  faClockRotateLeft,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { InvestmentsOverlayType } from "../InvestmentsPage";
@@ -23,9 +33,19 @@ export const InvestmentsHeader = ({
     setActiveOverlay(InvestmentsOverlayType.SELL);
   };
 
+  const handleHistoryClick = () => {
+    setActiveOverlay(InvestmentsOverlayType.HISTORY);
+  };
+
   return (
     <Container>
-      <PageTitle> Investments </PageTitle>
+      <PageTitleContainer>
+        <PageTitle>Investments</PageTitle>
+        <HistoryButton onClick={handleHistoryClick}>
+          <FontAwesomeIcon icon={faClockRotateLeft} />
+        </HistoryButton>
+      </PageTitleContainer>
+
       <ButtonContainer>
         <BaseButton onClick={handleAddClick}>
           <FontAwesomeIcon icon={faAdd} />
@@ -50,4 +70,12 @@ const Container = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   gap: ${SPACING.spacing6x};
+`;
+
+const PageTitleContainer = styled(Flex)`
+  gap: ${SPACING.spacing4x};
+`;
+
+const HistoryButton = styled(IconButton)`
+  font-size: 22px;
 `;

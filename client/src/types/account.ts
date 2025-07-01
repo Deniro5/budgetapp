@@ -12,7 +12,7 @@ export enum AccountType {
   CASH_ACCOUNT = "Cash Account",
 }
 
-export type Account = {
+export type RawAccount = {
   _id: string;
   name: string;
   institution: string;
@@ -21,6 +21,6 @@ export type Account = {
   baselineDate: string;
 };
 
-export type AccountWithBalance = Account & {
+export type Account = RawAccount & {
   balance: number;
 };

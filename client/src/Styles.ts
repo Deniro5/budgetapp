@@ -15,6 +15,14 @@ export const Flex = styled.div`
   gap: ${SPACING.spacing6x};
 `;
 
+export const ScrollableContainer = styled.div`
+  overflow: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
 // -------------------- Page Elements --------------------------
 
 export const PageContainer = styled.div``;
