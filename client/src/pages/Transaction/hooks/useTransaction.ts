@@ -3,6 +3,13 @@ import useTransactionStore from "../../../store/transaction/transactionStore";
 import { TransactionFilter } from "types/Transaction";
 import { View } from "../Transactions";
 
+type useTransactionProps = {
+  search: string;
+  filter: TransactionFilter;
+  startDate: string;
+  endDate: string;
+};
+
 export default function useTransaction({
   search,
   filter,

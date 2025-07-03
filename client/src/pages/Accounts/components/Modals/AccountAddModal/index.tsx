@@ -1,5 +1,5 @@
 import Modal from "components/Global/Modal";
-import { Account } from "types/account";
+import { Account, RawAccount } from "types/account";
 import AccountBaseModal from "../AccountBaseModal";
 import useAccountStore from "store/account/accountStore";
 
@@ -10,7 +10,7 @@ type AccountAddModalProps = {
 export default function AccountAddModal({ onClose }: AccountAddModalProps) {
   const { addAccount } = useAccountStore();
 
-  const handleModalSubmit = (account: Account) => {
+  const handleModalSubmit = (account: RawAccount) => {
     addAccount(account);
   };
 

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import {
   getCurrentDateFormatted,
-  getFirstDayOfMonthFormatted,
+  getDateDaysAgoFormatted,
 } from "../utils/DateUtils";
 
 const useCalendar = () => {
-  const firstDay = getFirstDayOfMonthFormatted();
+  const firstDay = getDateDaysAgoFormatted(30);
   const lastDay = getCurrentDateFormatted();
   const [startDate, setStartDate] = useState<string>(firstDay);
   const [endDate, setEndDate] = useState<string>(lastDay);

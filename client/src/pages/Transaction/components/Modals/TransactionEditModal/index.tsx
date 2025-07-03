@@ -14,8 +14,8 @@ function TransactionEditModal({
 }: TransactionEditModalProps) {
   const { updateTransaction } = useTransactionStore();
 
-  const handleModalSubmit = (updatedTransaction: RawTransaction) => {
-    updateTransaction(transaction._id, updatedTransaction);
+  const handleModalSubmit = (updatedTransaction: RawTransaction, callback?: () => void) => {
+    updateTransaction(transaction._id, updatedTransaction, callback);
   };
 
   return (

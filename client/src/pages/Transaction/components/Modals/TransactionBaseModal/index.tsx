@@ -76,11 +76,10 @@ export default function TransactionBaseModal({
       vendor: initialTransaction?.vendor,
       amount: initialTransaction?.amount,
       type: initialTransaction?.type,
-      date: initialTransaction?.date || new Date().toISOString().split("T")[0],
+      date: initialTransaction?.date,
       account:
         initialTransaction?.account?._id ||
-        userPreferences?.defaultAccount?._id ||
-        undefined,
+        (isPresetModal ? undefined : userPreferences?.defaultAccount?._id),
       category: initialTransaction?.category,
       tags: initialTransaction?.tags || [],
     },

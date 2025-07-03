@@ -69,8 +69,7 @@ export default function usePresetTransactions({
 
   //handle loading
   useEffect(() => {
-    // fetchPresetTransactions(queryString, isInitialLoad);
-    fetchPresetTransactions();
+    fetchPresetTransactions(queryString, isInitialLoad);
   }, [queryString]);
 
   return {

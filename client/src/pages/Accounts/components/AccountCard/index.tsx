@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 import { Card, DeleteButton, Divider, Flex, SecondaryButton } from "styles";
 import { FONTSIZE, SPACING } from "theme";
-import { Account, AccountWithBalance } from "types/account";
+import { Account, } from "types/account";
 import { AccountOverlayType } from "../..";
 
 type AccountCardProps = {
-  account: AccountWithBalance;
+  account: Account;
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<AccountOverlayType | null>
   >;

@@ -122,6 +122,8 @@ export const getCurrentAggregatedInvestments = async (
     res.status(500).json({ error: "Failed to fetch investments" });
   }
 };
+
+
 export const searchStocks = async (req: CustomRequest, res: Response) => {
   try {
     const { userId } = req;

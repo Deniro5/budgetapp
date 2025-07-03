@@ -5,6 +5,7 @@ import useAccountStore from "store/account/accountStore";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
 import {
+  PresetTransaction,
   Transaction,
   TransactionCategory,
   TransactionType,
@@ -12,7 +13,7 @@ import {
 import { getDollarValue } from "utils";
 
 type TransactionTableRowProps = {
-  transaction: Transaction;
+  transaction: Transaction | PresetTransaction;
   onClick: (transaction: Transaction | null) => void;
   onRightClick: (
     e: React.MouseEvent<HTMLTableRowElement>,
@@ -21,6 +22,8 @@ type TransactionTableRowProps = {
   onDoubleClick: (transaction: Transaction | null) => void;
   isSelected: boolean;
 };
+
+const emptyString = "N/A";
 
 function TransactionTableRow({
   transaction,
@@ -55,6 +58,8 @@ function TransactionTableRow({
       ? accountIdToNameMap[transaction.vendor]
       : transaction.vendor;
 
+  console.log(transaction);
+
   return (
     <Container
       onContextMenu={handleContextMenu}
@@ -62,21 +67,30 @@ function TransactionTableRow({
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <td> {transactionVendorName} </td>
-      <td> {transaction.date} </td>
+      <td> {transactionVendorName || emptyString} </td>
+      <td> {transaction.date ? transaction.date : emptyString} </td>
       <AmountTd transactionType={transaction.type}>
-        {transaction.type === TransactionType.INCOME && "+"}
-        {getDollarValue(transaction.amount)}{" "}
+        {transaction.amount
+          ? `${
+              transaction.type === TransactionType.INCOME ? "+" : ""
+            }${getDollarValue(transaction.amount)}`
+          : emptyString}
       </AmountTd>
       <CategoryTd>
-        <FontAwesomeIcon
-          icon={transactionCategoryImageMap[transaction.category]}
-          width={20}
-          height={20}
-        />
-        {transaction.category}
+        {transaction.category ? (
+          <>
+            <FontAwesomeIcon
+              icon={transactionCategoryImageMap[transaction.category]}
+              width={20}
+              height={20}
+            />
+            {transaction.category}
+          </>
+        ) : (
+          emptyString
+        )}
       </CategoryTd>
-      <td> {transaction.account.name} </td>
+      <td> {transaction.account?.name || emptyString} </td>
     </Container>
   );
 }
@@ -100,7 +114,7 @@ const Container = styled.tr<{ isSelected: boolean }>`
   }
 `;
 
-const AmountTd = styled.td<{ transactionType: TransactionType }>`
+const AmountTd = styled.td<{ transactionType?: TransactionType }>`
   color: ${({ transactionType }) =>
     transactionType === TransactionType.INCOME && COLORS.green};
 `;

@@ -9,7 +9,7 @@ const presetTransactionSchema: Schema = new Schema(
     amount: { type: Number, required: false },
     type: { type: String, required: false },
     date: { type: String, required: false },
-    account: { type: String, required: false },
+    account: { type: Schema.Types.ObjectId, ref: "Account", required: false }, // Reference to the Account
     category: { type: String, required: false },
     vendor: { type: String, required: false },
     tags: { type: [String], required: false },

@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import TransactionTableRow from "./TransactionTableRow";
-import { Transaction } from "types/Transaction";
+import { PresetTransaction, Transaction } from "types/Transaction";
 import { TransactionOverlayType } from "../../Transactions";
 import { Waypoint } from "react-waypoint";
 
 type TransactionTableProps = {
-  transactions: Transaction[];
+  transactions: Transaction[] | PresetTransaction[];
   error: string | null;
   loading: boolean;
   sidebarTransactionId: string | null;
@@ -31,7 +31,7 @@ function TransactionTable({
   loading,
   loadMore,
   sidebarTransactionId,
-  setSidebarTransactionId,
+
   setActiveTransaction,
   setActiveOverlay,
   setContextMenuPosition,
@@ -76,9 +76,8 @@ function TransactionTable({
       </ScrollableTable>
       {transactions.length === 0 && (
         <NoResult>
-          {" "}
           No transactions to show. Create a transaction by clicking the "Add
-          Transaction" button at the top of the page.{" "}
+          Transaction" button at the top of the page.
         </NoResult>
       )}
     </TableWrapper>

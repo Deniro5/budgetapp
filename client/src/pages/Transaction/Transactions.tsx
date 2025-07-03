@@ -114,12 +114,14 @@ function Transactions() {
         <FiltersContainer>
           <TransactionsSearchBar setSearch={setSearch} search={search} />
           <TransactionFilterButton setFilter={setFilter} filter={filter} />
-          <DateMenu
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-          />
+          {view === "Transactions" && (
+            <DateMenu
+              startDate={startDate}
+              endDate={endDate}
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
+            />
+          )}
         </FiltersContainer>
 
         {hasFilters && (
@@ -145,7 +147,6 @@ function Transactions() {
           </TableFlexContainer>
           <TransactionSidebar
             activeTransaction={activeTransaction}
-            sidebarTransactionId={sidebarTransactionId}
             setActiveTransaction={setActiveTransaction}
             setActiveOverlay={setActiveOverlay}
           />

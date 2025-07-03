@@ -96,31 +96,89 @@ export const getPresetTransactionById = async (
   }
 };
 
-//Read
 export const getPresetTransactions = async (
   req: CustomRequest,
   res: Response
 ) => {
   try {
     const { userId } = req;
-    const { limit = 100, sort = "-name" } = req.query;
+    const {
+      q,
+      limit = 100,
+      offset = 0,
+      sort = "-createdAt",
+      category,
+      tags,
+      type,
+      minAmount,
+      maxAmount,
+      account,
+    } = req.query;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    // Query object with only userId
-    const query = { userId };
+    const query: any = { userId };
 
-    const transactions = await PresetTransactionModel.find(query)
+    // Text search
+    if (q) {
+      query.$or = [
+        { name: { $regex: q, $options: "i" } },
+        { vendor: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    // Category filter
+    if (category) {
+      query.category = category;
+    }
+
+    // Tags filter
+    if (tags && tags.length) {
+      query.tags = {
+        $in: tags,
+      };
+    }
+
+    // Type filter
+    if (type) {
+      query.type = type;
+    }
+
+    // Amount range filter
+    if (minAmount || maxAmount) {
+      query.amount = {};
+      if (minAmount) query.amount.$gte = Number(minAmount);
+      if (maxAmount) query.amount.$lte = Number(maxAmount);
+    }
+
+    // Account filter
+    if (account) {
+      query.account = { $in: Array.isArray(account) ? account : [account] };
+    }
+
+    const presetTransactionCount = await PresetTransactionModel.countDocuments(
+      query
+    );
+
+    const presetTransactions = await PresetTransactionModel.find(query)
       .sort(sort as string)
-      .limit(Number(limit));
+      .skip(Number(offset))
+      .limit(Number(limit))
+      .populate({ path: "account", select: "name _id" }); // Remove or adjust if not needed
 
-    res.json(transactions);
+    console.log(presetTransactions);
+
+    res.json({
+      transactions: presetTransactions,
+      transactionCount: presetTransactionCount,
+    });
   } catch (err) {
-    console.error("Error fetching transactions:", err);
-    res.status(500).json({ error: "Failed to fetch transactions" });
+    console.error("Error fetching preset transactions:", err);
+    res.status(500).json({ error: "Failed to fetch preset transactions" });
   }
 };
 
@@ -145,9 +203,9 @@ export const updatePresetTransaction = async (
     });
 
     if (!transaction) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to update this transaction" });
+      res.status(403).json({
+        error: "You are not authorized to update this preset transaction",
+      });
       return;
     }
 
@@ -159,8 +217,8 @@ export const updatePresetTransaction = async (
 
     res.json(updatedTransaction);
   } catch (err) {
-    console.error("Error updating transaction:", err);
-    res.status(500).json({ error: "Failed to update transaction" });
+    console.error("Error updating preset transaction:", err);
+    res.status(500).json({ error: "Failed to update preset transaction" });
   }
 };
 

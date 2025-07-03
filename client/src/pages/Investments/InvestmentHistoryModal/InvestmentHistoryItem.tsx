@@ -1,3 +1,4 @@
+import { getAccountNameByIdMap } from "store/account/accountSelectors";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Investment } from "types/investment";
@@ -10,7 +11,7 @@ export const InvestmentHistoryItem = ({
   investment,
 }: InvestmentHistoryItemProps) => {
   const { quantity, price, date, asset, account } = investment;
-  const actionText = quantity > 0 ? "Bought" : "Sold";
+  const actionText = quantity > 0 ? "Bought" : "Sold"; 
 
   return (
     <Container>

@@ -11,7 +11,10 @@ export interface PresetTransactionStore {
   error: string | null;
   hasLoaded: boolean;
 
-  fetchPresetTransactions: () => Promise<void>;
+  fetchPresetTransactions: (
+    queryString: string,
+    isInitialLoad: boolean
+  ) => Promise<void>;
   addPresetTransaction: (transaction: RawPresetTransaction) => Promise<void>;
   updatePresetTransaction: (
     id: string,
@@ -29,16 +32,30 @@ const usePresetTransactionStore = create<PresetTransactionStore>(
     hasLoaded: false,
 
     // Fetch all transactions
-    fetchPresetTransactions: async () => {
+    fetchPresetTransactions: async (
+      queryString: string,
+      isInitialLoad: boolean
+    ) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await axios.get<PresetTransaction[]>(API_BASE_URL);
-        set({ presetTransactions: response.data });
+        const response = await axios.get<{
+          transactions: PresetTransaction[];
+          transactionCount: number;
+        }>(API_BASE_URL + queryString);
+
+        const { transactions, transactionCount } = response.data;
+
+        set({
+          presetTransactions: isInitialLoad
+            ? transactions
+            : [...get().presetTransactions, ...transactions],
+          presetTransactionCount: transactionCount,
+        });
       } catch (error) {
-        console.error("Error fetching transactions:", error);
-        set({ error: "Failed to fetch transactions" });
+        console.error("Error fetching preset transactions:", error);
+        set({ error: "Failed to fetch preset transactions" });
       } finally {
-        set({ isLoading: false, hasLoaded: true });
+        set({ isLoading: false });
       }
     },
 
@@ -52,6 +69,7 @@ const usePresetTransactionStore = create<PresetTransactionStore>(
         );
         set({
           presetTransactions: [response.data, ...get().presetTransactions],
+          presetTransactionCount: get().presetTransactionCount + 1,
         });
       } catch (error) {
         console.error("Error adding transaction:", error);
@@ -90,7 +108,10 @@ const usePresetTransactionStore = create<PresetTransactionStore>(
         const filteredTransactions = get().presetTransactions.filter(
           (transaction) => transaction._id !== id
         );
-        set({ presetTransactions: filteredTransactions });
+        set({
+          presetTransactions: filteredTransactions,
+          presetTransactionCount: get().presetTransactionCount - 1,
+        });
       } catch (error) {
         console.error("Error deleting transaction:", error);
         set({ error: "Failed to delete transaction" });

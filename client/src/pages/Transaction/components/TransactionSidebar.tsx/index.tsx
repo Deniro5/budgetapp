@@ -20,8 +20,7 @@ import { getDollarValue } from "utils";
 import useAccountStore from "store/account/accountStore";
 
 type TransactionSidebarProps = {
-  sidebarTransactionId: string | null;
-  activeTransaction: Transaction | PresetTransaction;
+  activeTransaction: Transaction | PresetTransaction | null;
   setActiveTransaction: React.Dispatch<
     React.SetStateAction<Transaction | null>
   >;
@@ -31,7 +30,6 @@ type TransactionSidebarProps = {
 };
 
 const TransactionSidebar = ({
-  sidebarTransactionId,
   activeTransaction,
   setActiveTransaction,
   setActiveOverlay,
