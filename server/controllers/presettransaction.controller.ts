@@ -213,7 +213,7 @@ export const updatePresetTransaction = async (
       id,
       updateData,
       { new: true }
-    );
+    ).populate({ path: "account", select: "name _id" });
 
     res.json(updatedTransaction);
   } catch (err) {

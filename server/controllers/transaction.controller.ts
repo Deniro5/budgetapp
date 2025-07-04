@@ -16,21 +16,11 @@ export const createTransaction = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const {
-      name,
-      description,
-      amount,
-      type,
-      date,
-      account,
-      category,
-      vendor,
-      tags,
-    } = req.body;
+    const { description, amount, type, date, account, category, vendor, tags } =
+      req.body;
 
     const newTransaction = new TransactionModel({
       userId,
-      name,
       description,
       amount,
       type,
@@ -107,7 +97,6 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
 
     if (q) {
       query.$or = [
-        { name: { $regex: q, $options: "i" } }, // Replace 'field1' with the field you want to search
         { vendor: { $regex: q, $options: "i" } }, // Add more fields if needed
         { description: { $regex: q, $options: "i" } }, // Add more fields if needed
       ];

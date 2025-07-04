@@ -43,7 +43,6 @@ export const budgetOnlyCategories = Object.values(TransactionCategory).filter(
 
 export type Transaction = {
   _id: string;
-  name: string;
   account: {
     _id: string;
     name: string;

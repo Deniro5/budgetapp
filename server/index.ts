@@ -11,6 +11,7 @@ import accountRoutes from "./routes/account.routes";
 import budgetRoutes from "./routes/budget.routes";
 import transferRoutes from "./routes/transfer.routes";
 import investmentRoutes from "./routes/investment.routes";
+import TransactionModel from "./models/transaction.model";
 
 const app = express();
 

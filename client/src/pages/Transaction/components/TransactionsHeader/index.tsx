@@ -28,7 +28,7 @@ function TransactionsHeader({
   };
 
   const handlePresetClick = () => {
-    setActiveOverlay(TransactionOverlayType.PRESET);
+    setActiveOverlay(TransactionOverlayType.ADD_PRESET);
   };
   return (
     <Container>

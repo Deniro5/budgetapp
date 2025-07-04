@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import TransactionTableRow from "./TransactionTableRow";
 import { PresetTransaction, Transaction } from "types/Transaction";
-import { TransactionOverlayType } from "../../Transactions";
+import { TransactionOverlayType, View } from "../../Transactions";
 import { Waypoint } from "react-waypoint";
 
 type TransactionTableProps = {
@@ -13,7 +13,7 @@ type TransactionTableProps = {
   loadMore?: () => void;
   setSidebarTransactionId: React.Dispatch<React.SetStateAction<string | null>>;
   setActiveTransaction: React.Dispatch<
-    React.SetStateAction<Transaction | null>
+    React.SetStateAction<Transaction | PresetTransaction | null>
   >;
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<TransactionOverlayType | null>
@@ -21,6 +21,7 @@ type TransactionTableProps = {
   setContextMenuPosition: React.Dispatch<
     React.SetStateAction<{ top: number; left: number }>
   >;
+  view: View;
 };
 
 const tableColumns = ["Vendor", "Date", "Amount", "Category", "Account"];
@@ -35,29 +36,38 @@ function TransactionTable({
   setActiveTransaction,
   setActiveOverlay,
   setContextMenuPosition,
+  view,
 }: TransactionTableProps) {
   const handleRightClick = (
     e: React.MouseEvent<HTMLTableRowElement>,
-    transaction: Transaction | null
+    transaction: Transaction | PresetTransaction | null
   ) => {
     setActiveTransaction(transaction);
     setActiveOverlay(TransactionOverlayType.CONTEXT);
     setContextMenuPosition({ top: e.clientY, left: e.clientX });
   };
 
-  const handleDoubleClick = (transaction: Transaction | null) => {
+  const isPreset = view === "Preset";
+  const transactionLabel = isPreset ? "preset transaction" : "transaction";
+  const handleDoubleClick = (
+    transaction: Transaction | PresetTransaction | null
+  ) => {
     setActiveTransaction(transaction);
     setActiveOverlay(TransactionOverlayType.EDIT);
   };
+
+  console.log(transactions);
 
   return (
     <TableWrapper>
       <ScrollableTable>
         <TableHead>
           <tr>
-            {tableColumns.map((column, index) => (
-              <th key={index}>{column}</th>
-            ))}
+            {[...(isPreset ? ["Name"] : []), ...tableColumns].map(
+              (column, index) => (
+                <th key={index}>{column}</th>
+              )
+            )}
           </tr>
         </TableHead>
         <ScrollBody>
@@ -76,8 +86,9 @@ function TransactionTable({
       </ScrollableTable>
       {transactions.length === 0 && (
         <NoResult>
-          No transactions to show. Create a transaction by clicking the "Add
-          Transaction" button at the top of the page.
+          No {transactionLabel}s to show. Create a {transactionLabel} by
+          clicking the "Add
+          {transactionLabel}" button at the top of the page.
         </NoResult>
       )}
     </TableWrapper>

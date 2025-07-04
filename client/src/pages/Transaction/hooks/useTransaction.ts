@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import useTransactionStore from "../../../store/transaction/transactionStore";
 import { TransactionFilter } from "types/Transaction";
-import { View } from "../Transactions";
 
 type useTransactionProps = {
   search: string;

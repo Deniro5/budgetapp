@@ -12,7 +12,6 @@ const transactionSchema: Schema = new Schema(
     vendor: { type: String, required: false },
     tags: { type: [String], required: false },
     description: { type: String, required: false },
-    name: { type: String, required: false }, // not used for now
   },
   { timestamps: true }
 ); // Enable automatic createdAt and updatedAt fields);

@@ -8,7 +8,7 @@ type TransactionCopyModalProps = {
   initialTransaction: Transaction | null;
 };
 
-export default function TransactionAddModal({
+export default function TransactionCopyModal({
   onClose,
   initialTransaction,
 }: TransactionCopyModalProps) {

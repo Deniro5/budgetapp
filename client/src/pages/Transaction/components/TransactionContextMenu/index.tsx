@@ -1,11 +1,16 @@
 import React from "react";
 import PopoverContent from "components/Global/PopoverContent";
 import { Popover } from "react-tiny-popover";
-import { Transaction, TransactionCategory } from "types/Transaction";
-import { TransactionOverlayType } from "../../Transactions";
+import {
+  PresetTransaction,
+  Transaction,
+  TransactionCategory,
+} from "types/Transaction";
+import { TransactionOverlayType, View } from "../../Transactions";
+import { isPresetTransaction } from "../../utils";
 
 type TransactionContextMenuProps = {
-  activeTransaction: Transaction;
+  activeTransaction: Transaction | PresetTransaction;
   onClose: () => void;
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<TransactionOverlayType | null>
@@ -23,22 +28,29 @@ export default function TransactionContextMenu({
 }: TransactionContextMenuProps) {
   const isTransfer =
     activeTransaction.category === TransactionCategory.Transfer;
+  const isPreset = isPresetTransaction(activeTransaction);
+  const transactionLabel = isTransfer ? "Transfer" : "Transaction";
+  const presetLabel = isPreset ? "Preset" : " ";
+
+  const editLabel = `Edit ${presetLabel + " " + transactionLabel}`;
+  const copyLabel = `Copy ${presetLabel + " " + transactionLabel}`;
+  const deleteLabel = `Delete ${presetLabel + " " + transactionLabel}`;
 
   const menuItems = [
     {
-      label: isTransfer ? "Edit Transfer" : "Edit Transaction",
+      label: editLabel,
       function: () => {
         handleEditClick();
       },
     },
     {
-      label: isTransfer ? "Copy Transfer" : "Copy Transaction",
+      label: copyLabel,
       function: () => {
         handleCopyClick();
       },
     },
     {
-      label: isTransfer ? "Delete Transfer" : "Delete Transaction",
+      label: deleteLabel,
       function: () => {
         handleDeleteClick();
       },
@@ -46,23 +58,26 @@ export default function TransactionContextMenu({
   ];
 
   const handleEditClick = () => {
-    setActiveOverlay(
-      activeTransaction.category === TransactionCategory.Transfer
-        ? TransactionOverlayType.EDIT_TRANSFER
-        : TransactionOverlayType.EDIT
-    );
+    if (isTransfer) setActiveOverlay(TransactionOverlayType.EDIT_TRANSFER);
+    else if (isPreset) setActiveOverlay(TransactionOverlayType.EDIT_PRESET);
+    else {
+      setActiveOverlay(TransactionOverlayType.EDIT);
+    }
   };
 
   const handleDeleteClick = () => {
-    setActiveOverlay(TransactionOverlayType.DELETE);
+    if (isPreset) setActiveOverlay(TransactionOverlayType.DELETE_PRESET);
+    else {
+      setActiveOverlay(TransactionOverlayType.DELETE);
+    }
   };
 
   const handleCopyClick = () => {
-    setActiveOverlay(
-      isTransfer
-        ? TransactionOverlayType.COPY_TRANSFER
-        : TransactionOverlayType.COPY
-    );
+    if (isTransfer) setActiveOverlay(TransactionOverlayType.COPY_TRANSFER);
+    else if (isPreset) setActiveOverlay(TransactionOverlayType.COPY_PRESET);
+    else {
+      setActiveOverlay(TransactionOverlayType.COPY);
+    }
   };
 
   const handleOutsideClick = () => {
@@ -81,7 +96,7 @@ export default function TransactionContextMenu({
           left: `${left}px`,
           position: "absolute",
         }}
-        content={<PopoverContent menuItems={menuItems} />}
+        content={<PopoverContent menuItems={menuItems} width={220} />}
       >
         <></>
       </Popover>

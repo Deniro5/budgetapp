@@ -4,7 +4,7 @@ import { COLORS, SPACING } from "theme";
 import { useState } from "react";
 import useTransaction from "./hooks/useTransaction.ts";
 
-import { Transaction } from "types/Transaction";
+import { PresetTransaction, Transaction } from "types/Transaction";
 import { TransactionFilter } from "src/types/Transaction.ts";
 import TransactionAddModal from "./components/Modals/TransactionAddModal/index.tsx";
 import TransactionDeleteModal from "./components/Modals/TransactionDeleteModal/index.tsx";
@@ -17,7 +17,7 @@ import TransactionsHeader from "./components/TransactionsHeader/index.tsx";
 import TransactionSidebar from "./components/TransactionSidebar.tsx/index.tsx";
 import TransactionTable from "./components/TransactionTable/index.tsx";
 import TransactionFilterRow from "./components/TransactionFilterRow/index.tsx";
-import PresetTransactionModal from "./components/Modals/PresetTransactionModal/index.tsx";
+import { AddPresetTransactionModal } from "./components/Modals/AddPresetTransactionModal/AddPresetTransactionModal.tsx";
 import TransactionCopyModal from "./components/Modals/TransactionCopyModal/index.tsx";
 
 import useCalendar from "../../hooks/useCalendar.ts";
@@ -25,17 +25,24 @@ import TransferAddModal from "./components/Modals/TransferAddModal/index.tsx";
 import TransferEditModal from "./components/Modals/TransferEditModal/TransferEditModal.tsx";
 import { TransferCopyModal } from "./components/Modals/TransferCopyModal/TransferCopyModal.tsx";
 import usePresetTransactions from "./hooks/usePresetTransaction.ts";
+import { EditPresetTransactionModal } from "./components/Modals/EditPresetTransactionModal/EditPresetTransactionModal.tsx";
+import { CopyPresetTransactionModal } from "./components/Modals/CopyPresetTransactionModal/CopyPresetTransactionModal.tsx";
+import { DeletePresetTransactionModal } from "./components/DeletePresetTransactionModal/DeletePresetTransactionModal.tsx";
+import { isPresetTransaction, isTransaction } from "./utils";
 
 export enum TransactionOverlayType {
   ADD = "add",
   EDIT = "edit",
   DELETE = "delete",
   CONTEXT = "context",
-  PRESET = "preset",
   COPY = "copy",
   ADD_TRANSFER = "addTransfer",
   EDIT_TRANSFER = "editTransfer",
   COPY_TRANSFER = "copyTransfer",
+  ADD_PRESET = "addPreset",
+  COPY_PRESET = "copyPreset",
+  DELETE_PRESET = "deletePreset",
+  EDIT_PRESET = "editPreset",
 }
 
 export type View = "Transactions" | "Preset";
@@ -48,8 +55,9 @@ function Transactions() {
   const [sidebarTransactionId, setSidebarTransactionId] = useState<
     string | null
   >(null);
-  const [activeTransaction, setActiveTransaction] =
-    useState<Transaction | null>(null);
+  const [activeTransaction, setActiveTransaction] = useState<
+    Transaction | PresetTransaction | null
+  >(null);
   const [activeOverlay, setActiveOverlay] =
     useState<TransactionOverlayType | null>(null);
   const [contextMenuPosition, setContextMenuPosition] = useState<{
@@ -68,7 +76,6 @@ function Transactions() {
       filter,
       startDate,
       endDate,
-      view,
     });
 
   const {
@@ -99,7 +106,6 @@ function Transactions() {
     view === "Transactions" ? transactionCount : presetTransactionCount;
   const currentLoadMore = view === "Transactions" ? loadMore : loadMorePreset;
 
-  console.log(presetTransactions);
   return (
     <PageContainer>
       <TransactionsHeader
@@ -114,6 +120,7 @@ function Transactions() {
         <FiltersContainer>
           <TransactionsSearchBar setSearch={setSearch} search={search} />
           <TransactionFilterButton setFilter={setFilter} filter={filter} />
+          {/* Ony show date menu if view is transactions */}
           {view === "Transactions" && (
             <DateMenu
               startDate={startDate}
@@ -139,10 +146,11 @@ function Transactions() {
               setActiveTransaction={setActiveTransaction}
               setActiveOverlay={setActiveOverlay}
               setContextMenuPosition={setContextMenuPosition}
+              view={view}
             />
             <TransactionCount>
               Showing {currentTransactions.length} of {currentCount}{" "}
-              Transactions
+              {view === "Transactions" ? "transactions" : "preset transactions"}
             </TransactionCount>
           </TableFlexContainer>
           <TransactionSidebar
@@ -155,27 +163,28 @@ function Transactions() {
       {activeOverlay === TransactionOverlayType.ADD && (
         <TransactionAddModal onClose={handleCloseOverlay} />
       )}
-      {activeOverlay === TransactionOverlayType.COPY && (
-        <TransactionCopyModal
-          onClose={handleCloseOverlay}
-          initialTransaction={activeTransaction}
-        />
-      )}
-      {activeOverlay === TransactionOverlayType.PRESET && (
-        <PresetTransactionModal onClose={handleCloseOverlay} />
-      )}
-      {activeOverlay === TransactionOverlayType.EDIT && activeTransaction && (
-        <TransactionEditModal
-          transaction={activeTransaction}
-          onClose={handleCloseOverlay}
-        />
-      )}
-      {activeOverlay === TransactionOverlayType.DELETE && activeTransaction && (
-        <TransactionDeleteModal
-          transaction={activeTransaction}
-          onClose={handleCloseOverlay}
-        />
-      )}
+      {activeOverlay === TransactionOverlayType.COPY &&
+        isTransaction(activeTransaction) && (
+          <TransactionCopyModal
+            onClose={handleCloseOverlay}
+            initialTransaction={activeTransaction}
+          />
+        )}
+
+      {activeOverlay === TransactionOverlayType.EDIT &&
+        isTransaction(activeTransaction) && (
+          <TransactionEditModal
+            transaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.DELETE &&
+        isTransaction(activeTransaction) && (
+          <TransactionDeleteModal
+            transaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
       {activeOverlay === TransactionOverlayType.CONTEXT &&
         activeTransaction && (
           <TransactionContextMenu
@@ -190,7 +199,7 @@ function Transactions() {
         <TransferAddModal onClose={handleCloseOverlay} />
       )}
       {activeOverlay === TransactionOverlayType.EDIT_TRANSFER &&
-        activeTransaction && (
+        isTransaction(activeTransaction) && (
           <TransferEditModal
             onClose={handleCloseOverlay}
             transaction={activeTransaction}
@@ -198,10 +207,36 @@ function Transactions() {
         )}
 
       {activeOverlay === TransactionOverlayType.COPY_TRANSFER &&
-        activeTransaction && (
+        isTransaction(activeTransaction) && (
           <TransferCopyModal
             onClose={handleCloseOverlay}
             initialTransaction={activeTransaction}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.ADD_PRESET && (
+        <AddPresetTransactionModal onClose={handleCloseOverlay} />
+      )}
+
+      {activeOverlay === TransactionOverlayType.COPY_PRESET &&
+        isPresetTransaction(activeTransaction) && (
+          <CopyPresetTransactionModal
+            initialTransaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.EDIT_PRESET &&
+        isPresetTransaction(activeTransaction) && (
+          <EditPresetTransactionModal
+            initialTransaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
+
+      {activeOverlay === TransactionOverlayType.DELETE_PRESET &&
+        isPresetTransaction(activeTransaction) && (
+          <DeletePresetTransactionModal
+            transaction={activeTransaction}
+            onClose={handleCloseOverlay}
           />
         )}
     </PageContainer>

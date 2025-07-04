@@ -9,9 +9,12 @@ export default function PresetTransactionMenuItem({
   presetTransaction,
 }: PresetTransactionMenuItemProps) {
   const fields = [
-    { label: "Account", value: presetTransaction.account },
+    { label: "Account", value: presetTransaction.account?.name },
     { label: "Type", value: presetTransaction.type },
-    { label: "Amount", value: presetTransaction.amount },
+    {
+      label: "Amount",
+      value: presetTransaction.amount ? `$${presetTransaction.amount}` : "",
+    },
     { label: "Date", value: presetTransaction.date },
     {
       label: "Category",

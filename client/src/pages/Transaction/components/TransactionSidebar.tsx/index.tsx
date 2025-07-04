@@ -22,7 +22,7 @@ import useAccountStore from "store/account/accountStore";
 type TransactionSidebarProps = {
   activeTransaction: Transaction | PresetTransaction | null;
   setActiveTransaction: React.Dispatch<
-    React.SetStateAction<Transaction | null>
+    React.SetStateAction<Transaction | PresetTransaction | null>
   >;
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<TransactionOverlayType | null>

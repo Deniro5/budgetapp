@@ -5,26 +5,26 @@ import usePresetTransactionStore from "store/presetTransaction/presetTransaction
 
 type PresetTransactionModalProps = {
   onClose: () => void;
-  initialTransaction?: PresetTransaction | null;
+  initialTransaction: PresetTransaction;
 };
 
-export default function PresetTransactionModal({
+export function EditPresetTransactionModal({
   onClose,
   initialTransaction,
 }: PresetTransactionModalProps) {
-  const { addPresetTransaction } = usePresetTransactionStore();
+  const { updatePresetTransaction } = usePresetTransactionStore();
 
   const handleModalSubmit = (transaction: RawPresetTransaction) => {
-    addPresetTransaction(transaction);
+    updatePresetTransaction(initialTransaction._id, transaction);
   };
 
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
       <TransactionBaseModal
-        title="Add Preset Transaction"
+        title="Edit Preset Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransaction={undefined}
+        initialTransaction={initialTransaction}
         isPresetModal
       />
     </Modal>

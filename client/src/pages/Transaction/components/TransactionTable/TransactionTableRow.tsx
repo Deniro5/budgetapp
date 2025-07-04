@@ -11,15 +11,16 @@ import {
   TransactionType,
 } from "types/Transaction";
 import { getDollarValue } from "utils";
+import { isPresetTransaction } from "../../utils";
 
 type TransactionTableRowProps = {
   transaction: Transaction | PresetTransaction;
-  onClick: (transaction: Transaction | null) => void;
+  onClick: (transaction: Transaction | PresetTransaction | null) => void;
   onRightClick: (
     e: React.MouseEvent<HTMLTableRowElement>,
-    transaction: Transaction | null
+    transaction: Transaction | PresetTransaction | null
   ) => void;
-  onDoubleClick: (transaction: Transaction | null) => void;
+  onDoubleClick: (transaction: Transaction | PresetTransaction | null) => void;
   isSelected: boolean;
 };
 
@@ -53,12 +54,13 @@ function TransactionTableRow({
     onDoubleClick(transaction);
   };
 
-  const transactionVendorName =
-    transaction.category === TransactionCategory.Transfer
+  const getTransactionVendorName = () => {
+    if (!transaction.vendor) return emptyString;
+
+    return transaction.category === TransactionCategory.Transfer
       ? accountIdToNameMap[transaction.vendor]
       : transaction.vendor;
-
-  console.log(transaction);
+  };
 
   return (
     <Container
@@ -67,7 +69,10 @@ function TransactionTableRow({
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
-      <td> {transactionVendorName || emptyString} </td>
+      {isPresetTransaction(transaction) && (
+        <td> {transaction.name || emptyString} </td>
+      )}
+      <td> {getTransactionVendorName()} </td>
       <td> {transaction.date ? transaction.date : emptyString} </td>
       <AmountTd transactionType={transaction.type}>
         {transaction.amount
