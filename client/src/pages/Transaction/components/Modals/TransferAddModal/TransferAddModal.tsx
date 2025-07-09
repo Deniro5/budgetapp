@@ -1,22 +1,17 @@
-import { RawTransfer, Transaction } from "types/Transaction";
-import useTransactionStore from "store/transaction/transactionStore";
-
+import { RawTransfer } from "types/Transaction";
 import Modal from "components/Global/Modal";
 import TransferBaseModal from "../TransferBaseModal/TransferBaseModal";
+import { useAddTransfer } from "../../../hooks/useAddTransfer";
 
 type TransferAddModalProps = {
   onClose: () => void;
-  addTransferCallback?: (transaction: Transaction) => void;
 };
 
-export default function TransactionAddModal({
-  onClose,
-  addTransferCallback,
-}: TransferAddModalProps) {
-  const { addTransfer } = useTransactionStore();
+export function TransferAddModal({ onClose }: TransferAddModalProps) {
+  const { mutate } = useAddTransfer();
 
   const handleModalSubmit = (transfer: RawTransfer) => {
-    addTransfer(transfer, addTransferCallback);
+    mutate(transfer);
   };
 
   return (

@@ -38,7 +38,7 @@ type TransactionBaseModalProps = {
   onClose: () => void;
   onSubmit: (transaction: RawTransaction, callback?: () => void) => void;
   isPresetModal?: boolean;
-  initialTransaction?: Transaction;
+  initialTransaction?: Transaction | PresetTransaction;
 };
 
 export default function TransactionBaseModal({
@@ -128,11 +128,7 @@ export default function TransactionBaseModal({
       : undefined;
 
   const onSubmitForm = async (data: RawTransaction) => {
-    isPresetModal
-      ? onSubmit(data)
-      : onSubmit(data, () =>
-          updateLocalAccountBalanceById(data.account, afterBalance || 0)
-        );
+    onSubmit(data);
     onClose();
   };
 

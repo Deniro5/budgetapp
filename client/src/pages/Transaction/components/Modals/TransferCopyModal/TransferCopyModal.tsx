@@ -1,7 +1,7 @@
-import { RawTransaction, RawTransfer, Transaction } from "types/Transaction";
-import useTransactionStore from "store/transaction/transactionStore";
+import { RawTransfer, Transaction } from "types/Transaction";
 import TransferBaseModal from "../TransferBaseModal/TransferBaseModal";
 import Modal from "components/Global/Modal";
+import { useAddTransfer } from "../../../hooks/useAddTransfer";
 
 type TransferCopyModalProps = {
   onClose: () => void;
@@ -12,10 +12,10 @@ export const TransferCopyModal = ({
   onClose,
   initialTransaction,
 }: TransferCopyModalProps) => {
-  const { addTransfer } = useTransactionStore();
+  const { mutate } = useAddTransfer();
 
   const handleModalSubmit = (transfer: RawTransfer) => {
-    addTransfer(transfer);
+    mutate(transfer);
   };
 
   const convertTransactionToTransfer = () => {

@@ -7,7 +7,7 @@ import { Waypoint } from "react-waypoint";
 
 type TransactionTableProps = {
   transactions: Transaction[] | PresetTransaction[];
-  error: string | null;
+  error: string | Error | null;
   loading: boolean;
   sidebarTransactionId: string | null;
   loadMore?: () => void;

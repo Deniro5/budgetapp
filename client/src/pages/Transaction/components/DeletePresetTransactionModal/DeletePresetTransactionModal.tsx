@@ -1,8 +1,7 @@
 import Modal from "components/Global/Modal";
-
-import { PresetTransaction, Transaction } from "types/Transaction";
+import { PresetTransaction } from "types/Transaction";
 import ConfirmModal from "components/Global/ConfirmModal";
-import usePresetTransactionStore from "store/presetTransaction/presetTransactionStore";
+import { useDeletePresetTransaction } from "../../hooks/useDeletePresetTransaction";
 
 type DeletePresetTransactionModalProps = {
   transaction: PresetTransaction;
@@ -13,10 +12,10 @@ export function DeletePresetTransactionModal({
   transaction,
   onClose,
 }: DeletePresetTransactionModalProps) {
-  const { deletePresetTransaction } = usePresetTransactionStore();
+  const { mutate } = useDeletePresetTransaction();
 
   const handleConfirm = () => {
-    deletePresetTransaction(transaction._id);
+    mutate(transaction._id);
     onClose();
   };
 

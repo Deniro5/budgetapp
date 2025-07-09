@@ -1,25 +1,24 @@
 import { RawTransaction, Transaction } from "types/Transaction";
-import useTransactionStore from "store/transaction/transactionStore";
+import { useAddTransaction } from "../../../hooks/useAddTransaction";
+
 import TransactionBaseModal from "../TransactionBaseModal";
 import Modal from "components/Global/Modal";
 
 type TransactionCopyModalProps = {
   onClose: () => void;
-  initialTransaction: Transaction | null;
+  initialTransaction: Transaction;
 };
 
 export default function TransactionCopyModal({
   onClose,
   initialTransaction,
 }: TransactionCopyModalProps) {
-  const { addTransaction } = useTransactionStore();
+  const { mutate } = useAddTransaction();
 
-  const handleModalSubmit = (
-    transaction: RawTransaction,
-    callback?: () => void
-  ) => {
-    addTransaction(transaction, callback);
+  const handleModalSubmit = (transaction: RawTransaction) => {
+    mutate(transaction);
   };
+
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
       <TransactionBaseModal

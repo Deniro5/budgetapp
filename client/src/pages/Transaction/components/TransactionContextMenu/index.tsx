@@ -66,7 +66,8 @@ export default function TransactionContextMenu({
   };
 
   const handleDeleteClick = () => {
-    if (isPreset) setActiveOverlay(TransactionOverlayType.DELETE_PRESET);
+    if (isTransfer) setActiveOverlay(TransactionOverlayType.DELETE_TRANSFER);
+    else if (isPreset) setActiveOverlay(TransactionOverlayType.DELETE_PRESET);
     else {
       setActiveOverlay(TransactionOverlayType.DELETE);
     }

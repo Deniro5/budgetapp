@@ -1,18 +1,18 @@
 import Modal from "components/Global/Modal";
 import { Transaction } from "types/Transaction";
 import ConfirmModal from "components/Global/ConfirmModal";
-import { useDeleteTransaction } from "../../../hooks/useDeleteTransaction";
+import { useDeleteTransfer } from "../../../hooks/useDeleteTransfer";
 
-type TransactionDeleteButtonProps = {
+type TransferDeleteModalProps = {
   transaction: Transaction;
   onClose: () => void;
 };
 
-function TransactionDeleteModal({
+export function TransferDeleteModal({
   transaction,
   onClose,
-}: TransactionDeleteButtonProps) {
-  const { mutate } = useDeleteTransaction();
+}: TransferDeleteModalProps) {
+  const { mutate } = useDeleteTransfer();
 
   const handleConfirm = () => {
     mutate(transaction._id);
@@ -24,10 +24,10 @@ function TransactionDeleteModal({
       <ConfirmModal
         handleCancel={onClose}
         handleConfirm={handleConfirm}
-        text={"Are you sure you want to delete this transaction?"}
+        text={
+          "This transaction is part of a transfer. Deleting it will also delete the transaction that is paired with this one. Are you sure you want to proceed?"
+        }
       />
     </Modal>
   );
 }
-
-export default TransactionDeleteModal;

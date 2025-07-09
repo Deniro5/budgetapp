@@ -2,13 +2,12 @@ import { Flex, PageContainer } from "../../styles.ts";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
 import { useState } from "react";
-import useTransaction from "./hooks/useTransaction.ts";
 
 import { PresetTransaction, Transaction } from "types/Transaction";
 import { TransactionFilter } from "src/types/Transaction.ts";
 import TransactionAddModal from "./components/Modals/TransactionAddModal/index.tsx";
 import TransactionDeleteModal from "./components/Modals/TransactionDeleteModal/index.tsx";
-import TransactionEditModal from "./components/Modals/TransactionEditModal/index.tsx";
+import { TransactionEditModal } from "./components/Modals/TransactionEditModal/TransactionEditModal";
 import TransactionContextMenu from "./components/TransactionContextMenu/index.tsx";
 import TransactionsSearchBar from "./components/TransactionSearchBar/index.tsx";
 import DateMenu from "../../components/DateMenu/index.tsx";
@@ -19,9 +18,8 @@ import TransactionTable from "./components/TransactionTable/index.tsx";
 import TransactionFilterRow from "./components/TransactionFilterRow/index.tsx";
 import { AddPresetTransactionModal } from "./components/Modals/AddPresetTransactionModal/AddPresetTransactionModal.tsx";
 import TransactionCopyModal from "./components/Modals/TransactionCopyModal/index.tsx";
-
 import useCalendar from "../../hooks/useCalendar.ts";
-import TransferAddModal from "./components/Modals/TransferAddModal/index.tsx";
+import { TransferAddModal } from "./components/Modals/TransferAddModal/TransferAddModal.tsx";
 import TransferEditModal from "./components/Modals/TransferEditModal/TransferEditModal.tsx";
 import { TransferCopyModal } from "./components/Modals/TransferCopyModal/TransferCopyModal.tsx";
 import usePresetTransactions from "./hooks/usePresetTransaction.ts";
@@ -29,6 +27,8 @@ import { EditPresetTransactionModal } from "./components/Modals/EditPresetTransa
 import { CopyPresetTransactionModal } from "./components/Modals/CopyPresetTransactionModal/CopyPresetTransactionModal.tsx";
 import { DeletePresetTransactionModal } from "./components/DeletePresetTransactionModal/DeletePresetTransactionModal.tsx";
 import { isPresetTransaction, isTransaction } from "./utils";
+import useTransactions from "./hooks/useTransactions.ts";
+import { TransferDeleteModal } from "./components/Modals/DeleteTransferModal/DeleteTransferModal.tsx";
 
 export enum TransactionOverlayType {
   ADD = "add",
@@ -37,8 +37,9 @@ export enum TransactionOverlayType {
   CONTEXT = "context",
   COPY = "copy",
   ADD_TRANSFER = "addTransfer",
-  EDIT_TRANSFER = "editTransfer",
   COPY_TRANSFER = "copyTransfer",
+  DELETE_TRANSFER = "deleteTransfer",
+  EDIT_TRANSFER = "editTransfer",
   ADD_PRESET = "addPreset",
   COPY_PRESET = "copyPreset",
   DELETE_PRESET = "deletePreset",
@@ -71,7 +72,7 @@ function Transactions() {
   const { startDate, setStartDate, endDate, setEndDate } = useCalendar();
 
   const { transactions, transactionCount, loadMore, isLoading, error } =
-    useTransaction({
+    useTransactions({
       search,
       filter,
       startDate,
@@ -211,6 +212,13 @@ function Transactions() {
           <TransferCopyModal
             onClose={handleCloseOverlay}
             initialTransaction={activeTransaction}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.DELETE_TRANSFER &&
+        isTransaction(activeTransaction) && (
+          <TransferDeleteModal
+            onClose={handleCloseOverlay}
+            transaction={activeTransaction}
           />
         )}
       {activeOverlay === TransactionOverlayType.ADD_PRESET && (

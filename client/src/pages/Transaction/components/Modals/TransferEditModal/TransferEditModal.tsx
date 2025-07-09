@@ -1,8 +1,7 @@
 import { RawTransfer, Transaction } from "types/Transaction";
-import useTransactionStore from "store/transaction/transactionStore";
-
 import Modal from "components/Global/Modal";
 import TransferBaseModal from "../TransferBaseModal/TransferBaseModal";
+import { useUpdateTransfer } from "../../../hooks/useUpdateTransfer";
 
 type TransferEditModalProps = {
   transaction: Transaction;
@@ -13,10 +12,10 @@ export default function TransactionEditModal({
   transaction,
   onClose,
 }: TransferEditModalProps) {
-  const { updateTransferByTransactionId } = useTransactionStore();
+  const { mutate } = useUpdateTransfer();
 
-  const handleModalSubmit = (transfer: RawTransfer) => {
-    updateTransferByTransactionId(transaction._id, transfer);
+  const handleModalSubmit = (updatedTransfer: RawTransfer) => {
+    mutate({ transactionId: transaction._id, updatedTransfer });
   };
 
   const convertTransactionToTransfer = () => {

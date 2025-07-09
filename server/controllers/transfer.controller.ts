@@ -34,7 +34,7 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
         type: "Expense",
         date,
         account: sendingAccountId,
-        category: "transfer",
+        category: "Transfer",
         vendor: receivingAccountId,
         tags: [],
       });
@@ -47,7 +47,7 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
         type: "Income",
         date,
         account: receivingAccountId,
-        category: "transfer",
+        category: "Transfer",
         vendor: sendingAccountId,
         tags: [],
       });

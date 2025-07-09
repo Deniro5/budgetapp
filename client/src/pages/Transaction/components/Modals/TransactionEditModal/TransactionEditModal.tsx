@@ -1,21 +1,21 @@
 import Modal from "components/Global/Modal";
 import TransactionBaseModal from "../TransactionBaseModal";
-import useTransactionStore from "store/transaction/transactionStore";
 import { RawTransaction, Transaction } from "types/Transaction";
+import { useUpdateTransaction } from "../../../hooks/useUpdateTransaction";
 
 type TransactionEditModalProps = {
   transaction: Transaction;
   onClose: () => void;
 };
 
-function TransactionEditModal({
+export function TransactionEditModal({
   transaction,
   onClose,
 }: TransactionEditModalProps) {
-  const { updateTransaction } = useTransactionStore();
+  const { mutate } = useUpdateTransaction();
 
-  const handleModalSubmit = (updatedTransaction: RawTransaction, callback?: () => void) => {
-    updateTransaction(transaction._id, updatedTransaction, callback);
+  const handleModalSubmit = (updatedTransaction: RawTransaction) => {
+    mutate({ transactionId: transaction._id, updatedTransaction });
   };
 
   return (
@@ -30,5 +30,3 @@ function TransactionEditModal({
     </Modal>
   );
 }
-
-export default TransactionEditModal;
