@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
 import { COLORS, SPACING } from "../Theme";
 import { useEffect, useState } from "react";
-import Transactions from "../pages/Transaction/Transactions";
+import Transactions from "../pages/Transaction/TransactionsPage";
 import Settings from "../pages/Settings";
 
 import Accounts from "../pages/Accounts";

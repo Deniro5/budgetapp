@@ -170,11 +170,9 @@ export const getPresetTransactions = async (
       .limit(Number(limit))
       .populate({ path: "account", select: "name _id" }); // Remove or adjust if not needed
 
-    console.log(presetTransactions);
-
     res.json({
-      transactions: presetTransactions,
-      transactionCount: presetTransactionCount,
+      presetTransactions: presetTransactions,
+      presetTransactionCount: presetTransactionCount,
     });
   } catch (err) {
     console.error("Error fetching preset transactions:", err);

@@ -5,9 +5,9 @@ import { Flex, SecondaryButton } from "styles";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import TransactionTable from "../../../pages/Transaction/components/TransactionTable";
-import TransactionAddModal from "../../../pages/Transaction/components/Modals/TransactionAddModal";
+import { TransactionTable } from "../../Transaction/shared/components";
 import { useRecentTransactionsWidget } from "./useRecentTransactionsWidget";
+import { AddTransactionModal } from "../../Transaction/Transactions/modals";
 
 export const RecentTransactionsWidget = () => {
   const { recentTransactions, isLoading, error, refetch } =
@@ -47,17 +47,13 @@ export const RecentTransactionsWidget = () => {
           setActiveTransaction={() => {}}
           setActiveOverlay={() => {}}
           setContextMenuPosition={() => {}}
+          view="Transactions"
         />
         <ViewMoreLink onClick={() => navigate("transactions")}>
           View All Transactions
         </ViewMoreLink>
       </TableContainer>
-      {showModal && (
-        <TransactionAddModal
-          addTransactionCallback={addTransactionCallback}
-          onClose={() => setShowModal(false)}
-        />
-      )}
+      {showModal && <AddTransactionModal onClose={() => setShowModal(false)} />}
     </>
   );
 };

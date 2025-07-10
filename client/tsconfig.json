@@ -27,7 +27,7 @@
       "types/*": ["src/types/*"],
       "store/*": ["src/store/*"],
       "components/*": ["src/components/*"],
-      "constants/*": ["src/pages/Transaction/constants/*"],
+      "constants/*": ["src/pages/Transaction/shared/constants/*"],
       "styles": ["src/styles"],
       "theme": ["src/Theme"],
       "utils": ["src/utils"]

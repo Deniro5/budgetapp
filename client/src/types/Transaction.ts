@@ -76,7 +76,7 @@ export type TransactionFilter = {
   type?: string;
   account?: string;
   tags?: string[];
-  category?: string;
+  category?: TransactionCategory;
 };
 
 export type RawTransfer = {
@@ -105,6 +105,9 @@ export type PresetTransaction = {
   createdAt: Date;
 };
 
-export type RawPresetTransaction = Omit<PresetTransaction, "_id" | "userId"> & {
+export type RawPresetTransaction = Omit<
+  PresetTransaction,
+  "_id" | "userId" | "account"
+> & {
   account?: string;
 };

@@ -113,7 +113,7 @@ const useTransactionStore = create<TransactionStore>((set, get) => ({
       set({ isLoading: false });
     }
   },
-
+  
   // Delete a transaction by ID
   deleteTransaction: async (id) => {
     set({ isLoading: true, error: null });
