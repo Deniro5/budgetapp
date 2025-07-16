@@ -1,17 +1,10 @@
 import { useInfiniteQuery, QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  PresetTransaction,
-  Transaction,
-  TransactionFilter,
-} from "types/Transaction";
+import { PresetTransaction } from "types/Transaction";
 import { BASE_API_URL } from "../../../../constants";
 
 type FetchPresetTransactionsArgs = {
   search: string;
-  filter: TransactionFilter;
-  startDate: string;
-  endDate: string;
 };
 
 type FetchPresetTransactionsResponse = {
@@ -24,44 +17,27 @@ const fetchPresetTransactions = async (
   context: QueryFunctionContext<[string, FetchPresetTransactionsArgs], number>
 ): Promise<FetchPresetTransactionsResponse> => {
   const { pageParam = 0, queryKey } = context;
-  const [_key, { search, filter, startDate, endDate }] = queryKey;
+  const [_key, { search }] = queryKey;
+
+  if (search === "")
+    return { presetTransactions: [], presetTransactionCount: 0 };
 
   const params = new URLSearchParams();
   params.append("offset", pageParam.toString());
   if (search) params.append("q", search);
-  params.append("startDate", startDate);
-  params.append("endDate", endDate);
-
-  Object.entries(filter).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      value.forEach((v) => params.append(key, v));
-    } else if (value) {
-      params.append(key, value.toString());
-    }
-  });
 
   const response = await axios.get<FetchPresetTransactionsResponse>(
-    `${BASE_API_URL}/preset-transactions?${params.toString()}`
+    `${BASE_API_URL}/preset-transactions?${params.toString()}&limit=5`
   );
 
   return response.data;
 };
 
 // Hook
-export default function usePresetTransactions({
+export default function usePresetTransactionSearch({
   search,
-  filter,
-  startDate,
-  endDate,
 }: FetchPresetTransactionsArgs) {
-  const {
-    data,
-    isLoading,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery<
+  const { data, isLoading, error } = useInfiniteQuery<
     FetchPresetTransactionsResponse,
     Error,
     import("@tanstack/react-query").InfiniteData<
@@ -71,7 +47,7 @@ export default function usePresetTransactions({
     [string, FetchPresetTransactionsArgs],
     number
   >({
-    queryKey: ["presetTransactions", { search, filter, startDate, endDate }],
+    queryKey: ["presetTransactionList", { search }],
     queryFn: fetchPresetTransactions,
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.reduce(
@@ -85,15 +61,10 @@ export default function usePresetTransactions({
 
   const presetTransactions =
     data?.pages.flatMap((p) => p.presetTransactions) ?? [];
-  const presetTransactionCount = data?.pages[0]?.presetTransactionCount ?? 0;
 
   return {
     presetTransactions,
-    presetTransactionCount,
     isLoading,
-    isFetchingNextPage,
     error,
-    loadMore: fetchNextPage,
-    hasMore: hasNextPage,
   };
 }

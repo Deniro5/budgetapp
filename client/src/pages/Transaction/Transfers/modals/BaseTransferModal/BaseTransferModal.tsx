@@ -16,6 +16,8 @@ import { SPACING, FONTSIZE, COLORS } from "theme";
 import { useEffect } from "react";
 
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
+import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
+import useAccount from "../../../../Accounts/hooks/useAccount";
 
 type BaseTransferModalProps = {
   title?: string;
@@ -52,7 +54,7 @@ export function BaseTransferModal({
     },
   });
 
-  const receivingAccountId = watch("receivingAccountId");
+  const { receivingAccountId, sendingAccountId, amount } = watch();
   useEffect(() => {
     register("sendingAccountId", {
       required: "Sending account is required",
@@ -64,7 +66,8 @@ export function BaseTransferModal({
     });
   }, [register, receivingAccountId]);
 
-  const currentValues = watch();
+  const { account: receivingAccount } = useAccount(receivingAccountId);
+  const { account: sendingAccount } = useAccount(sendingAccountId);
 
   const handleSendingAccountChange = (accountId: string) => {
     setValue("sendingAccountId", accountId, { shouldValidate: true });
@@ -79,16 +82,33 @@ export function BaseTransferModal({
     onClose();
   };
 
+  const parsedAmount = Number(amount);
+
+  const currentReceivingBalance = receivingAccount?.balance;
+  const afterReceivingBalance =
+    currentReceivingBalance && amount
+      ? currentReceivingBalance +
+        ((initialTransfer?.amount ?? 0) + parsedAmount)
+      : undefined;
+
+  const currentSendingBalance = sendingAccount?.balance;
+  currentSendingBalance && amount
+    ? currentSendingBalance + ((initialTransfer?.amount ?? 0) - parsedAmount)
+    : undefined;
+  const afterSendingBalance =
+    currentSendingBalance && amount
+      ? currentSendingBalance + ((initialTransfer?.amount ?? 0) - parsedAmount)
+      : undefined;
+
   return (
     <form onSubmit={handleSubmit(onSubmitForm)}>
       <Title>{title}</Title>
       <>
-        <SubTitle> Required Fields </SubTitle>
         <Row>
           <InputContainer>
             <InputLabel>Sending Account</InputLabel>
             <AccountDropdown
-              selectedAccountId={currentValues.sendingAccountId}
+              selectedAccountId={sendingAccountId}
               handleAccountChange={handleSendingAccountChange}
               placeholder="Select Sending Account"
             />
@@ -100,7 +120,7 @@ export function BaseTransferModal({
           <InputContainer>
             <InputLabel>Receiving Account</InputLabel>
             <AccountDropdown
-              selectedAccountId={currentValues.receivingAccountId}
+              selectedAccountId={receivingAccountId}
               handleAccountChange={handleReceivingAccountChange}
               placeholder="Select Receiving Account"
             />
@@ -139,6 +159,22 @@ export function BaseTransferModal({
           </InputContainer>
         </Row>
       </>
+      <BalanceSummaryLabel>
+        Receiving Account{" "}
+        {receivingAccount?.name ? `(${receivingAccount.name})` : ""}:
+      </BalanceSummaryLabel>
+      <BalanceSummaryFooter
+        currentBalance={currentReceivingBalance}
+        afterBalance={afterReceivingBalance}
+      />
+      <BalanceSummaryLabel>
+        Sending Account {sendingAccount?.name ? `(${sendingAccount.name})` : ""}
+        :
+      </BalanceSummaryLabel>
+      <BalanceSummaryFooter
+        currentBalance={currentSendingBalance}
+        afterBalance={afterSendingBalance}
+      />
       <ButtonContainer>
         <BaseButton type="submit">{confirmText}</BaseButton>
         <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
@@ -155,14 +191,6 @@ const Title = styled.h2`
   color: ${COLORS.pureBlack};
 `;
 
-const SubTitle = styled.h3`
-  text-align: left;
-  margin-top: 0;
-  margin-bottom: ${SPACING.spacing6x};
-  font-size: ${FONTSIZE.md};
-  color: ${COLORS.pureBlack};
-`;
-
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -175,4 +203,13 @@ const ErrorMessage = styled.p`
   margin: 0 ${SPACING.spacing2x};
   color: ${COLORS.deleteRed};
   font-size: ${FONTSIZE.sm};
+`;
+
+const BalanceSummaryLabel = styled.h3`
+  text-align: left;
+  margin-top: ${SPACING.spacing4x};
+  margin-bottom: ${SPACING.spacing2x};
+  font-size: ${FONTSIZE.md};
+  color: ${COLORS.pureBlack};
+  font-weight: 500;
 `;

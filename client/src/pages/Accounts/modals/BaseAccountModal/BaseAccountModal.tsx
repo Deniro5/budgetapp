@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { Account, AccountType } from "types/account";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 
-type AccountBaseModalProps = {
+type BaseAccountModalProps = {
   title: string;
   confirmText?: string;
   onClose: () => void;
@@ -21,13 +21,13 @@ type AccountBaseModalProps = {
   initialAccount?: Account;
 };
 
-export default function AccountBaseModal({
+export function BaseAccountModal({
   title,
   onClose,
   onSubmit,
   confirmText = "Add Account",
   initialAccount,
-}: AccountBaseModalProps) {
+}: BaseAccountModalProps) {
   const {
     register,
     handleSubmit,

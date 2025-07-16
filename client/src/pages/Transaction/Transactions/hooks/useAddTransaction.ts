@@ -8,9 +8,15 @@ export const useAddTransaction = () => {
 
   return useMutation({
     mutationFn: (newTransaction: RawTransaction) =>
-      axios.post(`${BASE_API_URL}/transactions`, newTransaction),
-    onSuccess: () => {
+      axios
+        .post(`${BASE_API_URL}/transactions`, newTransaction)
+        .then((res) => res.data),
+
+    onSuccess: (newTransaction) => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["account", newTransaction.accountId],
+      });
     },
   });
 };

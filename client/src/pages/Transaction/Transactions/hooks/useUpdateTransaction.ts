@@ -16,12 +16,18 @@ export const useUpdateTransaction = () => {
       transactionId,
       updatedTransaction,
     }: UpdateTransactionProps) =>
-      axios.put(
-        `${BASE_API_URL}/transactions/${transactionId}`,
-        updatedTransaction
-      ),
-    onSuccess: () => {
+      axios
+        .put(
+          `${BASE_API_URL}/transactions/${transactionId}`,
+          updatedTransaction
+        )
+        .then((res) => res.data), // Return only the updated transaction
+
+    onSuccess: (updatedTransaction) => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["account", updatedTransaction.accountId],
+      });
     },
   });
 };

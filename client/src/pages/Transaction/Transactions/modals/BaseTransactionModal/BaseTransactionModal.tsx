@@ -26,10 +26,12 @@ import { useEffect, useState } from "react";
 import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
 
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
-import usePresetTransactionStore from "store/presetTransaction/presetTransactionStore";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 import { getAccountBalanceByIdMap } from "store/account/accountSelectors";
 import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
+import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
+import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
+import useAccount from "../../../../Accounts/hooks/useAccount";
 
 type BaseTransactionModalProps = {
   title: string;
@@ -47,9 +49,12 @@ export function BaseTransactionModal({
   confirmText = "Add Transaction",
   initialTransaction,
 }: BaseTransactionModalProps) {
-  const { presetTransactions } = usePresetTransactionStore();
+  const [presetSearch, setPresetSearch] = useState("");
+
+  const { presetTransactions } = usePresetTransactionSearch({
+    search: presetSearch,
+  });
   const userPreferences = getUserPreferences();
-  const accountBalanceByIdMap = getAccountBalanceByIdMap();
 
   const [currentPreset, setCurrentPreset] = useState<PresetTransaction | null>(
     null
@@ -62,7 +67,6 @@ export function BaseTransactionModal({
     watch,
     clearErrors,
     reset,
-
     formState: { errors },
   } = useForm<RawTransaction>({
     mode: "onSubmit", // Validation only on submit
@@ -80,6 +84,9 @@ export function BaseTransactionModal({
       tags: initialTransaction?.tags || [],
     },
   });
+  const currentValues = watch();
+
+  const { account } = useAccount(currentValues.account);
 
   useEffect(() => {
     register("category", {
@@ -89,8 +96,6 @@ export function BaseTransactionModal({
       required: "Account is required",
     });
   }, [register]);
-
-  const currentValues = watch();
 
   const handleTagsChange = (tags: string[]) => {
     setValue("tags", tags);
@@ -105,6 +110,7 @@ export function BaseTransactionModal({
   };
 
   const handlePresetSelect = (preset: PresetTransaction) => {
+    console.log(preset);
     setCurrentPreset(preset);
     reset({ ...currentValues, ...preset, account: preset.account?._id });
   };
@@ -113,14 +119,15 @@ export function BaseTransactionModal({
     <PresetTransactionMenuItem presetTransaction={presetTransaction} />
   );
 
-  const presetToString = (presetTransaction: PresetTransaction) =>
-    presetTransaction.name;
-
-  const currentBalance = accountBalanceByIdMap[currentValues.account || ""];
+  const currentBalance = account?.balance;
+  const parsedAmount = Number(
+    currentValues.type === TransactionType.EXPENSE
+      ? currentValues.amount
+      : -currentValues.amount
+  );
   const afterBalance =
-    currentBalance && currentValues.amount
-      ? currentBalance +
-        ((initialTransaction?.amount || 0) - currentValues.amount)
+    currentBalance && parsedAmount
+      ? currentBalance + ((initialTransaction?.amount ?? 0) - parsedAmount)
       : undefined;
 
   const onSubmitForm = async (data: RawTransaction) => {
@@ -135,15 +142,18 @@ export function BaseTransactionModal({
         <Row>
           <InputContainer>
             <InputLabel>Prefill With Preset</InputLabel>
-            <DropdownList
-              items={presetTransactions}
-              itemRenderer={presetRenderer}
-              selected={currentPreset}
-              onSelect={handlePresetSelect}
-              itemToString={presetToString}
-              placeholder="Select Preset"
-              searchable
+            <SearchDropdown
               width={620}
+              value={presetSearch}
+              setValue={setPresetSearch}
+              items={presetTransactions}
+              placeholder="Search for preset transaction"
+              selected={currentPreset}
+              onSelect={function (item: PresetTransaction): void {
+                handlePresetSelect(item);
+              }}
+              itemRenderer={presetRenderer}
+              itemToString={({ name }) => `${name}`}
             />
           </InputContainer>
         </Row>

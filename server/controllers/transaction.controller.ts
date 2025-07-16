@@ -1,10 +1,38 @@
 import { Request, Response } from "express";
 import TransactionModel from "../models/transaction.model";
 import mongoose from "mongoose";
+import AccountModel from "../models/account.model";
 
 interface CustomRequest extends Request {
   userId?: string;
 }
+
+const updateAccountBalance = async ({
+  userId,
+  accountId,
+  change,
+}: {
+  userId: string;
+  accountId: string;
+  change: number;
+}) => {
+  try {
+    const account = await AccountModel.findOne({ _id: accountId, userId });
+    if (!account) {
+      throw new Error("Account not found");
+    }
+
+    const updateData = {
+      ...account.toObject(), // Important to convert Mongoose doc to plain object
+      balance: account.balance + change,
+    };
+
+    await AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
+  } catch (err) {
+    console.error("Error updating account balance:", err);
+    throw err; // re-throw to let caller handle it
+  }
+};
 
 // Create
 export const createTransaction = async (req: CustomRequest, res: Response) => {
@@ -32,11 +60,98 @@ export const createTransaction = async (req: CustomRequest, res: Response) => {
     });
 
     const savedTransaction = await newTransaction.save();
+    await updateAccountBalance({
+      userId,
+      accountId: account,
+      change: type === "Expense" ? -amount : amount,
+    });
 
     res.status(201).json(savedTransaction);
   } catch (err) {
     console.error("Error creating transaction:", err);
     res.status(500).json({ error: "Failed to create transaction" });
+  }
+};
+
+// Update
+export const updateTransaction = async (req: CustomRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+    const updateData = req.body;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const transaction = await TransactionModel.findOne({
+      _id: id,
+      userId,
+    });
+
+    if (!transaction) {
+      res
+        .status(403)
+        .json({ error: "You are not authorized to update this transaction" });
+      return;
+    }
+
+    const updatedTransaction = await TransactionModel.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true }
+    ).populate({ path: "account", select: "name _id" });
+
+    const change = updatedTransaction.amount - transaction.amount;
+
+    await updateAccountBalance({
+      userId,
+      accountId: transaction.account,
+      change: transaction.type === "Expense" ? -change : change,
+    });
+
+    res.json(updatedTransaction);
+  } catch (err) {
+    console.error("Error updating transaction:", err);
+    res.status(500).json({ error: "Failed to update transaction" });
+  }
+};
+
+// Delete
+export const deleteTransaction = async (req: CustomRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req;
+
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const transaction = await TransactionModel.findOne({ _id: id, userId });
+
+    if (!transaction) {
+      res
+        .status(403)
+        .json({ error: "You are not authorized to delete this transaction" });
+      return;
+    }
+
+    await TransactionModel.findByIdAndDelete(id);
+
+    const { type, amount } = transaction;
+
+    await updateAccountBalance({
+      userId,
+      accountId: transaction.account,
+      change: type === "Expense" ? amount : -amount, //since we are deleting the transaction if its an expense we need to add the amount back
+    });
+
+    res.json(transaction);
+  } catch (err) {
+    console.error("Error deleting transaction:", err);
+    res.status(500).json({ error: "Failed to delete transaction" });
   }
 };
 
@@ -150,72 +265,6 @@ export const getTransactions = async (req: CustomRequest, res: Response) => {
   } catch (err) {
     console.error("Error fetching transactions:", err);
     res.status(500).json({ error: "Failed to fetch transactions" });
-  }
-};
-
-// Update
-export const updateTransaction = async (req: CustomRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req;
-    const updateData = req.body;
-
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    const transaction = await TransactionModel.findOne({
-      _id: id,
-      userId,
-    });
-
-    if (!transaction) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to update this transaction" });
-      return;
-    }
-
-    const updatedTransaction = await TransactionModel.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    ).populate({ path: "account", select: "name _id" });
-
-    res.json(updatedTransaction);
-  } catch (err) {
-    console.error("Error updating transaction:", err);
-    res.status(500).json({ error: "Failed to update transaction" });
-  }
-};
-
-// Delete
-export const deleteTransaction = async (req: CustomRequest, res: Response) => {
-  try {
-    const { id } = req.params;
-    const { userId } = req;
-
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    const transaction = await TransactionModel.findOne({ _id: id, userId });
-
-    if (!transaction) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to delete this transaction" });
-      return;
-    }
-
-    await TransactionModel.findByIdAndDelete(id);
-
-    res.json({ message: "Transaction deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting transaction:", err);
-    res.status(500).json({ error: "Failed to delete transaction" });
   }
 };
 

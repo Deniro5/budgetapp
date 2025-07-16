@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 import { Card, DeleteButton, Divider, Flex, SecondaryButton } from "styles";
 import { FONTSIZE, SPACING } from "theme";
-import { Account, } from "types/account";
-import { AccountOverlayType } from "../..";
+import { Account } from "types/account";
+import { AccountOverlayType } from "../../AccountPage";
 
 type AccountCardProps = {
   account: Account;
@@ -14,7 +14,7 @@ type AccountCardProps = {
   setActiveAccount: React.Dispatch<React.SetStateAction<Account | null>>;
 };
 
-export default function accountAccountCard({
+export function AccountCard({
   account,
   setActiveAccount,
   setActiveOverlay,

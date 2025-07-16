@@ -9,6 +9,7 @@ const accountSchema: Schema = new Schema(
     baselineAmount: { type: Number, required: true },
     baselineDate: { type: String, required: true },
     type: { type: String, required: false },
+    balance: { type: Number, required: true },
   },
   { timestamps: true }
 );

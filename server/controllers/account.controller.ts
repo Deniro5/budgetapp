@@ -40,6 +40,7 @@ export const createAccount = async (req: CustomRequest, res: Response) => {
       baselineAmount,
       baselineDate,
       type,
+      balance: baselineAmount,
     });
 
     const savedAccount = await newAccount.save();
@@ -308,25 +309,6 @@ export const getAccounts = async (req: CustomRequest, res: Response) => {
     const query: any = { userId };
     let accounts = await AccountModel.find(query).sort({ date: -1, _id: -1 }); // Sort by date first, then by _id for uniqueness
 
-    const includeBalance = req.query.includeBalance === "true";
-
-    if (includeBalance) {
-      accounts = await Promise.all(
-        accounts.map(async (account) => {
-          const transactionTotal =
-            (await getAccountTransactionTotalAfterBaseline({
-              userId,
-              accountId: account._id,
-              baselineDate: account.baselineDate,
-            })) + account.baselineAmount;
-          return {
-            ...account.toObject(),
-            balance: transactionTotal,
-          };
-        })
-      );
-    }
-
     res.json(accounts);
   } catch (err) {
     console.error("Error fetching accounts:", err);
@@ -353,6 +335,25 @@ export const updateAccount = async (req: CustomRequest, res: Response) => {
         .status(403)
         .json({ error: "You are not authorized to update this transaction" });
       return;
+    }
+
+    if (
+      updateData.baselineAmount !== account.baselineAmount &&
+      updateData.baselineDate === account.baselineDate
+    ) {
+      //recalculate balance if baseline amount is modified and baseline date is not modified
+      updateData.balance += updateData.baselineAmount - account.baselineAmount;
+    }
+
+    if (updateData.baselineDate !== account.baselineDate) {
+      //recalculate balance if baseline date is modified
+      const transactionTotal =
+        (await getAccountTransactionTotalAfterBaseline({
+          userId,
+          accountId: id,
+          baselineDate: updateData.baselineDate,
+        })) + updateData.baselineAmount;
+      updateData.balance = transactionTotal;
     }
 
     const updatedAccount = await AccountModel.findByIdAndUpdate(

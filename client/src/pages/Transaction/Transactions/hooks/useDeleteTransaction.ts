@@ -7,9 +7,14 @@ export const useDeleteTransaction = () => {
 
   return useMutation({
     mutationFn: (transactionId: string) =>
-      axios.delete(`${BASE_API_URL}/transactions/${transactionId}`),
-    onSuccess: () => {
+      axios
+        .delete(`${BASE_API_URL}/transactions/${transactionId}`)
+        .then((res) => res.data), // Only return the deleted transaction data
+    onSuccess: (deletedTransaction) => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({
+        queryKey: ["account", deletedTransaction.accountId],
+      });
     },
   });
 };

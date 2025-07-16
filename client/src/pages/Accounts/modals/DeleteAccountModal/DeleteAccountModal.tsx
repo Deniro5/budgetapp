@@ -1,19 +1,22 @@
 import Modal from "components/Global/Modal";
 
 import ConfirmModal from "components/Global/ConfirmModal";
-import useAccountStore from "store/account/accountStore";
 import { Account } from "types/account";
+import { useDeleteAccount } from "../../hooks/useDeleteAccount";
 
-type AccountDeleteButtonProps = {
+type DeleteAccountButtonProps = {
   account: Account;
   onClose: () => void;
 };
 
-function AccountDeleteModal({ account, onClose }: AccountDeleteButtonProps) {
-  const { deleteAccount } = useAccountStore();
+export function DeleteAccountModal({
+  account,
+  onClose,
+}: DeleteAccountButtonProps) {
+  const { mutate } = useDeleteAccount();
 
   const handleConfirm = () => {
-    deleteAccount(account._id);
+    mutate(account._id);
     onClose();
   };
 
@@ -27,5 +30,3 @@ function AccountDeleteModal({ account, onClose }: AccountDeleteButtonProps) {
     </Modal>
   );
 }
-
-export default AccountDeleteModal;

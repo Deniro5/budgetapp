@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Transactions from "../pages/Transaction/TransactionsPage";
 import Settings from "../pages/Settings";
 
-import Accounts from "../pages/Accounts";
+import Accounts from "../pages/Accounts/AccountPage";
 import Budget from "../pages/Budget";
 import useInitialLoad from "../hooks/useInitialLoad";
 import { DashboardPage } from "../pages/Dashboard/DashboardPage";

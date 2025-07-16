@@ -1,10 +1,24 @@
-import { useEffect } from "react";
-import useAccountStore from "store/account/accountStore";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { BASE_API_URL } from "../../../constants";
+import { Account } from "types/account";
 
-export default function useAccount() {
-  const { isLoading, error, fetchAccounts } = useAccountStore();
+// Hook
+export default function useAccount(accountId: string | undefined) {
+  const { data, isLoading, error } = useQuery<Account>({
+    queryKey: ["account", accountId],
+    queryFn: async () => {
+      const res = await axios.get<Account>(
+        `${BASE_API_URL}/accounts/${accountId}`
+      );
+      return res.data;
+    },
+    enabled: !!accountId, // only fetch if accountId is truthy
+  });
 
-  useEffect(() => {
-    fetchAccounts();
-  }, []);
+  return {
+    account: data,
+    isLoading,
+    error,
+  };
 }

@@ -3,14 +3,14 @@ import { BaseButton, PageTitle } from "styles";
 import { SPACING } from "theme";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AccountOverlayType } from "../..";
+import { AccountOverlayType } from "../../AccountPage";
 type AccountsHeaderProps = {
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<AccountOverlayType | null>
   >;
 };
 
-function AccountsHeader({ setActiveOverlay }: AccountsHeaderProps) {
+export function AccountHeader({ setActiveOverlay }: AccountsHeaderProps) {
   const handleAddClick = () => {
     setActiveOverlay(AccountOverlayType.ADD);
   };
@@ -39,5 +39,3 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: ${SPACING.spacing6x};
 `;
-
-export default AccountsHeader;
