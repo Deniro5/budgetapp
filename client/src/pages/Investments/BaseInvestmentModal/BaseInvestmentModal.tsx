@@ -16,6 +16,9 @@ import Modal from "components/Global/Modal";
 import { Asset, RawInvestment } from "types/investment";
 import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import AssetMenuItem from "./AssetMenuItem";
+import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
+import { TransactionType } from "types/Transaction";
+import useAccount from "../../Accounts/hooks/useAccount";
 
 type BaseInvestmentModalProps = {
   title: string;
@@ -75,6 +78,7 @@ export function BaseInvestmentModal({
   }, [register]);
 
   const currentValues = watch();
+  const { account } = useAccount(currentValues.account);
   const handleAssetChange = (asset: Asset) => {
     setValue("asset", asset, { shouldValidate: true });
   };
@@ -183,6 +187,11 @@ export function BaseInvestmentModal({
           </InputContainer>
         </Row>
 
+        <BalanceSummaryFooter
+          account={account}
+          amount={currentValues.quantity * currentValues.price}
+          type={isSellModal ? TransactionType.INCOME : TransactionType.EXPENSE}
+        />
         <ButtonContainer>
           <BaseButton type="submit">Confirm</BaseButton>
           <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>

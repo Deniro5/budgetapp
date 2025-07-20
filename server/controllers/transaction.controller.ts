@@ -1,338 +1,158 @@
 import { Request, Response } from "express";
-import TransactionModel from "../models/transaction.model";
-import mongoose from "mongoose";
-import AccountModel from "../models/account.model";
+import * as transactionService from "../services/transactionService";
 
 interface CustomRequest extends Request {
   userId?: string;
 }
 
-const updateAccountBalance = async ({
-  userId,
-  accountId,
-  change,
-}: {
-  userId: string;
-  accountId: string;
-  change: number;
-}) => {
-  try {
-    const account = await AccountModel.findOne({ _id: accountId, userId });
-    if (!account) {
-      throw new Error("Account not found");
-    }
-
-    const updateData = {
-      ...account.toObject(), // Important to convert Mongoose doc to plain object
-      balance: account.balance + change,
-    };
-
-    await AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
-  } catch (err) {
-    console.error("Error updating account balance:", err);
-    throw err; // re-throw to let caller handle it
-  }
-};
-
-// Create
-export const createTransaction = async (req: CustomRequest, res: Response) => {
+export const createTransaction = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
     const { userId } = req;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const { description, amount, type, date, account, category, vendor, tags } =
-      req.body;
-
-    const newTransaction = new TransactionModel({
+    const transaction = await transactionService.createTransaction({
       userId,
-      description,
-      amount,
-      type,
-      date,
-      account,
-      category,
-      vendor,
-      tags,
+      ...req.body,
     });
 
-    const savedTransaction = await newTransaction.save();
-    await updateAccountBalance({
-      userId,
-      accountId: account,
-      change: type === "Expense" ? -amount : amount,
-    });
-
-    res.status(201).json(savedTransaction);
-  } catch (err) {
-    console.error("Error creating transaction:", err);
-    res.status(500).json({ error: "Failed to create transaction" });
+    res.status(201).json(transaction);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: err.message || "Failed to create transaction" });
   }
 };
 
-// Update
-export const updateTransaction = async (req: CustomRequest, res: Response) => {
+export const updateTransaction = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
+    const { userId } = req;
     const { id } = req.params;
-    const { userId } = req;
-    const updateData = req.body;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const transaction = await TransactionModel.findOne({
-      _id: id,
+    const updatedTransaction = await transactionService.updateTransaction(
       userId,
-    });
-
-    if (!transaction) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to update this transaction" });
-      return;
-    }
-
-    const updatedTransaction = await TransactionModel.findByIdAndUpdate(
       id,
-      updateData,
-      { new: true }
-    ).populate({ path: "account", select: "name _id" });
-
-    const change = updatedTransaction.amount - transaction.amount;
-
-    await updateAccountBalance({
-      userId,
-      accountId: transaction.account,
-      change: transaction.type === "Expense" ? -change : change,
-    });
+      req.body
+    );
 
     res.json(updatedTransaction);
-  } catch (err) {
-    console.error("Error updating transaction:", err);
-    res.status(500).json({ error: "Failed to update transaction" });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: err.message || "Failed to update transaction" });
   }
 };
 
-// Delete
-export const deleteTransaction = async (req: CustomRequest, res: Response) => {
+export const deleteTransaction = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
-    const { id } = req.params;
     const { userId } = req;
-
+    const { id } = req.params;
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const transaction = await TransactionModel.findOne({ _id: id, userId });
+    const deletedTransaction = await transactionService.deleteTransaction(
+      userId,
+      id
+    );
 
-    if (!transaction) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to delete this transaction" });
+    res.json(deletedTransaction);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: err.message || "Failed to delete transaction" });
+  }
+};
+
+export const getTransactionById = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req;
+    const { id } = req.params;
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    await TransactionModel.findByIdAndDelete(id);
-
-    const { type, amount } = transaction;
-
-    await updateAccountBalance({
-      userId,
-      accountId: transaction.account,
-      change: type === "Expense" ? amount : -amount, //since we are deleting the transaction if its an expense we need to add the amount back
-    });
+    const transaction = await transactionService.getTransactionById(userId, id);
 
     res.json(transaction);
-  } catch (err) {
-    console.error("Error deleting transaction:", err);
-    res.status(500).json({ error: "Failed to delete transaction" });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: err.message || "Failed to fetch transaction" });
   }
 };
 
-// ReadOne
-export const getTransactionById = async (req: CustomRequest, res: Response) => {
+export const getTransactions = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
-    const { id } = req.params;
     const { userId } = req;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const transaction = await TransactionModel.findOne({
-      _id: id,
-      userId,
-    }).populate({ path: "account", select: "name _id" });
+    const filters = req.query as any;
 
-    if (!transaction) {
-      res.status(404).json({ error: "Transaction not found or unauthorized" });
-      return;
-    }
+    const result = await transactionService.getTransactions(userId, filters);
 
-    res.json(transaction);
-  } catch (err) {
-    console.error("Error fetching transaction:", err);
-    res.status(500).json({ error: "Failed to fetch transaction" });
-  }
-};
-
-//Read
-export const getTransactions = async (req: CustomRequest, res: Response) => {
-  try {
-    const { userId } = req;
-    const {
-      q,
-      limit = 50,
-      offset = 0,
-      sort = "-date",
-      startDate,
-      endDate,
-      category,
-      tags,
-      type,
-      minAmount,
-      maxAmount,
-      account,
-    } = req.query;
-
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    // Build the query object
-    const query: any = { userId };
-
-    if (q) {
-      query.$or = [
-        { vendor: { $regex: q, $options: "i" } }, // Add more fields if needed
-        { description: { $regex: q, $options: "i" } }, // Add more fields if needed
-      ];
-    }
-
-    // Date range filter
-    if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = startDate;
-      if (endDate) query.date.$lte = endDate;
-    }
-
-    // Category filter
-    if (category) {
-      query.category = category;
-    }
-
-    // Tags filter
-    if (tags && tags.length) {
-      query.tags = {
-        $in: tags,
-      };
-    }
-
-    // Type filter
-    if (type) {
-      query.type = type;
-    }
-
-    // Amount range filter
-    if (minAmount || maxAmount) {
-      query.amount = {};
-      if (minAmount) query.amount.$gte = Number(minAmount);
-      if (maxAmount) query.amount.$lte = Number(maxAmount);
-    }
-
-    // Account filter. setup for array eventually but now just filter by one account
-    if (account) {
-      query.account = { $in: Array.isArray(account) ? account : [account] };
-    }
-
-    const transactionCount = await TransactionModel.countDocuments(query);
-
-    const transactions = await TransactionModel.find(query)
-      .sort({ date: -1, _id: -1 }) // Sort by date first, then by _id for uniqueness
-      .skip(Number(offset)) // Skip `offset` number of documents
-      .limit(Number(limit)) // Limit the number of results
-      .populate({ path: "account", select: "name _id" });
-
-    res.json({ transactions, transactionCount });
-  } catch (err) {
-    console.error("Error fetching transactions:", err);
-    res.status(500).json({ error: "Failed to fetch transactions" });
+    res.json(result);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: err.message || "Failed to fetch transactions" });
   }
 };
 
 export const getTransactionCategoriesByAmount = async (
   req: CustomRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
     const { userId } = req;
     const { limit, startDate, endDate } = req.query;
 
-    const matchConditions: Record<string, any> = {
-      userId: new mongoose.Types.ObjectId(userId),
-      type: { $ne: "Income" },
-    };
-
-    // Apply date filtering if startDate and endDate are provided
-
-    if (
-      startDate &&
-      typeof startDate === "string" &&
-      endDate &&
-      typeof endDate === "string"
-    ) {
-      matchConditions.date = {
-        $gte: startDate,
-        $lte: endDate,
-      };
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
     }
 
-    matchConditions.category = { $ne: "Transfer" };
+    const limitNum = limit ? Number(limit) : undefined;
 
-    const categoryTotals = await TransactionModel.aggregate([
-      {
-        $match: matchConditions,
-      },
-      {
-        $group: {
-          _id: "$category", // Group by category
-          totalAmount: { $sum: "$amount" }, // Sum the amounts
-        },
-      },
-      {
-        $project: {
-          _id: 0, // Remove _id field from output
-          category: "$_id",
-          totalAmount: 1,
-        },
-      },
-      {
-        $sort: { totalAmount: -1 }, // Sort by totalAmount in descending order
-      },
-    ]);
+    const categories =
+      await transactionService.getTransactionCategoriesByAmount(
+        userId,
+        limitNum,
+        typeof startDate === "string" ? startDate : undefined,
+        typeof endDate === "string" ? endDate : undefined
+      );
 
-    const limitNum = Number(limit) || categoryTotals.length;
-    const topCategories = categoryTotals.slice(0, limitNum);
-
-    const otherTotal = categoryTotals
-      .slice(limitNum)
-      .reduce((acc, curr) => acc + curr.totalAmount, 0);
-
-    if (otherTotal > 0) {
-      topCategories.push({ category: "Other", totalAmount: otherTotal });
-    }
-
-    res.json({ categoryTotals: topCategories });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.json({ categoryTotals: categories });
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ message: "Server error", error: err.message || err });
   }
 };
 
@@ -342,78 +162,24 @@ export const getTotalIncomeAndExpense = async (
 ): Promise<void> => {
   try {
     const { userId } = req;
-    const { startDate, endDate, category } = req.query as {
-      startDate?: string;
-      endDate?: string;
-      category?: string;
-    };
+    const { startDate, endDate, category } = req.query;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    // Category filter
-    const matchConditions: Record<string, any> = {
-      userId: new mongoose.Types.ObjectId(userId),
-    };
+    const incomeExpense = await transactionService.getTotalIncomeAndExpense(
+      userId,
+      typeof startDate === "string" ? startDate : undefined,
+      typeof endDate === "string" ? endDate : undefined,
+      typeof category === "string" ? category : undefined
+    );
 
-    // Apply date filtering if provided
-    if (startDate || endDate) {
-      matchConditions.date = {};
-      if (startDate) matchConditions.date.$gte = startDate;
-      if (endDate) matchConditions.date.$lte = endDate;
-    }
-
-    if (category) {
-      matchConditions.$and = [
-        { category: category },
-        { category: { $ne: "Transfer" } },
-      ];
-    } else {
-      matchConditions.category = { $ne: "Transfer" };
-    }
-    // Fetch and sort transactions by date
-    const transactions = await TransactionModel.find(matchConditions).sort({
-      date: 1,
-    });
-
-    if (transactions.length === 0) {
-      res.json([]);
-      return;
-    }
-
-    let cumulativeIncome = 0;
-    let cumulativeExpense = 0;
-
-    let datesWithIncomeAndExpense: Record<
-      string,
-      { income: number; expense: number }
-    > = {};
-
-    transactions.forEach(({ date, amount, type }) => {
-      if (type === "Income") {
-        cumulativeIncome += amount;
-      } else if (type === "Expense") {
-        cumulativeExpense += amount;
-      }
-
-      datesWithIncomeAndExpense[date] = {
-        expense: cumulativeExpense,
-        income: cumulativeIncome,
-      };
-    });
-
-    const result = Object.keys(datesWithIncomeAndExpense).map((date) => {
-      return {
-        date,
-        ...datesWithIncomeAndExpense[date],
-      };
-    });
-
-    res.json(result);
-  } catch (error) {
-    console.error("Error fetching total income and expense:", error);
-    res.status(500).json({ message: "Server error", error });
+    res.json(incomeExpense);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ message: "Server error", error: err.message || err });
   }
 };

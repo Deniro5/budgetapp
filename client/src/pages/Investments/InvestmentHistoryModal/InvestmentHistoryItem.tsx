@@ -11,13 +11,15 @@ export const InvestmentHistoryItem = ({
   investment,
 }: InvestmentHistoryItemProps) => {
   const { quantity, price, date, asset, account } = investment;
-  const actionText = quantity > 0 ? "Bought" : "Sold"; 
+  const isPurchase = quantity > 0;
+  const actionText = isPurchase ? "Bought" : "Sold";
+  const multiplier = isPurchase ? 1 : -1;
 
   return (
     <Container>
       <SubContainer>
         <MainText>
-          {actionText} {quantity} {asset.symbol}
+          {actionText} {multiplier * quantity} {asset.symbol}
         </MainText>
         <DateText>
           {" "}

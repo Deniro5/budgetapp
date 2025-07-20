@@ -10,7 +10,6 @@ import {
   SecondaryButton,
 } from "styles";
 import { useForm } from "react-hook-form";
-import DropdownList from "components/DropdownList/DropdownList";
 import TagInput from "components/Global/TagInput";
 
 import {
@@ -24,10 +23,8 @@ import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
 import { useEffect, useState } from "react";
 import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
-
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
-import { getAccountBalanceByIdMap } from "store/account/accountSelectors";
 import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
 import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
@@ -118,17 +115,6 @@ export function BaseTransactionModal({
   const presetRenderer = (presetTransaction: PresetTransaction) => (
     <PresetTransactionMenuItem presetTransaction={presetTransaction} />
   );
-
-  const currentBalance = account?.balance;
-  const parsedAmount = Number(
-    currentValues.type === TransactionType.EXPENSE
-      ? currentValues.amount
-      : -currentValues.amount
-  );
-  const afterBalance =
-    currentBalance && parsedAmount
-      ? currentBalance + ((initialTransaction?.amount ?? 0) - parsedAmount)
-      : undefined;
 
   const onSubmitForm = async (data: RawTransaction) => {
     onSubmit(data);
@@ -280,8 +266,12 @@ export function BaseTransactionModal({
         </Row>
 
         <BalanceSummaryFooter
-          currentBalance={currentBalance}
-          afterBalance={afterBalance}
+          initialAccountId={initialTransaction?.account?._id}
+          account={account}
+          amount={currentValues.amount}
+          initialAmount={initialTransaction?.amount}
+          type={currentValues.type}
+          initialType={initialTransaction?.type}
         />
 
         <ButtonContainer>

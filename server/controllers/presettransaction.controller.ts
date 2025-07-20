@@ -1,88 +1,59 @@
 import { Request, Response } from "express";
-import PresetTransactionModel from "../models/presettransaction.model";
+import * as presetTransactionService from "../services/presetTransactionService";
 
 interface CustomRequest extends Request {
   userId?: string;
 }
 
-// Create
 export const createPresetTransaction = async (
   req: CustomRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
     const { userId } = req;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    // Count existing transactions for the user
-    const transactionCount = await PresetTransactionModel.countDocuments({
-      userId,
-    });
+    try {
+      const newTransaction =
+        await presetTransactionService.createPresetTransaction({
+          ...req.body,
+          userId,
+        });
 
-    if (transactionCount >= 100) {
-      res.status(400).json({
-        error:
-          "Preset Transaction limit reached (100). Please delete an existing preset transaction and try again",
-      });
-      return;
+      res.status(201).json(newTransaction);
+    } catch (error: any) {
+      if (error.message.includes("Preset Transaction limit reached")) {
+        res.status(400).json({ error: error.message });
+        return;
+      }
+      throw error;
     }
-
-    const {
-      name,
-      description,
-      amount,
-      type,
-      date,
-      account,
-      category,
-      vendor,
-      tags,
-    } = req.body;
-
-    const newTransaction = new PresetTransactionModel({
-      name,
-      description,
-      amount,
-      type,
-      date,
-      account,
-      category,
-      vendor,
-      tags,
-      userId,
-    });
-
-    const savedTransaction = await newTransaction.save();
-
-    res.status(201).json(savedTransaction);
   } catch (err) {
     console.error("Error creating transaction:", err);
     res.status(500).json({ error: "Failed to create transaction" });
   }
 };
 
-// ReadOne
 export const getPresetTransactionById = async (
   req: CustomRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
-    const { id } = req.params;
     const { userId } = req;
+    const { id } = req.params;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const transaction = await PresetTransactionModel.findOne({
-      _id: id,
-      userId,
-    });
+    const transaction = await presetTransactionService.getPresetTransactionById(
+      id,
+      userId
+    );
 
     if (!transaction) {
       res.status(404).json({ error: "Transaction not found or unauthorized" });
@@ -99,13 +70,13 @@ export const getPresetTransactionById = async (
 export const getPresetTransactions = async (
   req: CustomRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
     const { userId } = req;
     const {
       q,
-      limit = 100,
-      offset = 0,
+      limit = "100",
+      offset = "0",
       sort = "-createdAt",
       category,
       tags,
@@ -120,59 +91,24 @@ export const getPresetTransactions = async (
       return;
     }
 
-    const query: any = { userId };
-
-    // Text search
-    if (q) {
-      query.$or = [
-        { name: { $regex: q, $options: "i" } },
-        { vendor: { $regex: q, $options: "i" } },
-        { description: { $regex: q, $options: "i" } },
-      ];
-    }
-
-    // Category filter
-    if (category) {
-      query.category = category;
-    }
-
-    // Tags filter
-    if (tags && tags.length) {
-      query.tags = {
-        $in: tags,
-      };
-    }
-
-    // Type filter
-    if (type) {
-      query.type = type;
-    }
-
-    // Amount range filter
-    if (minAmount || maxAmount) {
-      query.amount = {};
-      if (minAmount) query.amount.$gte = Number(minAmount);
-      if (maxAmount) query.amount.$lte = Number(maxAmount);
-    }
-
-    // Account filter
-    if (account) {
-      query.account = { $in: Array.isArray(account) ? account : [account] };
-    }
-
-    const presetTransactionCount = await PresetTransactionModel.countDocuments(
-      query
-    );
-
-    const presetTransactions = await PresetTransactionModel.find(query)
-      .sort(sort as string)
-      .skip(Number(offset))
-      .limit(Number(limit))
-      .populate({ path: "account", select: "name _id" }); // Remove or adjust if not needed
+    const { transactions, count } =
+      await presetTransactionService.getPresetTransactions({
+        userId,
+        q: q as string | undefined,
+        limit: Number(limit),
+        offset: Number(offset),
+        sort: sort as string,
+        category: category as string | undefined,
+        tags: tags as string | string[] | undefined,
+        type: type as string | undefined,
+        minAmount: minAmount ? Number(minAmount) : undefined,
+        maxAmount: maxAmount ? Number(maxAmount) : undefined,
+        account: account as string | string[] | undefined,
+      });
 
     res.json({
-      presetTransactions: presetTransactions,
-      presetTransactionCount: presetTransactionCount,
+      presetTransactions: transactions,
+      presetTransactionCount: count,
     });
   } catch (err) {
     console.error("Error fetching preset transactions:", err);
@@ -180,14 +116,13 @@ export const getPresetTransactions = async (
   }
 };
 
-// Update
 export const updatePresetTransaction = async (
   req: CustomRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
-    const { id } = req.params;
     const { userId } = req;
+    const { id } = req.params;
     const updateData = req.body;
 
     if (!userId) {
@@ -195,23 +130,19 @@ export const updatePresetTransaction = async (
       return;
     }
 
-    const transaction = await PresetTransactionModel.findOne({
-      _id: id,
-      userId,
-    });
+    const updatedTransaction =
+      await presetTransactionService.updatePresetTransaction(
+        id,
+        userId,
+        updateData
+      );
 
-    if (!transaction) {
+    if (!updatedTransaction) {
       res.status(403).json({
         error: "You are not authorized to update this preset transaction",
       });
       return;
     }
-
-    const updatedTransaction = await PresetTransactionModel.findByIdAndUpdate(
-      id,
-      updateData,
-      { new: true }
-    ).populate({ path: "account", select: "name _id" });
 
     res.json(updatedTransaction);
   } catch (err) {
@@ -220,33 +151,30 @@ export const updatePresetTransaction = async (
   }
 };
 
-// Delete
 export const deletePresetTransaction = async (
   req: CustomRequest,
   res: Response
-) => {
+): Promise<void> => {
   try {
-    const { id } = req.params;
     const { userId } = req;
+    const { id } = req.params;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const transaction = await PresetTransactionModel.findOne({
-      _id: id,
-      userId,
-    });
+    const deleted = await presetTransactionService.deletePresetTransaction(
+      id,
+      userId
+    );
 
-    if (!transaction) {
+    if (!deleted) {
       res
         .status(403)
         .json({ error: "You are not authorized to delete this transaction" });
       return;
     }
-
-    await PresetTransactionModel.findByIdAndDelete(id);
 
     res.json({ message: "Transaction deleted successfully" });
   } catch (err) {

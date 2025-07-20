@@ -1,16 +1,50 @@
 import styled from "styled-components";
 import { Flex } from "styles";
 import { COLORS, SPACING } from "theme";
+import { Account } from "types/account";
+import { TransactionType } from "types/Transaction";
 
 type BalanceSummaryFooterProps = {
-  currentBalance?: number;
-  afterBalance?: number;
+  account?: Account;
+  initialAccountId?: string;
+  amount: number;
+  initialAmount?: number;
+  type: TransactionType;
+  initialType?: TransactionType;
 };
 
 export default function BalanceSummaryFooter({
-  currentBalance,
-  afterBalance,
+  account,
+  initialAccountId,
+  initialAmount,
+  amount,
+  type,
+  initialType,
 }: BalanceSummaryFooterProps) {
+  if (!account) return null;
+
+  const getParsedInitialAmount = () => {
+    if (account._id !== initialAccountId) return 0;
+
+    return (
+      Number(initialAmount || 0) *
+      (initialType === TransactionType.EXPENSE ? -1 : 1)
+    );
+  };
+
+  const currentBalance = account.balance;
+
+  const parsedAmount = Number(
+    type === TransactionType.EXPENSE ? -amount : amount
+  );
+
+  const parsedInitialAmount = getParsedInitialAmount();
+
+  //current balance minus the amount of the transaction or the change in the transaction if there is an initial
+  const afterBalance = currentBalance
+    ? currentBalance - (parsedInitialAmount - parsedAmount)
+    : undefined;
+
   return (
     <Container>
       <SubContainer>

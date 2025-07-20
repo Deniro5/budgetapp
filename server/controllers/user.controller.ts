@@ -1,31 +1,32 @@
-import User from "../models/user.model";
 import { Request, Response } from "express";
+import * as userService from "../services/userService";
 
-const handleUpdate = async (req: Request, res: Response) => {
+export const handleUpdate = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    }).populate({
-      path: "preferences.defaultAccount",
-      select: "name _id",
-    });
+    const updatedUser = await userService.updateUserById(
+      req.params.id,
+      req.body
+    );
 
-    if (!user) {
+    if (!updatedUser) {
       res.status(404).json({ message: "User not found" });
       return;
     }
 
-    res.status(200).json({ message: "User updated successfully", user });
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
   } catch (e) {
     res.status(500).json({ message: "Server Error" });
-    return;
   }
 };
 
-const handleGet = async (req: Request, res: Response) => {
+export const handleGet = async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await userService.getUserById(req.params.id);
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
@@ -35,8 +36,5 @@ const handleGet = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Found user", user });
   } catch (e) {
     res.status(500).json({ message: "Server Error" });
-    return;
   }
 };
-
-export { handleGet, handleUpdate };

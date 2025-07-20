@@ -9,7 +9,7 @@ import {
 } from "styles";
 import { useForm } from "react-hook-form";
 
-import { RawTransfer } from "types/Transaction";
+import { RawTransfer, TransactionType } from "types/Transaction";
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
 
@@ -164,16 +164,24 @@ export function BaseTransferModal({
         {receivingAccount?.name ? `(${receivingAccount.name})` : ""}:
       </BalanceSummaryLabel>
       <BalanceSummaryFooter
-        currentBalance={currentReceivingBalance}
-        afterBalance={afterReceivingBalance}
+        initialAccountId={initialTransfer?.receivingAccountId}
+        account={receivingAccount}
+        initialAmount={initialTransfer?.amount}
+        initialType={initialTransfer ? TransactionType.INCOME : undefined}
+        amount={parsedAmount}
+        type={TransactionType.INCOME}
       />
       <BalanceSummaryLabel>
         Sending Account {sendingAccount?.name ? `(${sendingAccount.name})` : ""}
         :
       </BalanceSummaryLabel>
       <BalanceSummaryFooter
-        currentBalance={currentSendingBalance}
-        afterBalance={afterSendingBalance}
+        initialAccountId={initialTransfer?.sendingAccountId}
+        account={sendingAccount}
+        initialAmount={initialTransfer?.amount}
+        initialType={initialTransfer ? TransactionType.EXPENSE : undefined}
+        amount={parsedAmount}
+        type={TransactionType.EXPENSE}
       />
       <ButtonContainer>
         <BaseButton type="submit">{confirmText}</BaseButton>
