@@ -1,5 +1,7 @@
 import AccountModel from "../models/account.model";
+import InvestmentModel from "../models/investment.model";
 import TransactionModel from "../models/transaction.model";
+import { getAggregatedInvestmentsByAccount } from "../services/investmentService";
 
 interface AccountInput {
   userId: string;
@@ -37,8 +39,74 @@ export const getAccountById = async (userId: string, accountId: string) => {
   return AccountModel.findOne({ _id: accountId, userId });
 };
 
+export const getAccountInvestmentSummary = async ({
+  userId,
+  accountId,
+}: {
+  userId: string;
+  accountId: string;
+}) => await getAggregatedInvestmentsByAccount(userId, accountId);
+
 export const getAllAccounts = async (userId: string) => {
   return AccountModel.find({ userId }).sort({ date: -1, _id: -1 });
+};
+
+export const getAllAccountsWithInvestmentSummary = async (userId: string) => {
+  const accounts = await getAllAccounts(userId);
+
+  const accountsWithInvestments = await Promise.all(
+    accounts.map(async (account) => {
+      const investmentSummary = await getAggregatedInvestmentsByAccount(
+        userId,
+        account._id.toString()
+      );
+
+      console.log(investmentSummary);
+
+      return {
+        ...account.toObject(),
+        investmentSummary,
+      };
+    })
+  );
+
+  return accountsWithInvestments;
+};
+
+export const updateAccount = async (
+  userId: string,
+  accountId: string,
+  updateData: any
+) => {
+  const account = await AccountModel.findOne({ _id: accountId, userId });
+  if (!account) return null;
+
+  if (
+    updateData.baselineAmount !== account.baselineAmount &&
+    updateData.baselineDate === account.baselineDate
+  ) {
+    updateData.balance += updateData.baselineAmount - account.baselineAmount;
+  }
+
+  if (updateData.baselineDate !== account.baselineDate) {
+    const transactionTotal =
+      (await getAccountTransactionTotalAfterBaseline({
+        userId,
+        accountId,
+        baselineDate: updateData.baselineDate,
+      })) + updateData.baselineAmount;
+    updateData.balance = transactionTotal;
+  }
+
+  return AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
+};
+
+export const deleteAccount = async (userId: string, accountId: string) => {
+  const account = await AccountModel.findOne({ _id: accountId, userId });
+  if (!account) return null;
+
+  await AccountModel.findByIdAndDelete(accountId);
+  return true;
 };
 
 export const getAccountBalanceAtDate = async ({
@@ -224,40 +292,4 @@ export const getAccountInvestmentTotalBaseline = async ({
       (transaction.type === "Income" ? transaction.amount : -transaction.amount)
     );
   }, 0);
-};
-
-export const updateAccount = async (
-  userId: string,
-  accountId: string,
-  updateData: any
-) => {
-  const account = await AccountModel.findOne({ _id: accountId, userId });
-  if (!account) return null;
-
-  if (
-    updateData.baselineAmount !== account.baselineAmount &&
-    updateData.baselineDate === account.baselineDate
-  ) {
-    updateData.balance += updateData.baselineAmount - account.baselineAmount;
-  }
-
-  if (updateData.baselineDate !== account.baselineDate) {
-    const transactionTotal =
-      (await getAccountTransactionTotalAfterBaseline({
-        userId,
-        accountId,
-        baselineDate: updateData.baselineDate,
-      })) + updateData.baselineAmount;
-    updateData.balance = transactionTotal;
-  }
-
-  return AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
-};
-
-export const deleteAccount = async (userId: string, accountId: string) => {
-  const account = await AccountModel.findOne({ _id: accountId, userId });
-  if (!account) return null;
-
-  await AccountModel.findByIdAndDelete(accountId);
-  return true;
 };

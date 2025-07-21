@@ -95,6 +95,54 @@ export const getAggregatedInvestments = async (userId: string) => {
   ]);
 };
 
+export const getAggregatedInvestmentsByAccount = async (
+  userId: string,
+  accountId: string
+) => {
+  return await InvestmentModel.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        account: new mongoose.Types.ObjectId(accountId),
+      },
+    },
+    {
+      $group: {
+        _id: {
+          symbol: "$asset.symbol",
+          userId: "$userId",
+        },
+        name: { $first: "$asset.name" },
+        exchange: { $first: "$asset.exchange" },
+        totalQuantity: { $sum: "$quantity" },
+        totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
+      },
+    },
+    { $match: { totalQuantity: { $gt: 0 } } },
+    {
+      $project: {
+        _id: 0,
+        asset: {
+          symbol: "$_id.symbol",
+          name: "$name",
+          exchange: "$exchange",
+        },
+        quantity: "$totalQuantity",
+        price: {
+          $cond: [
+            { $eq: ["$totalQuantity", 0] },
+            0,
+            { $divide: ["$totalValue", "$totalQuantity"] },
+          ],
+        },
+      },
+    },
+    {
+      $sort: { "asset.symbol": 1 },
+    },
+  ]);
+};
+
 export const searchStocks = (query: string) => {
   const lower = query.toLowerCase();
   return SampleStocks.filter(

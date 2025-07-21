@@ -1,3 +1,5 @@
+import { Asset } from "./investment";
+
 export enum AccountType {
   CHEQUING = "Chequing",
   SAVINGS = "Savings",
@@ -12,6 +14,12 @@ export enum AccountType {
   CASH_ACCOUNT = "Cash Account",
 }
 
+export type AccountInvestmentSummaryItem = {
+  quantity: number;
+  price: number;
+  asset: Asset;
+};
+
 export type RawAccount = {
   _id: string;
   name: string;
@@ -23,4 +31,5 @@ export type RawAccount = {
 
 export type Account = RawAccount & {
   balance: number;
+  investmentSummary: AccountInvestmentSummaryItem[];
 };

@@ -69,7 +69,9 @@ export const getAccounts = async (
       return;
     }
 
-    const accounts = await accountService.getAllAccounts(userId);
+    const accounts = await accountService.getAllAccountsWithInvestmentSummary(
+      userId
+    );
 
     res.json(accounts);
   } catch (err) {

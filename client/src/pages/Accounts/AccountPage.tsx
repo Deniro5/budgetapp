@@ -12,11 +12,13 @@ import {
   EditAccountModal,
   DeleteAccountModal,
 } from "./modals";
+import { ViewAccountModal } from "./modals/ViewAccountModal/ViewAccountModal.tsx";
 
 export enum AccountOverlayType {
   ADD = "add",
   EDIT = "edit",
   DELETE = "delete",
+  VIEW = "view",
 }
 
 function Accounts() {
@@ -56,6 +58,12 @@ function Accounts() {
       </PageColumnFlexContainer>
       {activeOverlay === AccountOverlayType.ADD && (
         <AddAccountModal onClose={handleCloseOverlay} />
+      )}
+      {activeOverlay === AccountOverlayType.VIEW && activeAccount && (
+        <ViewAccountModal
+          onClose={handleCloseOverlay}
+          account={activeAccount}
+        />
       )}
       {activeOverlay === AccountOverlayType.EDIT && activeAccount && (
         <EditAccountModal

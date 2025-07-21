@@ -1,7 +1,14 @@
-import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
-import { Card, DeleteButton, Divider, Flex, SecondaryButton } from "styles";
+import {
+  BaseButton,
+  Card,
+  DeleteButton,
+  Divider,
+  Flex,
+  SecondaryButton,
+} from "styles";
 import { FONTSIZE, SPACING } from "theme";
 import { Account } from "types/account";
 import { AccountOverlayType } from "../../AccountPage";
@@ -19,6 +26,10 @@ export function AccountCard({
   setActiveAccount,
   setActiveOverlay,
 }: AccountCardProps) {
+  const handleViewClick = () => {
+    setActiveOverlay(AccountOverlayType.VIEW);
+    setActiveAccount(account);
+  };
   const handleEditClick = () => {
     setActiveOverlay(AccountOverlayType.EDIT);
     setActiveAccount(account);
@@ -27,6 +38,11 @@ export function AccountCard({
     setActiveOverlay(AccountOverlayType.DELETE);
     setActiveAccount(account);
   };
+
+  const assetTotal = account.investmentSummary.reduce((total, item) => {
+    return total + item.price * item.quantity;
+  }, 0);
+
   return (
     <Container>
       <AccountHeader> {account.name}</AccountHeader>
@@ -39,6 +55,12 @@ export function AccountCard({
           </b>
         </Flex>
         <Flex>
+          <Label> Asset Total: </Label>
+          <b>
+            <Text> ${assetTotal || 0} </Text>
+          </b>
+        </Flex>
+        <Flex>
           <Label>Institution: </Label>
           <Text> {account.institution} </Text>
         </Flex>
@@ -48,6 +70,10 @@ export function AccountCard({
         </Flex>
       </AccountInfo>
       <ButtonContainer>
+        <BaseButton onClick={handleViewClick}>
+          <FontAwesomeIcon icon={faEye} />
+          View Details
+        </BaseButton>
         <SecondaryButton onClick={handleEditClick}>
           <FontAwesomeIcon icon={faPencil} />
           Edit Account
@@ -73,7 +99,7 @@ const AccountInfo = styled(Flex)`
   flex-direction: column;
   align-items: flex-start;
   margin-top: ${SPACING.spacing6x};
-  gap: ${SPACING.spacing6x};
+  gap: ${SPACING.spacing3x};
   margin-left: ${SPACING.spacingBase};
 `;
 
