@@ -89,6 +89,9 @@ export const getAggregatedInvestments = async (userId: string) => {
         entries: 1,
       },
     },
+    {
+      $sort: { "asset.symbol": 1 },
+    },
   ]);
 };
 
