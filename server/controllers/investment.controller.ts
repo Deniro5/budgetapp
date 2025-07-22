@@ -67,9 +67,13 @@ export const getCurrentAggregatedInvestments = async (
       return;
     }
 
-    const aggregated = await investmentService.getAggregatedInvestments(userId);
-    req.investments = aggregated;
-    next();
+    const aggregated = await investmentService.getAggregatedInvestments(
+      userId,
+      true
+    );
+
+    res.json(aggregated);
+    return;
   } catch (err) {
     console.error("Error aggregating investments:", err);
     res.status(500).json({ error: "Failed to aggregate investments" });

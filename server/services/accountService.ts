@@ -1,7 +1,10 @@
 import AccountModel from "../models/account.model";
 import InvestmentModel from "../models/investment.model";
 import TransactionModel from "../models/transaction.model";
-import { getAggregatedInvestmentsByAccount } from "../services/investmentService";
+import {
+  getAggregatedInvestmentsByAccount,
+  getAggregatedInvestmentTimelineByAccount,
+} from "../services/investmentService";
 
 interface AccountInput {
   userId: string;
@@ -245,7 +248,31 @@ export const getAccountBalancesById = async ({
   cumulativeBalances.unshift({ date: earliestDate!, balance: startingBalance });
   cumulativeBalances.push({ date: endDate, balance: transactionTotal });
 
-  return cumulativeBalances;
+  const investmentBalances = await getAggregatedInvestmentTimelineByAccount({
+    userId,
+    accountId: id === "All" ? undefined : id,
+    appendHistory: true,
+  });
+  const map = new Map<
+    string,
+    { date: string; balance?: number; value?: number }
+  >();
+
+  cumulativeBalances.forEach(({ date, balance }) => {
+    if (!map.has(date)) {
+      map.set(date, { date });
+    }
+    map.get(date)!.balance = balance;
+  });
+
+  investmentBalances.forEach(({ date, value }) => {
+    if (!map.has(date)) {
+      map.set(date, { date });
+    }
+    map.get(date)!.value = value;
+  });
+
+  return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
 };
 
 export const getAccountTransactionTotalAfterBaseline = async ({

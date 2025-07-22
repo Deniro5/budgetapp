@@ -5,6 +5,9 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
+  LineChart,
+  Line,
+  ComposedChart,
 } from "recharts";
 
 import styled from "styled-components";
@@ -41,11 +44,14 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
     } else {
       return (
         <ResponsiveContainer width="100%" height={350}>
-          <AreaChart
+          <ComposedChart
             data={accountWithBalances}
             margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
           >
             <YAxis />
+            <XAxis dataKey="date" />
+            <Tooltip />
+
             <defs>
               <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
@@ -56,15 +62,24 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
                 <stop offset="95%" stopColor="#ff7979" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="date" />
-            <Tooltip />
+
+            {/* Area for balance */}
             <Area
               type="monotone"
               dataKey="balance"
               stroke="#82ca9d"
               fill="url(#colorIncome)"
             />
-          </AreaChart>
+
+            {/* Line for investment value */}
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#ff7979"
+              strokeWidth={2}
+              dot={false}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
       );
     }

@@ -11,6 +11,7 @@ type useAccountWidgetProps = {
 type AccountWithBalances = {
   date: string;
   balance: number;
+  value: number;
 }[];
 
 const fetchAccountWithBalances = async (

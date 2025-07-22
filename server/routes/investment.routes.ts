@@ -6,17 +6,11 @@ import {
   searchStocks,
 } from "../controllers/investment.controller";
 import { verifyToken } from "../middleware/verifyToken";
-import { updateAssetPriceHistory } from "../middleware/updateAssetPriceHistory";
 
 const router = express.Router();
 
 router.get("/search", verifyToken, searchStocks);
-router.get(
-  "/",
-  verifyToken,
-  getCurrentAggregatedInvestments,
-  updateAssetPriceHistory
-);
+router.get("/", verifyToken, getCurrentAggregatedInvestments);
 router.get("/history", verifyToken, getAllInvestments);
 router.post("/", verifyToken, createInvestment);
 

@@ -90,3 +90,6 @@ export function getAggregatedValue(
 
   return Math.round((value / 30) * diffDays);
 }
+
+export const formatTimestampToYYYYMMDD = (isoString: string) =>
+  new Date(isoString).toISOString().split("T")[0];

@@ -45,20 +45,21 @@ export function AccountCard({
 
   return (
     <Container>
-      <AccountHeader> {account.name}</AccountHeader>
+      <AccountHeader>
+        <AccountHeaderText>{account.name}</AccountHeaderText>
+        <AccountHeaderText>${assetTotal + account.balance}</AccountHeaderText>
+      </AccountHeader>
       <StyledDivider />
       <AccountInfo>
         <Flex>
           <Label> Balance: </Label>
-          <b>
-            <Text> ${account.balance} </Text>
-          </b>
+
+          <Text> ${account.balance} </Text>
         </Flex>
         <Flex>
           <Label> Asset Total: </Label>
-          <b>
-            <Text> ${assetTotal || 0} </Text>
-          </b>
+
+          <Text> ${assetTotal} </Text>
         </Flex>
         <Flex>
           <Label>Institution: </Label>
@@ -114,7 +115,12 @@ const Text = styled.p`
   margin: 0;
 `;
 
-const AccountHeader = styled.h2`
+const AccountHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const AccountHeaderText = styled.h2`
   margin: 0;
   font-size: ${FONTSIZE.ml};
 `;

@@ -2,7 +2,34 @@ import InvestmentModel from "../models/investment.model";
 import { SampleStocks } from "../data/sample-stocks";
 import mongoose from "mongoose";
 import AccountModel from "../models/account.model";
+import AssetPriceHistoryModel from "../models/assetpricehistory.model";
+import axios from "axios";
 
+const API_URL = "https://www.alphavantage.co/query";
+const ONE_DAY = 24 * 60 * 60 * 1000;
+
+interface Investment {
+  asset: {
+    symbol: string;
+  };
+}
+
+interface CustomRequest extends Request {
+  investments?: Investment[];
+}
+
+interface TimeSeriesEntry {
+  [date: string]: {
+    "1. open": string;
+    "2. high": string;
+    "3. low": string;
+    "4. close": string;
+    "5. adjusted close": string;
+    "6. volume": string;
+    "7. dividend amount"?: string;
+    "8. split coefficient"?: string;
+  };
+}
 interface UpdateAccountBalanceArgs {
   userId: string;
   accountId: string;
@@ -52,8 +79,11 @@ export const getAllInvestments = async (userId: string) => {
   return await InvestmentModel.find({ userId }).sort({ date: -1, _id: -1 });
 };
 
-export const getAggregatedInvestments = async (userId: string) => {
-  return await InvestmentModel.aggregate([
+export const getAggregatedInvestments = async (
+  userId: string,
+  appendHistory?: boolean
+) => {
+  const investments = await InvestmentModel.aggregate([
     { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
@@ -93,13 +123,16 @@ export const getAggregatedInvestments = async (userId: string) => {
       $sort: { "asset.symbol": 1 },
     },
   ]);
+  return appendHistory ? updateAssetPriceHistory(investments) : investments;
 };
 
 export const getAggregatedInvestmentsByAccount = async (
   userId: string,
-  accountId: string
+  accountId: string,
+  appendHistory?: boolean
 ) => {
-  return await InvestmentModel.aggregate([
+  console.log(accountId);
+  const investments = await InvestmentModel.aggregate([
     {
       $match: {
         userId: new mongoose.Types.ObjectId(userId),
@@ -141,6 +174,104 @@ export const getAggregatedInvestmentsByAccount = async (
       $sort: { "asset.symbol": 1 },
     },
   ]);
+  return appendHistory ? updateAssetPriceHistory(investments) : investments;
+};
+export const getAggregatedInvestmentTimelineByAccount = async ({
+  userId,
+  accountId,
+  appendHistory,
+}: {
+  userId: string;
+  accountId?: string;
+  appendHistory?: boolean;
+}) => {
+  const investments = await InvestmentModel.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        ...(accountId
+          ? { account: new mongoose.Types.ObjectId(accountId) }
+          : {}),
+      },
+    },
+    {
+      $group: {
+        _id: {
+          symbol: "$asset.symbol",
+          userId: "$userId",
+        },
+        name: { $first: "$asset.name" },
+        exchange: { $first: "$asset.exchange" },
+        totalQuantity: { $sum: "$quantity" },
+        totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
+        entries: { $push: "$$ROOT" },
+      },
+    },
+    { $match: { totalQuantity: { $gt: 0 } } },
+    {
+      $project: {
+        _id: 0,
+        asset: {
+          symbol: "$_id.symbol",
+          name: "$name",
+          exchange: "$exchange",
+        },
+        entries: 1,
+      },
+    },
+    {
+      $sort: { "asset.symbol": 1 },
+    },
+  ]);
+  const investmentsWithHistory = appendHistory
+    ? await updateAssetPriceHistory(investments)
+    : investments;
+
+  const test = investmentsWithHistory.map((inv) => {
+    const { history } = inv.asset;
+    const { entries } = inv;
+    // Sort entries and history to ensure they're chronological
+    const sortedEntries = [...entries].sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
+    const sortedHistory = [...history].sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
+
+    let cumulativeQty = 0;
+    let entryIndex = 0;
+
+    const dailyValue = sortedHistory.map(({ date, price }) => {
+      // Accumulate quantity from entries up to and including this date
+      while (
+        entryIndex < sortedEntries.length &&
+        sortedEntries[entryIndex].date <= date
+      ) {
+        cumulativeQty += sortedEntries[entryIndex].quantity; // buy = positive, sell = negative
+        entryIndex++;
+      }
+
+      const value = cumulativeQty * price;
+
+      return {
+        date,
+        value,
+      };
+    });
+
+    return dailyValue;
+  });
+  let index = 0;
+  let result = [];
+  while (index < 100) {
+    let total = 0;
+    for (let i = 0; i < test.length; i++) {
+      total += test[i][index].value;
+    }
+    result.push({ date: test[0][index].date, value: total });
+    index++;
+  }
+  return result;
 };
 
 export const searchStocks = (query: string) => {
@@ -150,4 +281,68 @@ export const searchStocks = (query: string) => {
       stock.symbol.toLowerCase().includes(lower) ||
       stock.name.toLowerCase().includes(lower)
   ).slice(0, 20);
+};
+
+export const updateAssetPriceHistory = async (investments: Investment[]) => {
+  const now = Date.now();
+  const investmentsWithHistory = [];
+
+  for (const investment of investments) {
+    const symbol = investment.asset.symbol;
+    let history: any = await AssetPriceHistoryModel.findOne({ symbol });
+
+    const needsUpdate =
+      !history || now - new Date(history.lastUpdated).getTime() > ONE_DAY;
+
+    if (needsUpdate) {
+      const params = {
+        function: "TIME_SERIES_DAILY",
+        symbol,
+        apikey: process.env.AV_KEY as string,
+        outputsize: "compact",
+      };
+
+      const { data } = await axios.get<{
+        "Time Series (Daily)": TimeSeriesEntry;
+      }>(API_URL, {
+        params,
+      });
+
+      const timeSeries = data["Time Series (Daily)"];
+      if (!timeSeries) {
+        console.warn(`Alpha Vantage response for ${symbol} was invalid`, data);
+        continue;
+      }
+
+      history = Object.entries(timeSeries).map(([date, daily]) => ({
+        date,
+        price: parseFloat(daily["4. close"]),
+      }));
+
+      // Sort ascending
+      history.sort(
+        (a: any, b: any) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+      await AssetPriceHistoryModel.findOneAndUpdate(
+        { symbol },
+        {
+          symbol,
+          history,
+          lastUpdated: new Date(),
+        },
+        { upsert: true, new: true }
+      );
+    } else {
+      //if we get history from mongo , we need to just take the history part not the symbol
+      history = history.history;
+    }
+
+    investmentsWithHistory.push({
+      ...investment,
+      asset: { ...investment.asset, history },
+    });
+  }
+  return investmentsWithHistory;
 };
