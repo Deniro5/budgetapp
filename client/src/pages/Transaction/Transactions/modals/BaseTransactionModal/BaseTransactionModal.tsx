@@ -107,7 +107,6 @@ export function BaseTransactionModal({
   };
 
   const handlePresetSelect = (preset: PresetTransaction) => {
-    console.log(preset);
     setCurrentPreset(preset);
     reset({ ...currentValues, ...preset, account: preset.account?._id });
   };

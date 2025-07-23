@@ -37,7 +37,6 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
   const handleAccountChange = (id: string) => {
     setAccountWidgetId(id);
   };
-
   const ChartContent = () => {
     if (!accountWithBalances.length) {
       return <b> No data to show.</b>;
@@ -66,7 +65,7 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
             {/* Area for balance */}
             <Area
               type="monotone"
-              dataKey="balance"
+              dataKey="total"
               stroke="#82ca9d"
               fill="url(#colorIncome)"
             />
@@ -76,6 +75,14 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
               type="monotone"
               dataKey="value"
               stroke="#ff7979"
+              strokeWidth={2}
+              dot={false}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="balance"
+              stroke="blue"
               strokeWidth={2}
               dot={false}
             />

@@ -11,6 +11,7 @@ import Budget from "../pages/Budget";
 import useInitialLoad from "../hooks/useInitialLoad";
 import { DashboardPage } from "../pages/Dashboard/DashboardPage";
 import { InvestmentsPage } from "../pages/Investments/InvestmentsPage";
+import { ToastProvider } from "../Context/Toast";
 
 const accountsElement = <Accounts />;
 const budgetElement = <Budget />;
@@ -42,21 +43,23 @@ function MainLayout() {
 
   return (
     <AppContainer>
-      <Sidebar isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
+      <ToastProvider>
+        <Sidebar isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
 
-      <ContentContainer isExpanded={isExpanded}>
-        <Routes>
-          <Route path="/" element={dashboardElement} />
-          <Route path="/transactions" element={transactionsElement} />
-          <Route path="/accounts" element={accountsElement} />
-          <Route path="/budget" element={budgetElement} />
-          <Route path="/reports" element={<p> reports </p>} />
-          <Route path="/savings" element={<p> savings </p>} />
-          <Route path="/debts" element={<p> debts </p>} />
-          <Route path="/settings" element={settingsElement} />
-          <Route path="/investments" element={investmentsElement} />
-        </Routes>
-      </ContentContainer>
+        <ContentContainer isExpanded={isExpanded}>
+          <Routes>
+            <Route path="/" element={dashboardElement} />
+            <Route path="/transactions" element={transactionsElement} />
+            <Route path="/accounts" element={accountsElement} />
+            <Route path="/budget" element={budgetElement} />
+            <Route path="/reports" element={<p> reports </p>} />
+            <Route path="/savings" element={<p> savings </p>} />
+            <Route path="/debts" element={<p> debts </p>} />
+            <Route path="/settings" element={settingsElement} />
+            <Route path="/investments" element={investmentsElement} />
+          </Routes>
+        </ContentContainer>
+      </ToastProvider>
     </AppContainer>
   );
 }

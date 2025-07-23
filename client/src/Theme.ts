@@ -59,6 +59,7 @@ export const COLORS = {
   darkDeleteRed: "#D32F2F",
   background: "#fafafa",
   green: "#2dcc2d",
+  darkGreen: "#1e8f1e",
 };
 
 export const SPACING = {

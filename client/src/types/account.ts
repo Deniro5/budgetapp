@@ -32,4 +32,5 @@ export type RawAccount = {
 export type Account = RawAccount & {
   balance: number;
   investmentSummary: AccountInvestmentSummaryItem[];
+  createdAt: string;
 };
