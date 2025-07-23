@@ -1,10 +1,10 @@
 import AccountModel from "../models/account.model";
-import InvestmentModel from "../models/investment.model";
 import TransactionModel from "../models/transaction.model";
 import {
   getAggregatedInvestmentsByAccount,
   getAggregatedInvestmentTimelineByAccount,
 } from "../services/investmentService";
+import { addOneDay } from "../utils/dateutils";
 
 interface AccountInput {
   userId: string;
@@ -63,9 +63,6 @@ export const getAllAccountsWithInvestmentSummary = async (userId: string) => {
         userId,
         account._id.toString()
       );
-
-      console.log(investmentSummary);
-
       return {
         ...account.toObject(),
         investmentSummary,
@@ -230,49 +227,50 @@ export const getAccountBalancesById = async ({
     a.date > b.date ? 1 : -1
   );
 
-  const startingBalance = transactionTotal;
-  const cumulativeBalancesMap: Record<string, number> = {};
-
-  sortedTransactions.forEach(({ date, amount, type }) => {
-    transactionTotal += type === "Income" ? amount : -amount;
-    cumulativeBalancesMap[date] = transactionTotal;
-  });
-
-  const cumulativeBalances = Object.entries(cumulativeBalancesMap).map(
-    ([date, balance]) => ({
-      date,
-      balance,
-    })
-  );
-
-  cumulativeBalances.unshift({ date: earliestDate!, balance: startingBalance });
-  cumulativeBalances.push({ date: endDate, balance: transactionTotal });
-
   const investmentBalances = await getAggregatedInvestmentTimelineByAccount({
     userId,
     accountId: id === "All" ? undefined : id,
     appendHistory: true,
   });
-  const map = new Map<
-    string,
-    { date: string; balance?: number; value?: number }
-  >();
 
-  cumulativeBalances.forEach(({ date, balance }) => {
-    if (!map.has(date)) {
-      map.set(date, { date });
+  const investmentBalancesMap = investmentBalances.reduce(
+    (acc: Record<string, number>, cur: { date: string; value: number }) => {
+      acc[cur.date] = cur.value;
+      return acc;
+    },
+    {}
+  );
+
+  console.log(investmentBalancesMap);
+
+  let currentDate = startDate;
+  const result: {
+    date: string;
+    balance: number;
+    value: number;
+    total: number;
+  }[] = [];
+
+  sortedTransactions.forEach(({ date, amount, type }) => {
+    while (date > currentDate) {
+      result.push({
+        date: currentDate,
+        balance: transactionTotal,
+        value: investmentBalancesMap[currentDate] || 0,
+        total: transactionTotal + investmentBalancesMap[currentDate] || 0,
+      });
+      currentDate = addOneDay(currentDate);
     }
-    map.get(date)!.balance = balance;
+    transactionTotal += type === "Income" ? amount : -amount;
+    result.push({
+      date: currentDate,
+      balance: transactionTotal,
+      value: investmentBalancesMap[currentDate] || 0,
+      total: transactionTotal + investmentBalancesMap[currentDate] || 0,
+    });
   });
 
-  investmentBalances.forEach(({ date, value }) => {
-    if (!map.has(date)) {
-      map.set(date, { date });
-    }
-    map.get(date)!.value = value;
-  });
-
-  return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
+  return result;
 };
 
 export const getAccountTransactionTotalAfterBaseline = async ({

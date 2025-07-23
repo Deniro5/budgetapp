@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import AccountModel from "../models/account.model";
 import AssetPriceHistoryModel from "../models/assetpricehistory.model";
 import axios from "axios";
+import { addOneDay } from "../utils/dateutils";
 
 const API_URL = "https://www.alphavantage.co/query";
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -131,7 +132,6 @@ export const getAggregatedInvestmentsByAccount = async (
   accountId: string,
   appendHistory?: boolean
 ) => {
-  console.log(accountId);
   const investments = await InvestmentModel.aggregate([
     {
       $match: {
@@ -261,15 +261,25 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
 
     return dailyValue;
   });
-  let index = 0;
+
   let result = [];
-  while (index < 100) {
+  let start = test[0][0].date;
+  let end = test[0][test[0].length - 1].date;
+  let lastValue = 0;
+  //go through every date and get the current value. There are gaps on the weekends so we have to manually fill them with the last known value.
+  while (start <= end) {
     let total = 0;
-    for (let i = 0; i < test.length; i++) {
-      total += test[i][index].value;
+    const index = test[0].findIndex((item) => item.date === start);
+    if (index < 0) {
+      result.push({ date: start, value: lastValue });
+    } else {
+      for (let i = 0; i < test.length; i++) {
+        total += test[i][index].value;
+      }
+      result.push({ date: start, value: total });
+      lastValue = total;
     }
-    result.push({ date: test[0][index].date, value: total });
-    index++;
+    start = addOneDay(start);
   }
   return result;
 };
