@@ -14,6 +14,8 @@ import { TransactionCategory } from "types/Transaction";
 import { getAggregatedCategoryBudgetLine } from "store/budget/budgetSelectors";
 import { useCategoryLineWidget } from "./useCategoryLineWidget";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
+import renderChart from "../Hocs/renderChart";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 type CategoryLineWidgetProps = {
   startDate: string;
@@ -24,7 +26,7 @@ export const CategoryLineWidget = ({
   startDate,
   endDate,
 }: CategoryLineWidgetProps) => {
-  const { categoryExpenseByDate, category, setCategory } =
+  const { categoryExpenseByDate, category, setCategory, isLoading, error } =
     useCategoryLineWidget({
       startDate,
       endDate,
@@ -34,64 +36,65 @@ export const CategoryLineWidget = ({
     setCategory(category);
   };
 
-  const ChartContent = () => {
-    if (!categoryExpenseByDate.length) {
-      return <p> no data</p>;
-    } else {
-      const budgetLineValue = getAggregatedCategoryBudgetLine(
-        startDate,
-        endDate,
-        category
-      );
+  const budgetLineValue = getAggregatedCategoryBudgetLine(
+    startDate,
+    endDate,
+    category
+  );
+  const chartElement = (
+    <ResponsiveContainer width="100%" height={350}>
+      <LineChart
+        data={categoryExpenseByDate}
+        margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+      >
+        <YAxis
+          domain={[
+            0,
+            Math.max(
+              200,
+              budgetLineValue,
+              ...categoryExpenseByDate.map((d) => d.expense)
+            ),
+          ]}
+        />
 
-      return (
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart
-            data={categoryExpenseByDate}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-          >
-            <YAxis
-              domain={[
-                0,
-                Math.max(
-                  200,
-                  budgetLineValue,
-                  ...categoryExpenseByDate.map((d) => d.expense)
-                ),
-              ]}
-            />
+        <XAxis dataKey="date" />
+        <Tooltip />
 
-            <XAxis dataKey="date" />
-            <Tooltip />
+        <Line
+          type="monotone"
+          dataKey="expense"
+          stroke="#ff7979"
+          strokeWidth={2}
+          dot={false}
+        />
 
-            <Line
-              type="monotone"
-              dataKey="expense"
-              stroke="#ff7979"
-              strokeWidth={2}
-              dot={false}
-            />
+        {budgetLineValue > 0 && (
+          <ReferenceLine
+            y={budgetLineValue}
+            stroke="black"
+            strokeDasharray="5 5"
+            label={{
+              value: `Aggregated Budget Limit : $${budgetLineValue}`,
+              position: "center",
+              fill: "black",
+              dy: -10,
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          />
+        )}
+      </LineChart>
+    </ResponsiveContainer>
+  );
 
-            {budgetLineValue > 0 && (
-              <ReferenceLine
-                y={budgetLineValue}
-                stroke="black"
-                strokeDasharray="5 5"
-                label={{
-                  value: `Aggregated Budget Limit : $${budgetLineValue}`,
-                  position: "center",
-                  fill: "black",
-                  dy: -10,
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-              />
-            )}
-          </LineChart>
-        </ResponsiveContainer>
-      );
-    }
-  };
+  const chartContent = renderChart({
+    isEmpty: categoryExpenseByDate?.length === 0,
+    loading: isLoading,
+    error: error,
+    chartElement,
+    loadingElement: <SkeletonLoader height={350} rows={1} columns={1} />,
+  });
 
   return (
     <>
@@ -102,7 +105,7 @@ export const CategoryLineWidget = ({
           handleCategoryChange={handleSetCategory}
         />
       </Header>
-      <ChartContent />
+      {chartContent}
     </>
   );
 };

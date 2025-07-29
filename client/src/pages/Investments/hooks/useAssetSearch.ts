@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueryWithError } from "../../../hooks/useQueryWithError";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
@@ -16,26 +16,27 @@ export const useAssetSearch = () => {
     return () => clearTimeout(handler);
   }, [input]);
 
-  const query = useQuery({
-    queryKey: ["assetSearch", debouncedInput],
-    queryFn: async () => {
+  const { data, isLoading, error } = useQueryWithError<Asset[], Error>(
+    ["assetSearch", debouncedInput],
+    async () => {
       const res = await axios.get<Asset[]>(
         `${BASE_API_URL}/investments/search`,
-        {
-          params: { q: debouncedInput },
-        }
+        { params: { q: debouncedInput } }
       );
       return res.data;
     },
-    enabled: !!debouncedInput,
-    staleTime: 5 * 60 * 1000,
-  });
+    {
+      enabled: !!debouncedInput,
+      staleTime: 5 * 60 * 1000,
+    },
+    "Failed to search for assets"
+  );
 
   return {
     input,
     setInput,
-    results: query.data ?? [],
-    isLoading: query.isLoading,
-    error: query.error,
+    results: data ?? [],
+    isLoading,
+    error,
   };
 };

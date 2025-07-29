@@ -11,6 +11,8 @@ import styled from "styled-components";
 import { Flex } from "styles";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { useIncomeExpenseWidget } from "./useIncomeExpenseWidget";
+import renderChart from "../Hocs/renderChart";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 interface IncomeExpenseWidgetProps {
   startDate: string;
@@ -21,14 +23,58 @@ export const IncomeExpenseWidget = ({
   startDate,
   endDate,
 }: IncomeExpenseWidgetProps) => {
-  const { totalIncomeAndExpenseByDate, netIncome } = useIncomeExpenseWidget({
-    startDate,
-    endDate,
-  });
+  const { totalIncomeAndExpenseByDate, netIncome, isLoading, error } =
+    useIncomeExpenseWidget({
+      startDate,
+      endDate,
+    });
   const isIncrease = netIncome >= 0;
 
   if (!totalIncomeAndExpenseByDate || totalIncomeAndExpenseByDate.length === 0)
     return null; // Handle empty data case
+
+  const chartElement = (
+    <ResponsiveContainer width="100%" height={350}>
+      <AreaChart
+        data={totalIncomeAndExpenseByDate}
+        margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+      >
+        <defs>
+          <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#ff7979" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#ff7979" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Area
+          type="monotone"
+          dataKey="income"
+          stroke="#82ca9d"
+          fill="url(#colorIncome)"
+        />
+        <Area
+          type="monotone"
+          dataKey="expense"
+          stroke="#ff7979"
+          fill="url(#colorExpense)"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+
+  const chartContent = renderChart({
+    isEmpty: totalIncomeAndExpenseByDate.length === 0,
+    loading: isLoading,
+    error: error,
+    chartElement,
+    loadingElement: <SkeletonLoader height={350} rows={1} columns={1} />,
+  });
 
   return (
     <>
@@ -38,38 +84,7 @@ export const IncomeExpenseWidget = ({
           {isIncrease ? "+" : "-"} ${netIncome}
         </ChangeLabel>
       </Header>
-      <ResponsiveContainer width="100%" height={350}>
-        <AreaChart
-          data={totalIncomeAndExpenseByDate}
-          margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-        >
-          <defs>
-            <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#ff7979" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#ff7979" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Area
-            type="monotone"
-            dataKey="income"
-            stroke="#82ca9d"
-            fill="url(#colorIncome)"
-          />
-          <Area
-            type="monotone"
-            dataKey="expense"
-            stroke="#ff7979"
-            fill="url(#colorExpense)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      {chartContent}
     </>
   );
 };

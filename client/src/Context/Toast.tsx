@@ -58,11 +58,13 @@ const ToastContainer = styled.div<{ show: boolean; color: string }>`
   border-radius: 4px;
   position: absolute;
   right: 8px;
-  background: ${COLORS.darkGreen};
+  background: ${({ color }) => color};
   width: 400px;
   padding: ${SPACING.spacing4x};
-  color: ${({ color }) => color};
+  color: ${COLORS.pureWhite};
   transform: translateY(${({ show }) => (show ? "8px" : "-80px")});
   opacity: ${({ show }) => (show ? 1 : 0)};
   transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+  text-align: center;
+  z-index: 1000;
 `;

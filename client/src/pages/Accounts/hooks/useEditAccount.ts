@@ -1,4 +1,5 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMutationWithSuccessAndError } from "../../../hooks/useMutationWithSuccessAndError";
 import { BASE_API_URL } from "../../../constants";
 import axios from "axios";
 import { RawAccount } from "types/account";
@@ -11,11 +12,14 @@ type EditAccountProps = {
 export const useEditAccount = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ accountId, updatedAccount }: EditAccountProps) =>
-      axios.put(`${BASE_API_URL}/accounts/${accountId}`, updatedAccount),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+  return useMutationWithSuccessAndError({
+    options: {
+      mutationFn: ({ accountId, updatedAccount }: EditAccountProps) =>
+        axios.put(`${BASE_API_URL}/accounts/${accountId}`, updatedAccount),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      },
     },
+    customSuccess: "Account updated successfully",
   });
 };

@@ -4,6 +4,7 @@ import { TransactionTableRow } from "./TransactionTableRow";
 import { PresetTransaction, Transaction } from "types/Transaction";
 import { TransactionOverlayType, View } from "../../../TransactionsPage";
 import { Waypoint } from "react-waypoint";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 type TransactionTableProps = {
   transactions: Transaction[] | PresetTransaction[];
@@ -29,6 +30,7 @@ const tableColumns = ["Vendor", "Date", "Amount", "Category", "Account"];
 export function TransactionTable({
   transactions,
   loadMore,
+  loading,
   sidebarTransactionId,
   setActiveTransaction,
   setActiveOverlay,
@@ -53,6 +55,9 @@ export function TransactionTable({
     setActiveOverlay(TransactionOverlayType.EDIT);
   };
 
+  if (loading) {
+    return <SkeletonLoader height={40} rows={15} columns={1} />;
+  }
   return (
     <TableWrapper>
       <ScrollableTable>

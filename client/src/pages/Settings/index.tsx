@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import useUserStore from "../../store/user/userStore";
 import {
   BaseButton,
@@ -87,8 +87,10 @@ export default function Settings() {
           handleAccountChange={handleDefaultAccountChange}
         />
       </SettingRow>
-      <BaseButton onClick={handleUpdateSettings}>Save Changes</BaseButton>
-      <BaseButton onClick={logout}>Sign Out</BaseButton>
+      <ButtonContainer>
+        <BaseButton onClick={handleUpdateSettings}>Save Changes</BaseButton>
+        <BaseButton onClick={logout}>Sign Out</BaseButton>
+      </ButtonContainer>
     </PageContainer>
   );
 }
@@ -98,6 +100,7 @@ export const SettingRow = styled.div`
   flex-direction: column;
   gap: ${SPACING.spacing2x};
   padding: ${SPACING.spacing5x} 0;
+  max-width: 800px;
 `;
 
 export const SettingName = styled.h2`
@@ -110,4 +113,11 @@ export const SettingName = styled.h2`
 export const CategoryContainer = styled(Flex)`
   gap: ${SPACING.spacing4x};
   flex-wrap: wrap;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  gap: ${SPACING.spacing2x};
+  padding: ${SPACING.spacing5x} 0;
+  max-width: 800px;
 `;

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueryWithError } from "../../../hooks/useQueryWithError";
 import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
 
@@ -31,12 +31,17 @@ export const useAccountWidget = ({
   endDate,
   accountWidgetId,
 }: useAccountWidgetProps) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["accountWithBalances", accountWidgetId, startDate, endDate],
-    queryFn: () =>
-      fetchAccountWithBalances(accountWidgetId, startDate, endDate),
-    enabled: !!accountWidgetId && !!startDate && !!endDate,
-  });
+  const { data, isLoading, error } = useQueryWithError<
+    AccountWithBalances,
+    Error
+  >(
+    ["accountWithBalances", accountWidgetId, startDate, endDate],
+    () => fetchAccountWithBalances(accountWidgetId, startDate, endDate),
+    {
+      enabled: !!accountWidgetId && !!startDate && !!endDate,
+    },
+    "Failed to load account balance data"
+  );
 
   return {
     accountWithBalances: data ?? [],

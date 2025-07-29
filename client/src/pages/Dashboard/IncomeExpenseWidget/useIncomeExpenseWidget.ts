@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
+import axios from "axios";
+import { useQueryWithError } from "../../../hooks/useQueryWithError";
 
 type useIncomeExpenseWidgetProps = {
   startDate: string;
@@ -17,13 +17,10 @@ const fetchIncomeAndExpense = async (
   startDate: string,
   endDate: string
 ): Promise<IncomeExpenseData> => {
-  // Replace this with actual fetch logic
   const queryString = `startDate=${startDate}&endDate=${endDate}`;
-
   const response = await axios.get<IncomeExpenseData>(
     `${BASE_API_URL}/transactions/total-income-and-expense-by-date?${queryString}`
   );
-
   return response.data;
 };
 
@@ -31,15 +28,20 @@ export const useIncomeExpenseWidget = ({
   startDate,
   endDate,
 }: useIncomeExpenseWidgetProps) => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["incomeExpense", startDate, endDate],
-    queryFn: () => fetchIncomeAndExpense(startDate, endDate),
-    enabled: !!startDate && !!endDate,
-  });
+  const { data, isLoading, error } = useQueryWithError<
+    IncomeExpenseData,
+    Error
+  >(
+    ["incomeExpense", startDate, endDate],
+    () => fetchIncomeAndExpense(startDate, endDate),
+    {
+      enabled: !!startDate && !!endDate,
+    },
+    "Failed to load income and expense data"
+  );
 
   const getNetIncome = () => {
-    if (!data || !data.length) return 0;
-
+    if (!data?.length) return 0;
     const lastDate = data[data.length - 1];
     return lastDate.income - lastDate.expense;
   };

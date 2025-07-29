@@ -8,6 +8,8 @@ import { useState } from "react";
 import { TransactionTable } from "../../Transaction/shared/components";
 import { useRecentTransactionsWidget } from "./useRecentTransactionsWidget";
 import { AddTransactionModal } from "../../Transaction/Transactions/modals";
+import renderChart from "../Hocs/renderChart";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 export const RecentTransactionsWidget = () => {
   const { recentTransactions, isLoading, error, refetch } =
@@ -24,19 +26,8 @@ export const RecentTransactionsWidget = () => {
     refetch();
   };
 
-  if (!recentTransactions?.length) {
-    return null;
-  }
-
-  return (
+  const chartElement = (
     <>
-      <WidgetHeader>
-        <Name> Recent Transactions </Name>
-        <SecondaryButton onClick={handleAddClick}>
-          <FontAwesomeIcon icon={faAdd} />
-          Add Transaction{" "}
-        </SecondaryButton>
-      </WidgetHeader>
       <TableContainer>
         <TransactionTable
           loading={isLoading}
@@ -54,6 +45,26 @@ export const RecentTransactionsWidget = () => {
         </ViewMoreLink>
       </TableContainer>
       {showModal && <AddTransactionModal onClose={() => setShowModal(false)} />}
+    </>
+  );
+
+  const chartContent = renderChart({
+    isEmpty: recentTransactions?.length === 0,
+    loading: isLoading,
+    error: error,
+    chartElement,
+    loadingElement: <SkeletonLoader height={40} rows={7} columns={1} />,
+  });
+  return (
+    <>
+      <WidgetHeader>
+        <Name> Recent Transactions </Name>
+        <SecondaryButton onClick={handleAddClick}>
+          <FontAwesomeIcon icon={faAdd} />
+          Add Transaction{" "}
+        </SecondaryButton>
+      </WidgetHeader>
+      {chartContent}
     </>
   );
 };

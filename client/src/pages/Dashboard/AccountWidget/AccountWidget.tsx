@@ -3,9 +3,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  AreaChart,
   Area,
-  LineChart,
   Line,
   ComposedChart,
 } from "recharts";
@@ -18,6 +16,8 @@ import { getAccountids } from "store/account/accountSelectors";
 import { useAccountWidget } from "./useAccountWidget";
 import { useState } from "react";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
+import renderChart from "../Hocs/renderChart";
 
 type AccountWidgetProps = {
   startDate: string;
@@ -27,7 +27,7 @@ type AccountWidgetProps = {
 export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
   const [accountWidgetId, setAccountWidgetId] = useState("All");
 
-  const { accountWithBalances } = useAccountWidget({
+  const { accountWithBalances, isLoading, error } = useAccountWidget({
     startDate,
     endDate,
     accountWidgetId,
@@ -37,60 +37,65 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
   const handleAccountChange = (id: string) => {
     setAccountWidgetId(id);
   };
-  const ChartContent = () => {
-    if (!accountWithBalances.length) {
-      return <b> No data to show.</b>;
-    } else {
-      return (
-        <ResponsiveContainer width="100%" height={350}>
-          <ComposedChart
-            data={accountWithBalances}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-          >
-            <YAxis />
-            <XAxis dataKey="date" />
-            <Tooltip />
 
-            <defs>
-              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ff7979" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#ff7979" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+  const chartElement = (
+    <ResponsiveContainer width="100%" height={350}>
+      <ComposedChart
+        data={accountWithBalances}
+        margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+      >
+        <YAxis />
+        <XAxis dataKey="date" />
+        <Tooltip />
 
-            {/* Area for balance */}
-            <Area
-              type="monotone"
-              dataKey="total"
-              stroke="#82ca9d"
-              fill="url(#colorIncome)"
-            />
+        <defs>
+          <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#ff7979" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#ff7979" stopOpacity={0} />
+          </linearGradient>
+        </defs>
 
-            {/* Line for investment value */}
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="#ff7979"
-              strokeWidth={2}
-              dot={false}
-            />
+        {/* Area for balance */}
+        <Area
+          type="monotone"
+          dataKey="total"
+          stroke="#82ca9d"
+          fill="url(#colorIncome)"
+        />
 
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="blue"
-              strokeWidth={2}
-              dot={false}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-      );
-    }
-  };
+        {/* Line for investment value */}
+        <Line
+          type="natural"
+          dataKey="value"
+          stroke="#ff7979"
+          strokeWidth={2}
+          dot={false}
+          strokeDasharray="7 1"
+        />
+
+        <Line
+          type="basis"
+          dataKey="balance"
+          stroke="blue"
+          strokeWidth={2}
+          dot={false}
+          strokeDasharray="7 1"
+        />
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+
+  const chartContent = renderChart({
+    isEmpty: !accountWithBalances.length,
+    loading: isLoading,
+    error,
+    chartElement: chartElement,
+    loadingElement: <SkeletonLoader height={350} rows={1} columns={1} />,
+  });
 
   return (
     <>
@@ -109,7 +114,7 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
           handleAccountChange={handleAccountChange}
         />
       </Header>
-      <ChartContent />
+      {chartContent}
     </>
   );
 };

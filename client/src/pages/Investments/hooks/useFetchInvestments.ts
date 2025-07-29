@@ -1,28 +1,29 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQueryWithError } from "../../../hooks/useQueryWithError";
 import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
 import { Investment } from "../../../types/investment";
 
 export const useFetchInvestments = () => {
-  const query = useQuery({
-    queryKey: ["investments"],
-    queryFn: async () => {
+  const { data, isLoading, error } = useQueryWithError<Investment[], Error>(
+    ["investments"],
+    async () => {
       const res = await axios.get<Investment[]>(`${BASE_API_URL}/investments`);
       return res.data;
     },
-    enabled: true,
-  });
+    { enabled: true },
+    "Failed to fetch investments"
+  );
 
   const currentInvestmentsQuantityMap: Record<string, number> = {};
-  query.data?.forEach((investment: Investment) => {
+  data?.forEach((investment) => {
     currentInvestmentsQuantityMap[investment.asset.symbol] =
       investment.quantity;
   });
 
   return {
-    results: query.data ?? [],
-    isLoading: query.isLoading,
-    error: query.error,
+    results: data ?? [],
+    isLoading,
+    error,
     currentInvestmentsQuantityMap,
   };
 };

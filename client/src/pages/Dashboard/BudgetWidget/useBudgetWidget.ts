@@ -1,9 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { TransactionCategory } from "types/Transaction";
 import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
 import useBudgetStore from "store/budget/budgetStore";
 import { getAggregatedValue } from "../../../utils/DateUtils";
+import { useQueryWithError } from "../../../hooks/useQueryWithError";
 
 type useBudgetWidgetProps = {
   startDate: string;
@@ -23,16 +24,14 @@ type IncomeExpenseData = {
   expense: number;
 }[];
 
-// Placeholder async fetch function
 const fetchTransactionCategoriesByAmount = async (
   startDate: string,
   endDate: string
 ): Promise<BudgetCategoryData> => {
   const queryString = `startDate=${startDate}&endDate=${endDate}`;
-  const response = await axios.get(
+  const response = await axios.get<BudgetCategoryData>(
     `${BASE_API_URL}/transactions/transaction-categories-by-amount?${queryString}`
   );
-
   return response.data;
 };
 
@@ -41,13 +40,19 @@ export const useBudgetWidget = ({
   endDate,
 }: useBudgetWidgetProps) => {
   const { budget } = useBudgetStore();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["budgetCategories", startDate, endDate],
-    queryFn: () => fetchTransactionCategoriesByAmount(startDate, endDate),
-    enabled: !!startDate && !!endDate,
-  });
-
   const queryClient = useQueryClient();
+
+  const { data, isLoading, error } = useQueryWithError<
+    BudgetCategoryData,
+    Error
+  >(
+    ["budgetCategories", startDate, endDate],
+    () => fetchTransactionCategoriesByAmount(startDate, endDate),
+    {
+      enabled: !!startDate && !!endDate,
+    },
+    "Failed to load budget categories"
+  );
 
   const totalIncomeAndExpenseByDate =
     queryClient.getQueryData<IncomeExpenseData>([
@@ -62,7 +67,6 @@ export const useBudgetWidget = ({
   const getAggregatedCategoriesWithBudget = () => {
     if (!budgetCategories || !categoryTotals) return categoryTotals;
 
-    // Merge budget info
     return categoryTotals.map((categoryTotal) => {
       const rawTotalAmount = categoryTotal.totalAmount;
       const rawBudget = getAggregatedValue(
@@ -83,9 +87,7 @@ export const useBudgetWidget = ({
 
   const getAggregatedTotalBudget = () => {
     if (!budgetCategories) return 0;
-
-    const budgetValues = Object.values(budgetCategories);
-    return budgetValues.reduce(
+    return Object.values(budgetCategories).reduce(
       (acc, cur) => acc + getAggregatedValue(startDate, endDate, cur),
       0
     );
@@ -100,14 +102,10 @@ export const useBudgetWidget = ({
     return totalBudget - (lastDate?.expense ?? 0);
   };
 
-  const categoriesWithBudget = getAggregatedCategoriesWithBudget();
-  const totalBudget = getAggregatedTotalBudget();
-  const availableBudget = getAvailableBudget();
-
   return {
-    categoriesWithBudget,
-    totalBudget,
-    availableBudget,
+    categoriesWithBudget: getAggregatedCategoriesWithBudget(),
+    totalBudget: getAggregatedTotalBudget(),
+    availableBudget: getAvailableBudget(),
     isLoading,
     error,
   };

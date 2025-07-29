@@ -13,6 +13,8 @@ import { Flex } from "styles";
 import { FONTSIZE, SPACING, COLORS } from "theme";
 import { TransactionCategory } from "types/Transaction";
 import { useBudgetWidget } from "./useBudgetWidget";
+import renderChart from "../Hocs/renderChart";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 type BudgetWidgetProps = {
   startDate: string;
@@ -20,9 +22,64 @@ type BudgetWidgetProps = {
 };
 
 export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
-  const { categoriesWithBudget, totalBudget, availableBudget } =
-    useBudgetWidget({ startDate, endDate });
+  const {
+    categoriesWithBudget,
+    totalBudget,
+    availableBudget,
+    isLoading,
+    error,
+  } = useBudgetWidget({ startDate, endDate });
   const isWithinBudget = availableBudget > 0;
+
+  const chartElement = (
+    <ResponsiveContainer width="100%" height={400}>
+      <BarChart
+        data={categoriesWithBudget}
+        margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+        barCategoryGap={10}
+        barGap={0}
+      >
+        <XAxis
+          dataKey="category"
+          angle={-45}
+          textAnchor="end"
+          height={80}
+          tickFormatter={(category: TransactionCategory) => category}
+        />
+
+        <Tooltip
+          formatter={(value, name, props) => {
+            if (name === "Spent")
+              return [props.payload.rawTotalAmount, "Spent"];
+            if (name === "Budget Limit")
+              return [props.payload.rawBudget, "Budget Limit"];
+            return [value, name];
+          }}
+          labelFormatter={(label: TransactionCategory) => label}
+        />
+        <Legend />
+        <Bar dataKey="totalAmount" fill="#4285F4" name="Spent">
+          <LabelList
+            dx={-4}
+            fontSize={12}
+            dataKey="rawTotalAmount"
+            position="top"
+          />
+        </Bar>
+        <Bar dataKey="budget" fill="#EA4335" name="Budget Limit">
+          <LabelList fontSize={12} dataKey="rawBudget" position="top" dx={4} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
+
+  const chartContent = renderChart({
+    isEmpty: categoriesWithBudget?.length === 0,
+    loading: isLoading,
+    error: error,
+    chartElement,
+    loadingElement: <SkeletonLoader height={400} rows={1} columns={1} />,
+  });
 
   return (
     <>
@@ -42,50 +99,7 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
           </InfoSection>
         </InfoRow>
       </Header>
-      <ResponsiveContainer width="100%" height={400}>
-        <BarChart
-          data={categoriesWithBudget}
-          margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
-          barCategoryGap={10}
-          barGap={0}
-        >
-          <XAxis
-            dataKey="category"
-            angle={-45}
-            textAnchor="end"
-            height={80}
-            tickFormatter={(category: TransactionCategory) => category}
-          />
-
-          <Tooltip
-            formatter={(value, name, props) => {
-              if (name === "Spent")
-                return [props.payload.rawTotalAmount, "Spent"];
-              if (name === "Budget Limit")
-                return [props.payload.rawBudget, "Budget Limit"];
-              return [value, name];
-            }}
-            labelFormatter={(label: TransactionCategory) => label}
-          />
-          <Legend />
-          <Bar dataKey="totalAmount" fill="#4285F4" name="Spent">
-            <LabelList
-              dx={-4}
-              fontSize={12}
-              dataKey="rawTotalAmount"
-              position="top"
-            />
-          </Bar>
-          <Bar dataKey="budget" fill="#EA4335" name="Budget Limit">
-            <LabelList
-              fontSize={12}
-              dataKey="rawBudget"
-              position="top"
-              dx={4}
-            />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {chartContent}
     </>
   );
 };
