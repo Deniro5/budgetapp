@@ -14,8 +14,8 @@ import {
 } from "types/Transaction";
 import { format } from "date-fns";
 
-import { TransactionOverlayType } from "../../../TransactionsPage";
-import { getDollarValue } from "utils";
+import { TransactionOverlayType, View } from "../../../TransactionsPage";
+import { formatToCurrency } from "utils";
 
 import useAccountStore from "store/account/accountStore";
 
@@ -27,12 +27,13 @@ type TransactionSidebarProps = {
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<TransactionOverlayType | null>
   >;
+  view: View;
 };
 
 export const TransactionSidebar = ({
   activeTransaction,
-
   setActiveOverlay,
+  view,
 }: TransactionSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const { accountIdToNameMap } = useAccountStore();
@@ -44,16 +45,23 @@ export const TransactionSidebar = ({
 
   const handleEditClick = () => {
     if (!sidebarTransaction) return;
-    setActiveOverlay(
-      isTransfer
-        ? TransactionOverlayType.EDIT_TRANSFER
-        : TransactionOverlayType.EDIT
-    );
+    if (view === "Preset") setActiveOverlay(TransactionOverlayType.EDIT_PRESET);
+    else {
+      setActiveOverlay(
+        isTransfer
+          ? TransactionOverlayType.EDIT_TRANSFER
+          : TransactionOverlayType.EDIT
+      );
+    }
   };
 
   const handleDeleteClick = () => {
     if (!sidebarTransaction) return;
-    setActiveOverlay(TransactionOverlayType.DELETE);
+    if (view === "Preset")
+      setActiveOverlay(TransactionOverlayType.DELETE_PRESET);
+    else {
+      setActiveOverlay(TransactionOverlayType.DELETE);
+    }
   };
 
   const transactionVendorName =
@@ -81,6 +89,9 @@ export const TransactionSidebar = ({
               <b> Vendor: </b> <span> {transactionVendorName} </span>
             </Row>
             <Row>
+              <b> Vendor: </b> <span> {transactionVendorName} </span>
+            </Row>
+            <Row>
               <b> Date: </b> <span> {sidebarTransaction.date} </span>
             </Row>
             <Row>
@@ -88,7 +99,7 @@ export const TransactionSidebar = ({
             </Row>
             <Row>
               <b> Amount: </b>{" "}
-              <span>{getDollarValue(sidebarTransaction?.amount || 0)}</span>
+              <span>{formatToCurrency(sidebarTransaction?.amount || 0)}</span>
             </Row>
             <Row>
               <b> Type: </b> <span> {sidebarTransaction.type} </span>

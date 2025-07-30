@@ -18,6 +18,7 @@ import { useState } from "react";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import renderChart from "../Hocs/renderChart";
+import { formatCurrencyShort, formatToCurrency } from "utils";
 
 type AccountWidgetProps = {
   startDate: string;
@@ -44,9 +45,22 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
         data={accountWithBalances}
         margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
       >
-        <YAxis />
+        <YAxis tickFormatter={(value) => formatCurrencyShort(value)} />
         <XAxis dataKey="date" />
-        <Tooltip />
+        <Tooltip
+          formatter={(value, name, props) => {
+            if (name === "balance")
+              return [
+                formatToCurrency(props.payload.balance),
+                "Available Balance",
+              ];
+            if (name === "value")
+              return [formatToCurrency(props.payload.value), "Investments"];
+            if (name === "total")
+              return [formatToCurrency(props.payload.total), "Total Balance"];
+            return [value, name];
+          }}
+        />
 
         <defs>
           <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
@@ -97,16 +111,15 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
     loadingElement: <SkeletonLoader height={350} rows={1} columns={1} />,
   });
 
+  const lastEntry = accountWithBalances[accountWithBalances.length - 1];
+  const lastTotal = lastEntry?.value || 0 + lastEntry?.balance || 0;
+
   return (
     <>
       <Header>
         <Name> Account Status </Name>
         <span>
-          {" "}
-          <b>
-            {" "}
-            {accountWithBalances[accountWithBalances.length - 1]?.balance || ""}
-          </b>
+          <b>{formatToCurrency(lastTotal)}</b>
         </span>
         <AccountDropdown
           accountsList={["All", ...accountIds]}

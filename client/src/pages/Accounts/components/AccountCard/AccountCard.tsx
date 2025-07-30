@@ -12,6 +12,7 @@ import {
 import { FONTSIZE, SPACING } from "theme";
 import { Account } from "types/account";
 import { AccountOverlayType } from "../../AccountPage";
+import { formatToCurrency } from "utils";
 
 type AccountCardProps = {
   account: Account;
@@ -47,19 +48,21 @@ export function AccountCard({
     <Container>
       <AccountHeader>
         <AccountHeaderText>{account.name}</AccountHeaderText>
-        <AccountHeaderText>${assetTotal + account.balance}</AccountHeaderText>
+        <AccountHeaderText>
+          {formatToCurrency(assetTotal + account.balance)}
+        </AccountHeaderText>
       </AccountHeader>
       <StyledDivider />
       <AccountInfo>
         <Flex>
           <Label> Balance: </Label>
 
-          <Text> ${account.balance} </Text>
+          <Text> {formatToCurrency(account.balance)} </Text>
         </Flex>
         <Flex>
           <Label> Asset Total: </Label>
 
-          <Text> ${assetTotal} </Text>
+          <Text> {formatToCurrency(assetTotal)} </Text>
         </Flex>
         <Flex>
           <Label>Institution: </Label>

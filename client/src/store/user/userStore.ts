@@ -1,7 +1,8 @@
 // store.ts
 import { create } from "zustand";
-import { RawUser, RawUserPreferences, User } from "../../types/user";
+import { RawUser, User } from "../../types/user";
 import axios from "axios";
+import { queryClient } from "../../main";
 
 axios.defaults.withCredentials = true;
 const BASE_URL = "http://localhost:8000";
@@ -87,6 +88,7 @@ const useUserStore = create<UserStore>((set) => ({
     try {
       await axios.post(`${BASE_URL}/auth/logout/`);
       set(() => ({ user: null, isAuthenticated: false }));
+      queryClient.clear();
     } catch (e) {
       console.error(e);
     }
@@ -97,6 +99,7 @@ const useUserStore = create<UserStore>((set) => ({
       const { user } = response.data;
       set(() => ({ user, isAuthenticated: true }));
     } catch (error) {
+      queryClient.clear();
       console.log(error);
     } finally {
       set(() => ({ isCheckingAuth: false }));

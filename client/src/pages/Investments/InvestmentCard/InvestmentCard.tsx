@@ -6,7 +6,8 @@ import { FONTSIZE, SPACING } from "theme";
 import { Investment, RawInvestment } from "types/investment";
 import { InvestmentsOverlayType } from "../InvestmentsPage";
 import { AssetChart } from "./AssetChart/AssetChart";
-import { roundTo2Decimals } from "utils";
+import { formatToCurrency } from "utils";
+import { format } from "date-fns";
 
 type InvestmentCardProps = {
   investment: Investment;
@@ -24,9 +25,9 @@ export const InvestmentCard = ({
   const { asset, quantity, price } = investment;
   const { symbol, name, history } = asset;
   const currentPrice = history[history.length - 1].price;
-  const totalCost = roundTo2Decimals(price * quantity);
-  const totalValue = roundTo2Decimals(quantity * currentPrice);
-  const totalGainLoss = roundTo2Decimals(totalValue - totalCost);
+  const totalCost = price * quantity;
+  const totalValue = quantity * currentPrice;
+  const totalGainLoss = totalValue - totalCost;
 
   const handleBuyClick = () => {
     setActiveOverlay(InvestmentsOverlayType.ADD);
@@ -48,7 +49,7 @@ export const InvestmentCard = ({
         <InvestmentName>
           <SymbolText> {symbol} </SymbolText>-<NameText>{name}</NameText>
         </InvestmentName>
-        <Price>${roundTo2Decimals(currentPrice)}</Price>
+        <Price>{formatToCurrency(currentPrice)}</Price>
       </InvestmentHeader>
       <StyledDivider />
       <AssetChart asset={asset} />
@@ -60,19 +61,19 @@ export const InvestmentCard = ({
         </Flex>
         <Flex>
           <Label>Average Cost: </Label>
-          <Text>${roundTo2Decimals(price)}</Text>
+          <Text>{formatToCurrency(price)}</Text>
         </Flex>
         <Flex>
           <Label>Total Cost: </Label>
-          <Text>${totalCost}</Text>
+          <Text>{formatToCurrency(totalCost)}</Text>
         </Flex>
         <Flex>
           <Label>Total Value: </Label>
-          <Text>${totalValue}</Text>
+          <Text>{formatToCurrency(totalValue)}</Text>
         </Flex>
         <Flex>
           <Label>Total Gain/Loss: </Label>
-          <Text>${totalGainLoss}</Text>
+          <Text>{formatToCurrency(totalGainLoss)}</Text>
         </Flex>
       </InvestmentInfo>
       <ButtonContainer>

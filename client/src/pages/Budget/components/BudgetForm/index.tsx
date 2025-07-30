@@ -6,6 +6,8 @@ import { BudgetCategories } from "types/budget";
 
 import { budgetOnlyCategories, TransactionCategory } from "types/Transaction";
 import { getTotalBudget } from "store/budget/budgetSelectors";
+import { format } from "date-fns";
+import { formatToCurrency } from "utils";
 
 type BudgetProps = {
   initialBudgetCategories: BudgetCategories;
@@ -63,7 +65,7 @@ export default function BudgetForm({
         </FormContainer>
         <p>
           {" "}
-          Total Monthly Budget: <b>{totalBudget}</b>{" "}
+          Total Monthly Budget: <b>{formatToCurrency(totalBudget)}</b>{" "}
         </p>
         <ButtonContainer>
           <BaseButton type="submit">Save Changes</BaseButton>

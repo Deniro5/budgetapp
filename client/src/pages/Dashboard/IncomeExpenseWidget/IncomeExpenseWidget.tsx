@@ -13,6 +13,7 @@ import { COLORS, FONTSIZE, SPACING } from "theme";
 import { useIncomeExpenseWidget } from "./useIncomeExpenseWidget";
 import renderChart from "../Hocs/renderChart";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
+import { capitalize, formatCurrencyShort, formatToCurrency } from "utils";
 
 interface IncomeExpenseWidgetProps {
   startDate: string;
@@ -50,8 +51,12 @@ export const IncomeExpenseWidget = ({
           </linearGradient>
         </defs>
         <XAxis dataKey="date" />
-        <YAxis />
-        <Tooltip />
+        <YAxis tickFormatter={(value) => formatCurrencyShort(value)} />
+        <Tooltip
+          formatter={(value: number, name: string) => {
+            return [formatToCurrency(value), capitalize(name)];
+          }}
+        />
         <Area
           type="monotone"
           dataKey="income"
@@ -81,7 +86,7 @@ export const IncomeExpenseWidget = ({
       <Header>
         <Name> Income / Expenses </Name>
         <ChangeLabel isIncrease={isIncrease}>
-          {isIncrease ? "+" : "-"} ${netIncome}
+          {isIncrease ? "+" : "-"} {formatToCurrency(netIncome)}
         </ChangeLabel>
       </Header>
       {chartContent}

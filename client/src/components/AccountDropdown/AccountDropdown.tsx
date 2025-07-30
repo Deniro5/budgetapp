@@ -27,7 +27,7 @@ export default function AccountDropdown({
       selected={selectedAccountId}
       onSelect={handleAccountChange}
       placeholder={placeholder || "Select Account"}
-      itemToString={(item: string) => accountNameByIdMap[item]}
+      itemToString={(item: string) => accountNameByIdMap[item] || item}
       searchable
     />
   );

@@ -37,6 +37,7 @@ type BaseTransactionModalProps = {
   onSubmit: (transaction: RawTransaction, callback?: () => void) => void;
   isPresetModal?: boolean;
   initialTransaction?: Transaction;
+  ignoreInitialAmount?: boolean;
 };
 
 export function BaseTransactionModal({
@@ -45,6 +46,7 @@ export function BaseTransactionModal({
   onSubmit,
   confirmText = "Add Transaction",
   initialTransaction,
+  ignoreInitialAmount,
 }: BaseTransactionModalProps) {
   const [presetSearch, setPresetSearch] = useState("");
 
@@ -268,7 +270,7 @@ export function BaseTransactionModal({
           initialAccountId={initialTransaction?.account?._id}
           account={account}
           amount={currentValues.amount}
-          initialAmount={initialTransaction?.amount}
+          initialAmount={ignoreInitialAmount ? 0 : initialTransaction?.amount}
           type={currentValues.type}
           initialType={initialTransaction?.type}
         />

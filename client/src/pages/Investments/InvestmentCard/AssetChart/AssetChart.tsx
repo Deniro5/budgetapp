@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { AssetWithPrice } from "types/investment";
+import { formatCurrencyShort } from "utils";
 
 type AssetChartProps = {
   asset: AssetWithPrice;
@@ -23,7 +24,10 @@ export const AssetChart = ({ asset }: AssetChartProps) => {
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="date" />
-        <YAxis domain={["auto", "auto"]} />
+        <YAxis
+          domain={["auto", "auto"]}
+          tickFormatter={(value) => formatCurrencyShort(value)}
+        />
         <Tooltip />
         <Line
           type="monotone"

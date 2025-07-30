@@ -65,6 +65,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: ${SPACING.spacing6x};
+  margin-bottom: ${SPACING.spacing6x};
 `;
 
 const ButtonContainer = styled.div`

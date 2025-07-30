@@ -7,6 +7,8 @@ export const getTotalBudget = () =>
   useBudgetStore((state: BudgetStore) => {
     if (!state.budget.budgetCategories) return 0;
 
+    console.log(state.budget.budgetCategories);
+
     const budgetValues = Object.values(state.budget.budgetCategories);
     return budgetValues.reduce((acc, cur) => acc + cur, 0);
   });

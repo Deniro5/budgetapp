@@ -79,8 +79,8 @@ export const useBudgetWidget = ({
         ...categoryTotal,
         totalAmount: Math.sqrt(rawTotalAmount),
         budget: Math.sqrt(rawBudget),
-        rawTotalAmount: "$" + rawTotalAmount,
-        rawBudget: "$" + rawBudget,
+        rawTotalAmount: rawTotalAmount,
+        rawBudget: rawBudget,
       };
     });
   };

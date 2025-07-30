@@ -26,6 +26,7 @@ export function CopyTransactionModal({
         onClose={onClose}
         onSubmit={handleModalSubmit}
         initialTransaction={initialTransaction}
+        ignoreInitialAmount={true}
       />
     </Modal>
   );

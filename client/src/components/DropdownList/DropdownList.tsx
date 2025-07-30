@@ -104,7 +104,10 @@ const DropdownList = <T,>({
         }
       >
         <SelectedItem onClick={handleButtonClick}>
-          {selected ? itemToString(selected) : placeholder}
+          <SelectedItemText>
+            {" "}
+            {selected ? itemToString(selected) : placeholder}
+          </SelectedItemText>
         </SelectedItem>
       </Popover>
     </>
@@ -130,6 +133,15 @@ const SelectedItem = styled.button`
   background: ${COLORS.pureWhite}
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23777' d='M0 0l5 6 5-6H0z'/%3E%3C/svg%3E")
     no-repeat right ${SPACING.spacing3x} center;
+`;
+
+const SelectedItemText = styled.span`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 90px;
+  padding-right: ${SPACING.spacing2x};
+  text-align: left;
 `;
 
 const SearchInput = styled.input`

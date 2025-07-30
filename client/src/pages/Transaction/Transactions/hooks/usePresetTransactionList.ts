@@ -1,7 +1,8 @@
-import { useInfiniteQuery, QueryFunctionContext } from "@tanstack/react-query";
+import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 import { PresetTransaction } from "types/Transaction";
 import { BASE_API_URL } from "../../../../constants";
+import { useInfiniteQueryWithError } from "../../../../hooks/useInfiniteQueryWithError"; // adjust the path
 
 type FetchPresetTransactionsArgs = {
   search: string;
@@ -33,31 +34,35 @@ const fetchPresetTransactions = async (
   return response.data;
 };
 
-// Hook
+// Hook using useInfiniteQueryWithError
 export default function usePresetTransactionSearch({
   search,
 }: FetchPresetTransactionsArgs) {
-  const { data, isLoading, error } = useInfiniteQuery<
+  const { data, isLoading, error } = useInfiniteQueryWithError<
+    [string, FetchPresetTransactionsArgs],
     FetchPresetTransactionsResponse,
     Error,
     import("@tanstack/react-query").InfiniteData<
       FetchPresetTransactionsResponse,
       number
     >,
-    [string, FetchPresetTransactionsArgs],
     number
-  >({
-    queryKey: ["presetTransactionList", { search }],
-    queryFn: fetchPresetTransactions,
-    getNextPageParam: (lastPage, allPages) => {
-      const loaded = allPages.reduce(
-        (sum, page) => sum + page.presetTransactions.length,
-        0
-      );
-      return loaded < lastPage.presetTransactionCount ? loaded : undefined;
+  >(
+    ["presetTransactionList", { search }],
+    fetchPresetTransactions,
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        const loaded = allPages.reduce(
+          (sum, page) => sum + page.presetTransactions.length,
+          0
+        );
+        return loaded < lastPage.presetTransactionCount ? loaded : undefined;
+      },
+      initialPageParam: 0,
+      enabled: search !== "", // optional safeguard
     },
-    initialPageParam: 0,
-  });
+    "Failed to fetch preset transactions"
+  );
 
   const presetTransactions =
     data?.pages.flatMap((p) => p.presetTransactions) ?? [];

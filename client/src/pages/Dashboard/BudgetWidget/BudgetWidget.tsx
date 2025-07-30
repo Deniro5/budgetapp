@@ -15,6 +15,8 @@ import { TransactionCategory } from "types/Transaction";
 import { useBudgetWidget } from "./useBudgetWidget";
 import renderChart from "../Hocs/renderChart";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
+import { formatToCurrency } from "utils";
+import { format } from "date-fns";
 
 type BudgetWidgetProps = {
   startDate: string;
@@ -50,9 +52,12 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
         <Tooltip
           formatter={(value, name, props) => {
             if (name === "Spent")
-              return [props.payload.rawTotalAmount, "Spent"];
+              return [formatToCurrency(props.payload.rawTotalAmount), "Spent"];
             if (name === "Budget Limit")
-              return [props.payload.rawBudget, "Budget Limit"];
+              return [
+                formatToCurrency(props.payload.rawBudget),
+                "Budget Limit",
+              ];
             return [value, name];
           }}
           labelFormatter={(label: TransactionCategory) => label}
@@ -88,13 +93,13 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
         <InfoRow>
           <InfoSection>
             <Label>Budget Total:</Label>
-            <p>${totalBudget} </p>
+            <p>{formatToCurrency(totalBudget)} </p>
           </InfoSection>
           <InfoSection>
             {" "}
             <Label>Budget Remaining:</Label>
             <ChangeLabel isIncrease={isWithinBudget}>
-              ${availableBudget}
+              {formatToCurrency(availableBudget)}
             </ChangeLabel>
           </InfoSection>
         </InfoRow>

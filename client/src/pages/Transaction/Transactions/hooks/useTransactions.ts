@@ -1,7 +1,8 @@
-import { useInfiniteQuery, QueryFunctionContext } from "@tanstack/react-query";
+import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 import { Transaction, TransactionFilter } from "types/Transaction";
 import { BASE_API_URL } from "../../../../constants";
+import { useInfiniteQueryWithError } from "../../../../hooks/useInfiniteQueryWithError"; // adjust path
 
 type FetchTransactionsArgs = {
   search: string;
@@ -55,27 +56,30 @@ export default function useTransactions({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery<
+  } = useInfiniteQueryWithError<
+    [string, FetchTransactionsArgs],
     FetchTransactionsResponse,
     Error,
     import("@tanstack/react-query").InfiniteData<
       FetchTransactionsResponse,
       number
-    >, // TData
-    [string, FetchTransactionsArgs], // TQueryKey
-    number // TPageParam
-  >({
-    queryKey: ["transactions", { search, filter, startDate, endDate }],
-    queryFn: fetchTransactions,
-    getNextPageParam: (lastPage, allPages) => {
-      const loaded = allPages.reduce(
-        (sum, page) => sum + page.transactions.length,
-        0
-      );
-      return loaded < lastPage.transactionCount ? loaded : undefined;
+    >,
+    number
+  >(
+    ["transactions", { search, filter, startDate, endDate }],
+    fetchTransactions,
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        const loaded = allPages.reduce(
+          (sum, page) => sum + page.transactions.length,
+          0
+        );
+        return loaded < lastPage.transactionCount ? loaded : undefined;
+      },
+      initialPageParam: 0,
     },
-    initialPageParam: 0,
-  });
+    "Failed to fetch transactions"
+  );
 
   const transactions = data?.pages.flatMap((p) => p.transactions) ?? [];
   const transactionCount = data?.pages[0]?.transactionCount ?? 0;

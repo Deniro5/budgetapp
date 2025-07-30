@@ -1,11 +1,8 @@
-import { useInfiniteQuery, QueryFunctionContext } from "@tanstack/react-query";
+import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
-import {
-  PresetTransaction,
-  Transaction,
-  TransactionFilter,
-} from "types/Transaction";
+import { PresetTransaction, TransactionFilter } from "types/Transaction";
 import { BASE_API_URL } from "../../../../constants";
+import { useInfiniteQueryWithError } from "../../../../hooks/useInfiniteQueryWithError";
 
 type FetchPresetTransactionsArgs = {
   search: string;
@@ -61,27 +58,30 @@ export default function usePresetTransactions({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery<
+  } = useInfiniteQueryWithError<
+    [string, FetchPresetTransactionsArgs],
     FetchPresetTransactionsResponse,
     Error,
     import("@tanstack/react-query").InfiniteData<
       FetchPresetTransactionsResponse,
       number
     >,
-    [string, FetchPresetTransactionsArgs],
     number
-  >({
-    queryKey: ["presetTransactions", { search, filter, startDate, endDate }],
-    queryFn: fetchPresetTransactions,
-    getNextPageParam: (lastPage, allPages) => {
-      const loaded = allPages.reduce(
-        (sum, page) => sum + page.presetTransactions.length,
-        0
-      );
-      return loaded < lastPage.presetTransactionCount ? loaded : undefined;
+  >(
+    ["presetTransactions", { search, filter, startDate, endDate }],
+    fetchPresetTransactions,
+    {
+      getNextPageParam: (lastPage, allPages) => {
+        const loaded = allPages.reduce(
+          (sum, page) => sum + page.presetTransactions.length,
+          0
+        );
+        return loaded < lastPage.presetTransactionCount ? loaded : undefined;
+      },
+      initialPageParam: 0,
     },
-    initialPageParam: 0,
-  });
+    "Failed to load preset transactions"
+  );
 
   const presetTransactions =
     data?.pages.flatMap((p) => p.presetTransactions) ?? [];

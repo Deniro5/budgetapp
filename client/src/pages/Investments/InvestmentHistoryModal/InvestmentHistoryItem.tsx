@@ -1,7 +1,7 @@
-import { getAccountNameByIdMap } from "store/account/accountSelectors";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Investment } from "types/investment";
+import { formatToCurrency } from "utils";
 
 type InvestmentHistoryItemProps = {
   investment: Investment;
@@ -23,11 +23,11 @@ export const InvestmentHistoryItem = ({
         </MainText>
         <DateText>
           {" "}
-          Date: {date} | Account: {account}
+          Date: {date} | Account: {account} | Price: {formatToCurrency(price)}
         </DateText>
       </SubContainer>
 
-      <MainText>${Math.abs(price * quantity)}</MainText>
+      <MainText>{formatToCurrency(Math.abs(price * quantity))}</MainText>
     </Container>
   );
 };

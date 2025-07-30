@@ -1,20 +1,14 @@
-import { createContext, Dispatch, ReactNode, useEffect, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  ReactNode,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
-
-interface ToastContext {
-  toast: Toast | null;
-  setToast: Dispatch<React.SetStateAction<Toast | null>>;
-}
-
-const initialState = {
-  toast: null,
-  setToast: () => {},
-};
-
-export const ToastContext = createContext<ToastContext>(
-  initialState as ToastContext
-);
 
 type ToastType = "success" | "error";
 
@@ -23,34 +17,56 @@ type Toast = {
   type: ToastType;
 };
 
-const { Provider } = ToastContext;
+interface ToastContextType {
+  toast: Toast | null;
+  setToast: Dispatch<React.SetStateAction<Toast | null>>;
+}
 
-const toastColorMap = {
+// Initial context
+export const ToastContext = createContext<ToastContextType>({
+  toast: null,
+  setToast: () => {},
+});
+
+export const useToast = () => useContext(ToastContext);
+
+const toastColorMap: Record<ToastType, string> = {
   success: COLORS.darkGreen,
   error: COLORS.darkDeleteRed,
 };
-export const ToastProvider: React.FC<{ children: ReactNode }> = (props) => {
+
+export const ToastProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [toast, setToast] = useState<Toast | null>(null);
+  const lastType = useRef<ToastType>("success"); //we need this so that the color doesnt flash when going off screen
 
   useEffect(() => {
-    if (!toast) return;
-    setTimeout(() => {
-      setToast(null);
+    if (!toast?.toast) return;
+
+    lastType.current = toast.type;
+    const timeout = setTimeout(() => {
+      setToast({
+        type: lastType.current,
+        toast: "",
+      });
     }, 3000);
+
+    return () => clearTimeout(timeout);
   }, [toast]);
 
   return (
-    <Provider value={{ toast, setToast }}>
+    <ToastContext.Provider value={{ toast, setToast }}>
       <>
         <ToastContainer
-          show={!!toast}
+          show={!!toast?.toast}
           color={toastColorMap[toast?.type || "success"]}
         >
           {toast?.toast}
         </ToastContainer>
-        {props.children}
+        {children}
       </>
-    </Provider>
+    </ToastContext.Provider>
   );
 };
 
@@ -58,6 +74,7 @@ const ToastContainer = styled.div<{ show: boolean; color: string }>`
   border-radius: 4px;
   position: absolute;
   right: 8px;
+  top: 16px;
   background: ${({ color }) => color};
   width: 400px;
   padding: ${SPACING.spacing4x};

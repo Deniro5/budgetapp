@@ -4,6 +4,7 @@ import { Account, AccountInvestmentSummaryItem } from "types/account";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import Modal from "components/Global/Modal";
 import { formatTimestampToYYYYMMDD } from "../../../../utils/DateUtils";
+import { formatToCurrency } from "utils";
 
 type ViewAccountModalProps = {
   account: Account;
@@ -20,10 +21,11 @@ const InvestmentCard = (investment: AccountInvestmentSummaryItem) => {
       </NameContainer>
       <InfoContainer>
         <div>
-          <b>Total Value:</b> ${investment.quantity * investment.price}
+          <b>Total Value:</b>{" "}
+          {formatToCurrency(investment.quantity * investment.price)}
         </div>
         <div>
-          <b>Price:</b> ${investment.price}
+          <b>Price:</b> {formatToCurrency(investment.price)}
         </div>
         <div>
           <b>Quantity:</b> {investment.quantity}
@@ -67,7 +69,7 @@ export function ViewAccountModal({ account, onClose }: ViewAccountModalProps) {
         </InputContainer>
         <InputContainer>
           <InputLabel>Balance</InputLabel>
-          {account.balance}
+          {formatToCurrency(account.balance)}
         </InputContainer>
         <InputContainer>
           <InputLabel>Baseline Date</InputLabel>
@@ -78,7 +80,7 @@ export function ViewAccountModal({ account, onClose }: ViewAccountModalProps) {
       <Row>
         <InputContainer>
           <InputLabel>Baseline Amount</InputLabel>
-          {account.baselineAmount}
+          {formatToCurrency(account.baselineAmount)}
         </InputContainer>
 
         <InputContainer>
@@ -96,7 +98,8 @@ export function ViewAccountModal({ account, onClose }: ViewAccountModalProps) {
           <InputLabel>Investment Total</InputLabel>${assetTotal}
         </InputContainer>
         <InputContainer>
-          <InputLabel>Total Balance</InputLabel>${assetTotal + account.balance}
+          <InputLabel>Total Balance</InputLabel>
+          {formatToCurrency(assetTotal + account.balance)}
         </InputContainer>
         <InputContainer>
           <InputLabel>Date Created</InputLabel>
@@ -108,9 +111,6 @@ export function ViewAccountModal({ account, onClose }: ViewAccountModalProps) {
         <InputContainer>
           <InputLabel>Investments</InputLabel>
           <InvestmentListContainer>
-            {account.investmentSummary.map((investment) => (
-              <InvestmentCard key={investment.asset.symbol} {...investment} />
-            ))}
             {account.investmentSummary.map((investment) => (
               <InvestmentCard key={investment.asset.symbol} {...investment} />
             ))}

@@ -3,6 +3,7 @@ import { Flex } from "styles";
 import { COLORS, SPACING } from "theme";
 import { Account } from "types/account";
 import { TransactionType } from "types/Transaction";
+import { formatToCurrency } from "utils";
 
 type BalanceSummaryFooterProps = {
   account?: Account;
@@ -49,11 +50,11 @@ export default function BalanceSummaryFooter({
     <Container>
       <SubContainer>
         <Label> Current Balance:</Label>
-        {currentBalance ? `$${currentBalance}` : "N/A"}
+        {currentBalance ? `${formatToCurrency(currentBalance)}` : "N/A"}
       </SubContainer>
       <SubContainer>
         <Label> Balance After:</Label>
-        {afterBalance ? `$${afterBalance}` : "N/A"}
+        {afterBalance ? `${formatToCurrency(afterBalance)}` : "N/A"}
       </SubContainer>
     </Container>
   );

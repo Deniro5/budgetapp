@@ -13,6 +13,7 @@ import {
   DeleteAccountModal,
 } from "./modals";
 import { ViewAccountModal } from "./modals/ViewAccountModal/ViewAccountModal.tsx";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader.tsx";
 
 export enum AccountOverlayType {
   ADD = "add",
@@ -22,7 +23,7 @@ export enum AccountOverlayType {
 }
 
 function Accounts() {
-  const { accounts } = useAccounts();
+  const { accounts, isLoading, error } = useAccounts();
   const [activeAccount, setActiveAccount] = useState<Account | null>(null);
   const [activeOverlay, setActiveOverlay] = useState<AccountOverlayType | null>(
     null
@@ -33,28 +34,27 @@ function Accounts() {
     setActiveAccount(null);
   };
 
+  const getPageContent = () => {
+    if (isLoading) return <SkeletonLoader rows={2} columns={3} height={320} />;
+    if (error)
+      return <div>Failed to load accounts. Please refresh the page</div>;
+    if (!accounts.length) return <div>No accounts found</div>;
+
+    return accounts.map((account) => (
+      <AccountCard
+        key={account._id}
+        account={account}
+        setActiveOverlay={setActiveOverlay}
+        setActiveAccount={setActiveAccount}
+      />
+    ));
+  };
+
   return (
     <PageContainer>
       <AccountHeader setActiveOverlay={setActiveOverlay} />
       <PageColumnFlexContainer>
-        <ContentContainer>
-          {!accounts.length && (
-            <>
-              {" "}
-              You currently have no accounts. Click the "Add Account" button in
-              the top right corner to make your first account.{" "}
-            </>
-          )}
-          {accounts &&
-            accounts.map((account) => (
-              <AccountCard
-                setActiveOverlay={setActiveOverlay}
-                setActiveAccount={setActiveAccount}
-                account={account}
-                key={account._id}
-              />
-            ))}
-        </ContentContainer>
+        <ContentContainer>{getPageContent()}</ContentContainer>
       </PageColumnFlexContainer>
       {activeOverlay === AccountOverlayType.ADD && (
         <AddAccountModal onClose={handleCloseOverlay} />

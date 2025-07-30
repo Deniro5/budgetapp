@@ -16,6 +16,7 @@ import { useCategoryLineWidget } from "./useCategoryLineWidget";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 import renderChart from "../Hocs/renderChart";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
+import { capitalize, formatToCurrency } from "utils";
 
 type CategoryLineWidgetProps = {
   startDate: string;
@@ -59,7 +60,11 @@ export const CategoryLineWidget = ({
         />
 
         <XAxis dataKey="date" />
-        <Tooltip />
+        <Tooltip
+          formatter={(value: number, name: string) => {
+            return [formatToCurrency(value), capitalize(name)];
+          }}
+        />
 
         <Line
           type="monotone"
@@ -75,7 +80,9 @@ export const CategoryLineWidget = ({
             stroke="black"
             strokeDasharray="5 5"
             label={{
-              value: `Aggregated Budget Limit : $${budgetLineValue}`,
+              value: `Aggregated Budget Limit : ${formatToCurrency(
+                budgetLineValue
+              )}`,
               position: "center",
               fill: "black",
               dy: -10,

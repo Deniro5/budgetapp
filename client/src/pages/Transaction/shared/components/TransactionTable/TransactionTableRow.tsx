@@ -10,7 +10,7 @@ import {
   TransactionCategory,
   TransactionType,
 } from "types/Transaction";
-import { getDollarValue } from "utils";
+import { formatToCurrency } from "utils";
 import { isPresetTransaction } from "../../utils";
 
 type TransactionTableRowProps = {
@@ -78,7 +78,7 @@ export function TransactionTableRow({
         {transaction.amount
           ? `${
               transaction.type === TransactionType.INCOME ? "+" : ""
-            }${getDollarValue(transaction.amount)}`
+            }${formatToCurrency(transaction.amount)}`
           : emptyString}
       </AmountTd>
       <CategoryTd>

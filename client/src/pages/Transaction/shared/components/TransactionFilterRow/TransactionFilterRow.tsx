@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { SPACING } from "theme";
 import { TransactionFilterTag } from "./TransactionFilterTag";
 import { TransactionFilter } from "types/Transaction";
-import { formatCamelCaseToTitleCase } from "utils";
+import { formatCamelCaseToTitleCase, formatToCurrency } from "utils";
 import useAccountStore from "store/account/accountStore";
 
 type TransactionFilterRowProps = {
@@ -23,10 +23,12 @@ export function TransactionFilterRow({
     let label: string | number | string[];
     if (key === "account") {
       label = accountIdToNameMap[filter[key]!] || "";
+    }
+    if (key === "maxAmount" || key === "minAmount") {
+      label = formatToCurrency(filter[key] || 0);
     } else {
       label = filter[key] || "";
     }
-
     return `${formatCamelCaseToTitleCase(key)} : ${label}`;
   };
 

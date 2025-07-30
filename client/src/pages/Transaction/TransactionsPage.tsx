@@ -118,7 +118,16 @@ export default function TransactionsPage() {
   const currentError = view === "Transactions" ? error : errorPreset;
   const currentCount =
     view === "Transactions" ? transactionCount : presetTransactionCount;
-  const currentLoadMore = view === "Transactions" ? loadMore : loadMorePreset;
+
+  const handleLoadMore = () => {
+    if (currentError) return;
+
+    if (view === "Transactions") {
+      loadMore();
+    } else {
+      loadMorePreset();
+    }
+  };
 
   return (
     <PageContainer>
@@ -153,7 +162,7 @@ export default function TransactionsPage() {
             <TransactionTable
               transactions={currentTransactions}
               loading={currentLoading}
-              loadMore={currentLoadMore}
+              loadMore={handleLoadMore}
               error={currentError}
               sidebarTransactionId={sidebarTransactionId}
               setSidebarTransactionId={setSidebarTransactionId}
@@ -171,6 +180,7 @@ export default function TransactionsPage() {
             activeTransaction={activeTransaction}
             setActiveTransaction={setActiveTransaction}
             setActiveOverlay={setActiveOverlay}
+            view={view}
           />
         </ContentContainer>
       </PageColumnFlexContainer>

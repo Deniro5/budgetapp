@@ -24,13 +24,6 @@ export function isValidUsername(username: string): boolean {
 
 //string formatting
 
-export function getDollarValue(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
-}
-
 export function formatCamelCaseToTitleCase(input: string) {
   return input
     .replace(/([a-z])([A-Z])/g, "$1 $2") // Insert space before uppercase letters
@@ -47,4 +40,25 @@ export function isAlphanumeric(key: string) {
 
 export function roundTo2Decimals(num: number) {
   return Math.round(num * 100) / 100;
+}
+
+export function formatToCurrency(value: number | string): string {
+  return Number(value).toLocaleString("en-CA", {
+    style: "currency",
+    currency: "CAD",
+  });
+}
+
+export function capitalize(str: string): string {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+export function formatCurrencyShort(value: number): string {
+  const format = (num: number) =>
+    num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
+
+  if (value >= 1_000_000) return `$${format(value / 1_000_000)}M`;
+  if (value >= 1_000) return `$${format(value / 1_000)}K`;
+  return `$${format(value)}`;
 }

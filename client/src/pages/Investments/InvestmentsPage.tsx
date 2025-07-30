@@ -12,6 +12,7 @@ import styled from "styled-components";
 import { SPACING } from "theme";
 import SellInvestmentModal from "./SellInvestmentModal/SellInvestmentModal.tsx";
 import { InvestmentHistoryModal } from "./InvestmentHistoryModal/InvestmentHistoryModal.tsx";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader.tsx";
 
 export enum InvestmentsOverlayType {
   ADD = "add",
@@ -21,7 +22,8 @@ export enum InvestmentsOverlayType {
 
 export const InvestmentsPage = () => {
   const { mutate } = useCreateInvestment();
-  const { results, currentInvestmentsQuantityMap } = useFetchInvestments();
+  const { results, currentInvestmentsQuantityMap, isLoading, error } =
+    useFetchInvestments();
   const [activeOverlay, setActiveOverlay] =
     useState<InvestmentsOverlayType | null>(null);
   const [presetValues, setPresetValues] = useState<Partial<RawInvestment>>({});
@@ -34,9 +36,13 @@ export const InvestmentsPage = () => {
     mutate(investment);
   };
 
-  return (
-    <PageContainer>
-      <InvestmentsHeader setActiveOverlay={setActiveOverlay} />
+  const getPageContent = () => {
+    if (isLoading) return <SkeletonLoader rows={1} columns={3} height={500} />;
+    if (error)
+      return <div>Failed to load investments. Please refresh the page</div>;
+    if (!results.length) return <div>No investments found</div>;
+
+    return (
       <InvestmentCardContainer>
         {results.map((investment) => (
           <InvestmentCard
@@ -46,7 +52,13 @@ export const InvestmentsPage = () => {
           />
         ))}
       </InvestmentCardContainer>
+    );
+  };
 
+  return (
+    <PageContainer>
+      <InvestmentsHeader setActiveOverlay={setActiveOverlay} />
+      {getPageContent()}
       {activeOverlay === InvestmentsOverlayType.ADD && (
         <AddInvestmentModal
           onClose={handleCloseOverlay}
@@ -78,5 +90,4 @@ const InvestmentCardContainer = styled(Flex)`
   grid-template-columns: repeat(3, 1fr);
   gap: ${SPACING.spacing6x};
   justify-content: center; /* Horizontally center the grid */
-  margin-top: ${SPACING.spacing6x};
 `;
