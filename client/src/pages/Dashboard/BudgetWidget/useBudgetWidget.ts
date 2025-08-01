@@ -2,9 +2,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { TransactionCategory } from "types/Transaction";
 import axios from "axios";
 import { BASE_API_URL } from "../../../constants";
-import useBudgetStore from "store/budget/budgetStore";
 import { getAggregatedValue } from "../../../utils/DateUtils";
 import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import { useBudget } from "../../../pages/Budget/hooks/useBudget";
 
 type useBudgetWidgetProps = {
   startDate: string;
@@ -39,7 +39,7 @@ export const useBudgetWidget = ({
   startDate,
   endDate,
 }: useBudgetWidgetProps) => {
-  const { budget } = useBudgetStore();
+  const { budget } = useBudget();
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQueryWithError<

@@ -27,21 +27,24 @@ export const CategoryLineWidget = ({
   startDate,
   endDate,
 }: CategoryLineWidgetProps) => {
-  const { categoryExpenseByDate, category, setCategory, isLoading, error } =
-    useCategoryLineWidget({
-      startDate,
-      endDate,
-    });
+  const {
+    categoryExpenseByDate,
+    category,
+    setCategory,
+    isLoading,
+    error,
+    getAggregatedCategoryBudgetLine,
+  } = useCategoryLineWidget({
+    startDate,
+    endDate,
+  });
+
+  const budgetLineValue = getAggregatedCategoryBudgetLine();
 
   const handleSetCategory = (category: TransactionCategory) => {
     setCategory(category);
   };
 
-  const budgetLineValue = getAggregatedCategoryBudgetLine(
-    startDate,
-    endDate,
-    category
-  );
   const chartElement = (
     <ResponsiveContainer width="100%" height={350}>
       <LineChart

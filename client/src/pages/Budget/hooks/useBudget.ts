@@ -1,10 +1,32 @@
-import { useEffect } from "react";
-import useBudgetStore from "store/budget/budgetStore";
+import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import axios from "axios";
+import { BASE_API_URL } from "../../../constants";
+import { BudgetType } from "../../../types/budget";
+export const useBudget = () => {
+  const {
+    data: budget,
+    isLoading,
+    error,
+  } = useQueryWithError<BudgetType, Error>(
+    ["budget"],
+    async () => {
+      const res = await axios.get<BudgetType>(`${BASE_API_URL}/budget`);
+      return res.data;
+    },
+    { enabled: true },
+    "Failed to fetch budget"
+  );
 
-export default function useBudget() {
-  const { isLoading, error, fetchBudget } = useBudgetStore();
+  const getTotalBudget = () => {
+    if (!budget || !budget.budgetCategories) return 0;
+    const budgetValues = Object.values(budget.budgetCategories);
+    return budgetValues.reduce((acc, cur) => acc + cur, 0);
+  };
 
-  useEffect(() => {
-    fetchBudget();
-  }, []);
-}
+  return {
+    budget,
+    isLoading,
+    error,
+    getTotalBudget,
+  };
+};

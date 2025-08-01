@@ -1,17 +1,22 @@
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import { BaseButton, BaseInput, InputContainer, InputLabel } from "styles";
+import {
+  BaseButton,
+  BaseInput,
+  InputContainer,
+  InputLabel,
+  SecondaryButton,
+} from "styles";
 import { SPACING } from "theme";
 import { BudgetCategories } from "types/budget";
 
 import { budgetOnlyCategories, TransactionCategory } from "types/Transaction";
-import { getTotalBudget } from "store/budget/budgetSelectors";
-import { format } from "date-fns";
 import { formatToCurrency } from "utils";
 
 type BudgetProps = {
   initialBudgetCategories: BudgetCategories;
   onSubmit: (transaction: BudgetCategories) => void;
+  budgetTotal: number;
 };
 
 const defaultValues = budgetOnlyCategories.reduce((acc, cur) => {
@@ -22,12 +27,15 @@ const defaultValues = budgetOnlyCategories.reduce((acc, cur) => {
 export default function BudgetForm({
   initialBudgetCategories,
   onSubmit,
+  budgetTotal,
 }: BudgetProps) {
   const {
     register,
     handleSubmit,
     clearErrors,
     formState: { errors },
+    watch,
+    reset,
   } = useForm<BudgetCategories>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
@@ -37,10 +45,20 @@ export default function BudgetForm({
     },
   });
 
-  const totalBudget = getTotalBudget();
+  const currentValues = watch();
 
   const onSubmitForm = (data: BudgetCategories) => {
     onSubmit(data);
+  };
+
+  const newBudget = Object.values(currentValues).reduce(
+    (acc, cur) => acc + Number(cur),
+    0
+  );
+
+  const handleReset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    reset();
   };
 
   return (
@@ -63,12 +81,20 @@ export default function BudgetForm({
             );
           })}
         </FormContainer>
-        <p>
-          {" "}
-          Total Monthly Budget: <b>{formatToCurrency(totalBudget)}</b>{" "}
-        </p>
+        <TotalsContainer>
+          <p>
+            Current Total Monthly Budget: <b>{formatToCurrency(budgetTotal)}</b>
+          </p>
+          |
+          <p>
+            New Total Monthly Budget: <b>{formatToCurrency(newBudget)}</b>
+          </p>
+        </TotalsContainer>
         <ButtonContainer>
           <BaseButton type="submit">Save Changes</BaseButton>
+          <SecondaryButton onClick={handleReset}>
+            Revert Changes
+          </SecondaryButton>
         </ButtonContainer>
       </form>
     </>
@@ -85,7 +111,12 @@ const ButtonContainer = styled.div`
 
 const FormContainer = styled.div`
   display: flex;
-
   flex-wrap: wrap;
   gap: ${SPACING.spacing4x};
+`;
+
+const TotalsContainer = styled.div`
+  display: flex;
+  gap: ${SPACING.spacing4x};
+  align-items: center;
 `;
