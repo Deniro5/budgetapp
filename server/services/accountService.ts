@@ -222,10 +222,18 @@ export const getAccountBalancesById = async ({
 
     allTransactionsAfterStartDate.push(...transactionsFromStartToEnd);
   }
-
-  const sortedTransactions = allTransactionsAfterStartDate.sort((a, b) =>
-    a.date > b.date ? 1 : -1
+  //use reduce to get a map from date to transaction total on that date
+  const transactionBalancesByDate = allTransactionsAfterStartDate.reduce(
+    (acc, curr) => {
+      const { date, amount, type } = curr;
+      if (!acc[date]) acc[date] = 0;
+      acc[date] += type === "Income" ? amount : -amount;
+      return acc;
+    },
+    {}
   );
+
+  console.log(transactionBalancesByDate);
 
   const investmentBalances = await getAggregatedInvestmentTimelineByAccount({
     userId,
@@ -241,8 +249,6 @@ export const getAccountBalancesById = async ({
     {}
   );
 
-  console.log(investmentBalancesMap);
-
   let currentDate = startDate;
   const result: {
     date: string;
@@ -251,25 +257,17 @@ export const getAccountBalancesById = async ({
     total: number;
   }[] = [];
 
-  sortedTransactions.forEach(({ date, amount, type }) => {
-    while (date > currentDate) {
-      result.push({
-        date: currentDate,
-        balance: transactionTotal,
-        value: investmentBalancesMap[currentDate] || 0,
-        total: transactionTotal + investmentBalancesMap[currentDate] || 0,
-      });
-      currentDate = addOneDay(currentDate);
-    }
-    transactionTotal += type === "Income" ? amount : -amount;
+  while (currentDate <= endDate) {
+    transactionTotal += transactionBalancesByDate[currentDate] || 0;
     result.push({
       date: currentDate,
       balance: transactionTotal,
       value: investmentBalancesMap[currentDate] || 0,
-      total: transactionTotal + investmentBalancesMap[currentDate] || 0,
+      total: transactionTotal + (investmentBalancesMap[currentDate] || 0),
     });
-  });
-
+    currentDate = addOneDay(currentDate);
+  }
+  console.log(result);
   return result;
 };
 

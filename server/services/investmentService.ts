@@ -262,6 +262,8 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     return dailyValue;
   });
 
+  if (test.length === 0) return [];
+
   let result = [];
   let start = test[0][0].date;
   let end = test[0][test[0].length - 1].date;
