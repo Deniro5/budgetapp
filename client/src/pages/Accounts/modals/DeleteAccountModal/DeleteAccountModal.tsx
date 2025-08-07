@@ -3,6 +3,14 @@ import Modal from "components/Global/Modal";
 import ConfirmModal from "components/Global/ConfirmModal";
 import { Account } from "types/account";
 import { useDeleteAccount } from "../../hooks/useDeleteAccount";
+import { useState } from "react";
+import { BaseButton, Row, SecondaryButton } from "styles";
+import styled from "styled-components";
+import { COLORS, FONTSIZE, SPACING } from "theme";
+import AccountDropdown from "components/AccountDropdown/AccountDropdown";
+import { useCheckAccountDeletable } from "../../hooks/useCheckAccountDeletable";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 type DeleteAccountButtonProps = {
   account: Account;
@@ -14,19 +22,86 @@ export function DeleteAccountModal({
   onClose,
 }: DeleteAccountButtonProps) {
   const { mutate } = useDeleteAccount();
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
+    null
+  );
+  const isBalanceZero = account.balance === 0;
+  const isInvestmentZero = account.investmentSummary.length === 0;
+  const isDeletable = isBalanceZero && isInvestmentZero;
 
   const handleConfirm = () => {
     mutate(account._id);
     onClose();
   };
 
+  const getStatusIcon = (status: boolean) => {
+    if (status) {
+      return <FontAwesomeIcon icon={faCheck} color={COLORS.green} />;
+    } else {
+      return <FontAwesomeIcon icon={faTimes} color={COLORS.deleteRed} />;
+    }
+  };
+
   return (
     <Modal isOpen={true} onClose={onClose}>
-      <ConfirmModal
-        handleCancel={onClose}
-        handleConfirm={handleConfirm}
-        text="Are you sure you want to delete this Account?"
-      />
+      {isDeletable ? (
+        <ConfirmModal
+          handleCancel={onClose}
+          handleConfirm={handleConfirm}
+          text="Are you sure you want to archive this Account?"
+        />
+      ) : (
+        <SecondStepContainer>
+          <Title> Unable to delete account </Title>
+          <p>
+            In order to delete this account you will need to set its balance and
+            its investments to zero. The recommended way to do this is by first
+            selling any remaining investments and then doing a transfer of the
+            remaining balance to another account.
+          </p>
+
+          <StatusRow>
+            {getStatusIcon(isBalanceZero)}
+            Account balance is zero
+          </StatusRow>
+          <StatusRow>
+            {getStatusIcon(isInvestmentZero)}
+            This account as no investments
+          </StatusRow>
+
+          <ButtonContainer>
+            <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          </ButtonContainer>
+        </SecondStepContainer>
+      )}
     </Modal>
   );
 }
+
+const SecondStepContainer = styled.div`
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: ${SPACING.spacing4x};
+  padding-top: ${SPACING.spacing6x};
+  gap: ${SPACING.spacing6x};
+`;
+
+const Title = styled.h2`
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: ${SPACING.spacing6x};
+  font-size: ${FONTSIZE.lg};
+`;
+
+const StatusRow = styled.div`
+  display: flex;
+  padding: ${SPACING.spacing2x} 0;
+  gap: ${SPACING.spacing2x};
+  align-items: center;
+`;

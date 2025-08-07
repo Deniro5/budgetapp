@@ -50,6 +50,8 @@ const updateAccountBalance = async ({
     balance: account.balance + Number(change),
   };
 
+  console.log(updateData);
+
   await AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
 };
 
@@ -180,10 +182,14 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
   userId,
   accountId,
   appendHistory,
+  startDate,
+  endDate,
 }: {
   userId: string;
   accountId?: string;
   appendHistory?: boolean;
+  startDate: string;
+  endDate: string;
 }) => {
   const investments = await InvestmentModel.aggregate([
     {
@@ -262,26 +268,35 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     return dailyValue;
   });
 
-  if (test.length === 0) return [];
+  //if there are no investments, or the date is out of the range of the data
+  if (
+    test.length === 0 ||
+    endDate < test[0][0].date ||
+    startDate > test[0][test[0].length - 1].date
+  )
+    return [];
 
   let result = [];
-  let start = test[0][0].date;
-  let end = test[0][test[0].length - 1].date;
   let lastValue = 0;
+  let currDate = startDate;
   //go through every date and get the current value. There are gaps on the weekends so we have to manually fill them with the last known value.
-  while (start <= end) {
+  while (currDate <= endDate) {
     let total = 0;
-    const index = test[0].findIndex((item) => item.date === start);
+    //find a date in the test that matches the start date
+    const index = test[0].findIndex((item) => item.date === currDate);
+    console.log(endDate);
     if (index < 0) {
-      result.push({ date: start, value: lastValue });
+      //if theres no date found just use the last value
+      result.push({ date: currDate, value: lastValue });
     } else {
+      //add up all the investments for that day
       for (let i = 0; i < test.length; i++) {
         total += test[i][index].value;
       }
-      result.push({ date: start, value: total });
+      result.push({ date: currDate, value: total });
       lastValue = total;
     }
-    start = addOneDay(start);
+    currDate = addOneDay(currDate);
   }
   return result;
 };
@@ -302,7 +317,6 @@ export const updateAssetPriceHistory = async (investments: Investment[]) => {
   for (const investment of investments) {
     const symbol = investment.asset.symbol;
     let history: any = await AssetPriceHistoryModel.findOne({ symbol });
-
     const needsUpdate =
       !history || now - new Date(history.lastUpdated).getTime() > ONE_DAY;
 

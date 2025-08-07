@@ -19,8 +19,17 @@ export default function useAccounts() {
     "Failed to load accounts"
   );
 
+  const accountIds = data?.map((account) => account._id) ?? [];
+  const accountNameByIdMap =
+    data?.reduce((acc: Record<string, string>, cur) => {
+      acc[cur._id] = cur.name;
+      return acc;
+    }, {}) || {};
+
   return {
     accounts: data ?? [],
+    accountIds,
+    accountNameByIdMap,
     isLoading,
     error,
   };

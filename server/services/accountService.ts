@@ -233,11 +233,11 @@ export const getAccountBalancesById = async ({
     {}
   );
 
-  console.log(transactionBalancesByDate);
-
   const investmentBalances = await getAggregatedInvestmentTimelineByAccount({
     userId,
     accountId: id === "All" ? undefined : id,
+    startDate,
+    endDate,
     appendHistory: true,
   });
 
@@ -267,7 +267,6 @@ export const getAccountBalancesById = async ({
     });
     currentDate = addOneDay(currentDate);
   }
-  console.log(result);
   return result;
 };
 

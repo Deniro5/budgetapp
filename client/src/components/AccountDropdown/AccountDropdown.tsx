@@ -1,9 +1,5 @@
 import DropdownList from "components/DropdownList/DropdownList";
-
-import {
-  getAccountids,
-  getAccountNameByIdMap,
-} from "store/account/accountSelectors";
+import useAccounts from "../../pages/Accounts/hooks/useAccounts";
 
 interface AccountDropdownProps {
   selectedAccountId: string | null;
@@ -18,9 +14,7 @@ export default function AccountDropdown({
   accountsList,
   placeholder,
 }: AccountDropdownProps) {
-  const accountIds = getAccountids();
-  const accountNameByIdMap = getAccountNameByIdMap();
-
+  const { accountIds, accountNameByIdMap } = useAccounts();
   return (
     <DropdownList
       items={accountsList || accountIds}

@@ -84,7 +84,7 @@ export function AccountCard({
         </SecondaryButton>
         <DeleteButton onClick={handleDeleteClick}>
           {" "}
-          <FontAwesomeIcon icon={faTrash} /> Delete Account{" "}
+          <FontAwesomeIcon icon={faTrash} /> Archive Account{" "}
         </DeleteButton>
       </ButtonContainer>
     </Container>
