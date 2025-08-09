@@ -27,6 +27,7 @@ export type RawAccount = {
   type: AccountType;
   baselineAmount: number;
   baselineDate: string;
+  isArchived?: boolean;
 };
 
 export type Account = RawAccount & {

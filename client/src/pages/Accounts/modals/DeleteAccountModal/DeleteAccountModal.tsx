@@ -2,15 +2,12 @@ import Modal from "components/Global/Modal";
 
 import ConfirmModal from "components/Global/ConfirmModal";
 import { Account } from "types/account";
-import { useDeleteAccount } from "../../hooks/useDeleteAccount";
-import { useState } from "react";
-import { BaseButton, Row, SecondaryButton } from "styles";
+import { SecondaryButton } from "styles";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
-import AccountDropdown from "components/AccountDropdown/AccountDropdown";
-import { useCheckAccountDeletable } from "../../hooks/useCheckAccountDeletable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { useEditAccount } from "../../hooks/useEditAccount";
 
 type DeleteAccountButtonProps = {
   account: Account;
@@ -21,16 +18,16 @@ export function DeleteAccountModal({
   account,
   onClose,
 }: DeleteAccountButtonProps) {
-  const { mutate } = useDeleteAccount();
-  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
-    null
-  );
+  const { mutate } = useEditAccount("Account archived successfully");
   const isBalanceZero = account.balance === 0;
   const isInvestmentZero = account.investmentSummary.length === 0;
   const isDeletable = isBalanceZero && isInvestmentZero;
 
   const handleConfirm = () => {
-    mutate(account._id);
+    mutate({
+      accountId: account._id,
+      updatedAccount: { ...account, isArchived: true },
+    });
     onClose();
   };
 

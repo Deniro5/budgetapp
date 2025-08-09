@@ -10,6 +10,7 @@ const accountSchema: Schema = new Schema(
     baselineDate: { type: String, required: true },
     type: { type: String, required: false },
     balance: { type: Number, required: true },
+    isArchived: { type: Boolean, default: false, required: false },
   },
   { timestamps: true }
 );

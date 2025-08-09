@@ -23,7 +23,7 @@ export enum AccountOverlayType {
 }
 
 function Accounts() {
-  const { accounts, isLoading, error } = useAccounts();
+  const { activeAccounts, isLoading, error } = useAccounts();
   const [activeAccount, setActiveAccount] = useState<Account | null>(null);
   const [activeOverlay, setActiveOverlay] = useState<AccountOverlayType | null>(
     null
@@ -38,9 +38,9 @@ function Accounts() {
     if (isLoading) return <SkeletonLoader rows={2} columns={3} height={320} />;
     if (error)
       return <div>Failed to load accounts. Please refresh the page</div>;
-    if (!accounts.length) return <div>No accounts found</div>;
+    if (!activeAccounts.length) return <div>No accounts found</div>;
 
-    return accounts.map((account) => (
+    return activeAccounts.map((account) => (
       <AccountCard
         key={account._id}
         account={account}

@@ -10,7 +10,7 @@ import {
 import { useForm } from "react-hook-form";
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import Modal from "components/Global/Modal";
 import { Asset, RawInvestment } from "types/investment";
@@ -19,6 +19,7 @@ import AssetMenuItem from "./AssetMenuItem";
 import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
 import { TransactionType } from "types/Transaction";
 import useAccount from "../../Accounts/hooks/useAccount";
+import useAccounts from "../../../pages/Accounts/hooks/useAccounts";
 
 type BaseInvestmentModalProps = {
   title: string;
@@ -28,7 +29,7 @@ type BaseInvestmentModalProps = {
   input: string;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   assetsList: Asset[];
-  currentInvestmentsQuantityMap: Record<string, number>;
+  investmentsByAccount: Record<string, Record<string, number>>;
   isSellModal?: boolean;
 };
 
@@ -44,10 +45,11 @@ export function BaseInvestmentModal({
   assetsList,
   input,
   setInput,
-  currentInvestmentsQuantityMap,
+  investmentsByAccount,
   isSellModal,
 }: BaseInvestmentModalProps) {
   const userPreferences = getUserPreferences();
+  const { activeAccountIds } = useAccounts();
 
   const {
     register,
@@ -68,6 +70,9 @@ export function BaseInvestmentModal({
     },
   });
 
+  const currentValues = watch();
+  const { account } = useAccount(currentValues.account);
+
   useEffect(() => {
     register("account", {
       required: "Account is required",
@@ -77,8 +82,6 @@ export function BaseInvestmentModal({
     });
   }, [register]);
 
-  const currentValues = watch();
-  const { account } = useAccount(currentValues.account);
   const handleAssetChange = (asset: Asset) => {
     setValue("asset", asset, { shouldValidate: true });
   };
@@ -91,10 +94,30 @@ export function BaseInvestmentModal({
     onClose();
   };
 
+  const checkAccountHasAsset = (accountId: string) =>
+    currentValues.asset &&
+    investmentsByAccount[accountId] &&
+    investmentsByAccount[accountId][currentValues.asset?.symbol];
+
   const assetQuantityOwned =
-    (currentValues.asset &&
-      currentInvestmentsQuantityMap[currentValues.asset?.symbol]) ||
-    0;
+    account && checkAccountHasAsset(account._id)
+      ? investmentsByAccount[account._id][currentValues.asset?.symbol]
+      : 0;
+
+  // if it's the sell modal only show the accounts that have the asset
+  const filteredAccountIds = isSellModal
+    ? activeAccountIds.filter((accountId) => checkAccountHasAsset(accountId))
+    : activeAccountIds;
+
+  // set the modal default account to the first account that has the asset if we are selling and if the default account is not in the list
+  useEffect(() => {
+    if (isSellModal && !checkAccountHasAsset(currentValues.account)) {
+      const defaultAccount = activeAccountIds.find((accountId) =>
+        checkAccountHasAsset(accountId)
+      );
+      handleAccountChange(defaultAccount || "");
+    }
+  }, [activeAccountIds]);
 
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
@@ -126,9 +149,7 @@ export function BaseInvestmentModal({
         <Row>
           <InputContainer>
             <InputLabel>
-              Amount{" "}
-              {!!assetQuantityOwned &&
-                `(Currently owned: ${assetQuantityOwned})`}
+              Amount Currently in {account?.name}: {assetQuantityOwned}
             </InputLabel>
             <BaseInput
               {...register("quantity", {
@@ -180,6 +201,7 @@ export function BaseInvestmentModal({
             <AccountDropdown
               selectedAccountId={currentValues.account}
               handleAccountChange={handleAccountChange}
+              accountsList={filteredAccountIds}
             />
             {errors.account && (
               <ErrorMessage>{errors.account.message}</ErrorMessage>

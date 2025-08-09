@@ -12,13 +12,13 @@ import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING } from "theme";
 
-import { getAccountids } from "store/account/accountSelectors";
 import { useAccountWidget } from "./useAccountWidget";
 import { useState } from "react";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import renderChart from "../Hocs/renderChart";
 import { formatCurrencyShort, formatToCurrency } from "utils";
+import useAccounts from "../../../pages/Accounts/hooks/useAccounts";
 
 type AccountWidgetProps = {
   startDate: string;
@@ -27,13 +27,13 @@ type AccountWidgetProps = {
 
 export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
   const [accountWidgetId, setAccountWidgetId] = useState("All");
+  const { activeAccountIds } = useAccounts();
 
   const { accountWithBalances, isLoading, error } = useAccountWidget({
     startDate,
     endDate,
     accountWidgetId,
   });
-  const accountIds = getAccountids();
 
   const handleAccountChange = (id: string) => {
     setAccountWidgetId(id);
@@ -122,7 +122,7 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
           <b>{formatToCurrency(lastTotal)}</b>
         </span>
         <AccountDropdown
-          accountsList={["All", ...accountIds]}
+          accountsList={["All", ...activeAccountIds]}
           selectedAccountId={accountWidgetId}
           handleAccountChange={handleAccountChange}
         />

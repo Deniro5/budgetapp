@@ -14,10 +14,12 @@ export default function AccountDropdown({
   accountsList,
   placeholder,
 }: AccountDropdownProps) {
-  const { accountIds, accountNameByIdMap } = useAccounts();
+  const { activeAccountIds, accountNameByIdMap } = useAccounts();
+
+  console.log(accountsList);
   return (
     <DropdownList
-      items={accountsList || accountIds}
+      items={accountsList || activeAccountIds}
       selected={selectedAccountId}
       onSelect={handleAccountChange}
       placeholder={placeholder || "Select Account"}

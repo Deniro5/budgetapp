@@ -1,8 +1,5 @@
 import { Asset, RawInvestment } from "types/investment";
-
-import { useAssetSearch } from "../hooks/useAssetSearch";
 import { BaseInvestmentModal } from "../BaseInvestmentModal/BaseInvestmentModal";
-import { useState } from "react";
 import { useSearchDropdown } from "components/SearchDropdown/hooks/useSearchDropdown";
 
 type SellInvestmentModalProps = {
@@ -10,7 +7,7 @@ type SellInvestmentModalProps = {
   onSubmit: (investment: RawInvestment) => void;
   presetValues: Partial<RawInvestment>;
   assetsList: Asset[];
-  currentInvestmentsQuantityMap: Record<string, number>;
+  investmentsByAccount: Record<string, Record<string, number>>;
 };
 
 const assetToString = (asset: Asset) => {
@@ -22,7 +19,7 @@ export default function SellInvestmentModal({
   onSubmit,
   presetValues,
   assetsList,
-  currentInvestmentsQuantityMap,
+  investmentsByAccount,
 }: SellInvestmentModalProps) {
   const { input, setInput, results } = useSearchDropdown({
     items: assetsList,
@@ -42,7 +39,7 @@ export default function SellInvestmentModal({
       input={input}
       setInput={setInput}
       assetsList={results}
-      currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
+      investmentsByAccount={investmentsByAccount}
       isSellModal
     />
   );

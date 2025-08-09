@@ -1,10 +1,21 @@
+type Entry = {
+  account: string;
+  asset: Asset;
+  createdAt: string;
+  date: string;
+  price: number;
+  quantity: number;
+  updatedAt: string;
+  userId: string;
+};
+
 export type Investment = {
   asset: AssetWithPrice;
   quantity: number;
   price: number;
   date: string;
   account: string;
-  _id: string;
+  entries: Entry[];
 };
 
 export type RawInvestment = {

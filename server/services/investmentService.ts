@@ -50,8 +50,6 @@ const updateAccountBalance = async ({
     balance: account.balance + Number(change),
   };
 
-  console.log(updateData);
-
   await AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
 };
 
@@ -284,7 +282,7 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     let total = 0;
     //find a date in the test that matches the start date
     const index = test[0].findIndex((item) => item.date === currDate);
-    console.log(endDate);
+
     if (index < 0) {
       //if theres no date found just use the last value
       result.push({ date: currDate, value: lastValue });

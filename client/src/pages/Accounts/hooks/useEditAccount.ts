@@ -9,7 +9,9 @@ type EditAccountProps = {
   updatedAccount: RawAccount;
 };
 
-export const useEditAccount = () => {
+export const useEditAccount = (
+  customSuccess = "Account updated successfully"
+) => {
   const queryClient = useQueryClient();
 
   return useMutationWithSuccessAndError({
@@ -20,6 +22,6 @@ export const useEditAccount = () => {
         queryClient.invalidateQueries({ queryKey: ["accounts"] });
       },
     },
-    customSuccess: "Account updated successfully",
+    customSuccess,
   });
 };

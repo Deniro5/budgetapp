@@ -35,8 +35,9 @@ export default function BalanceSummaryFooter({
 
   const currentBalance = account.balance;
 
+  const rawAmount = isNaN(amount) ? 0 : amount;
   const parsedAmount = Number(
-    type === TransactionType.EXPENSE ? -amount : amount
+    type === TransactionType.EXPENSE ? -rawAmount : rawAmount
   );
 
   const parsedInitialAmount = getParsedInitialAmount();
@@ -50,11 +51,15 @@ export default function BalanceSummaryFooter({
     <Container>
       <SubContainer>
         <Label> Current Balance:</Label>
-        {currentBalance ? `${formatToCurrency(currentBalance)}` : "N/A"}
+        {currentBalance !== null && currentBalance !== undefined
+          ? `${formatToCurrency(currentBalance)}`
+          : "N/A"}
       </SubContainer>
       <SubContainer>
         <Label> Balance After:</Label>
-        {afterBalance ? `${formatToCurrency(afterBalance)}` : "N/A"}
+        {afterBalance !== null && afterBalance !== undefined
+          ? `${formatToCurrency(afterBalance)}`
+          : "N/A"}
       </SubContainer>
     </Container>
   );

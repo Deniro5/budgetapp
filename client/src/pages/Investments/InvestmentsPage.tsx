@@ -1,10 +1,8 @@
 import { Flex, PageContainer } from "../../styles.ts";
-
 import { useState } from "react";
-
 import { InvestmentsHeader } from "./InvestmentsHeader/InvestmentsHeader.tsx";
 import AddInvestmentModal from "./AddInvestmentModal/AddInvestmentModal.tsx";
-import { Asset, RawInvestment } from "types/investment.ts";
+import { RawInvestment } from "types/investment.ts";
 import { useCreateInvestment } from "./hooks/useCreateInvestment.ts";
 import { useFetchInvestments } from "./hooks/useFetchInvestments.ts";
 import { InvestmentCard } from "./InvestmentCard/InvestmentCard.tsx";
@@ -22,8 +20,10 @@ export enum InvestmentsOverlayType {
 
 export const InvestmentsPage = () => {
   const { mutate } = useCreateInvestment();
-  const { results, currentInvestmentsQuantityMap, isLoading, error } =
+  const { results, getInvestmentsByAccount, isLoading, error } =
     useFetchInvestments();
+  const investmentsByAccount = getInvestmentsByAccount();
+
   const [activeOverlay, setActiveOverlay] =
     useState<InvestmentsOverlayType | null>(null);
   const [presetValues, setPresetValues] = useState<Partial<RawInvestment>>({});
@@ -64,7 +64,7 @@ export const InvestmentsPage = () => {
           onClose={handleCloseOverlay}
           onSubmit={handleInvestmentSubmit}
           presetValues={presetValues}
-          currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
+          investmentsByAccount={investmentsByAccount}
         />
       )}
 
@@ -74,7 +74,7 @@ export const InvestmentsPage = () => {
           onSubmit={handleInvestmentSubmit}
           presetValues={presetValues}
           assetsList={results.map((investment) => investment.asset)}
-          currentInvestmentsQuantityMap={currentInvestmentsQuantityMap}
+          investmentsByAccount={investmentsByAccount}
         />
       )}
 
