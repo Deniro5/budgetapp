@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import AccountModel from "../models/account.model";
 import AssetPriceHistoryModel from "../models/assetpricehistory.model";
 import axios from "axios";
-import { addOneDay } from "../utils/dateutils";
+import { addOneDay, getTodayDate } from "../utils/dateutils";
 
 const API_URL = "https://www.alphavantage.co/query";
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -242,6 +242,19 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
       a.date.localeCompare(b.date)
     );
 
+    const today = getTodayDate();
+
+    if (
+      sortedHistory.length > 0 &&
+      sortedHistory[sortedHistory.length - 1].date !== today
+    ) {
+      sortedHistory.push({
+        date: today,
+        price: sortedHistory[sortedHistory.length - 1].price,
+      });
+    }
+
+    console.log(sortedHistory);
     let cumulativeQty = 0;
     let entryIndex = 0;
 
@@ -297,6 +310,48 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     currDate = addOneDay(currDate);
   }
   return result;
+};
+
+export const getInvestmentTransactionHistoryByAccount = async ({
+  userId,
+  accountId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  accountId?: string;
+  startDate: string;
+  endDate: string;
+}) => {
+  const rawInvestmentTransactionTotalsByDate = await InvestmentModel.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        ...(accountId
+          ? { account: new mongoose.Types.ObjectId(accountId) }
+          : {}),
+        date: { $gte: startDate, $lte: endDate },
+      },
+    },
+    {
+      $group: {
+        _id: "$date", // key directly by date
+        totalValue: {
+          $sum: {
+            $multiply: ["$quantity", "$price"],
+          },
+        },
+      },
+    },
+  ]);
+
+  const investmentTransactionTotalsByDate =
+    rawInvestmentTransactionTotalsByDate.reduce((acc, cur) => {
+      acc[cur._id] = cur.totalValue;
+      return acc;
+    }, {});
+
+  return investmentTransactionTotalsByDate;
 };
 
 export const searchStocks = (query: string) => {

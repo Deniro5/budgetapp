@@ -4,3 +4,7 @@ export function addOneDay(dateStr: string): string {
   date.setDate(date.getDate() + 1);
   return date.toISOString().split("T")[0];
 }
+
+export function getTodayDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}

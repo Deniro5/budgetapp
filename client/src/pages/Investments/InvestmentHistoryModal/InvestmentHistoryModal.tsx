@@ -16,6 +16,7 @@ export function InvestmentHistoryModal({
   onClose,
 }: InvestmentHistoryModalProps) {
   const { results, isLoading, error } = useFetchInvestmentHistory();
+
   const accountNameByIdMap = getAccountNameByIdMap();
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
@@ -29,7 +30,7 @@ export function InvestmentHistoryModal({
         <ResultsContainer>
           {results.map((investment) => (
             <InvestmentHistoryItem
-              key={investment._id}
+              key={investment.asset.symbol}
               investment={{
                 ...investment,
                 account: accountNameByIdMap[investment.account],

@@ -39,8 +39,6 @@ export const useCheckAccountDeletable = ({
     "Failed to load account balance data"
   );
 
-  console.log(data);
-
   const isBalanceZero = isLoading
     ? false
     : data?.length

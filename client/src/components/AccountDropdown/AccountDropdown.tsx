@@ -16,7 +16,6 @@ export default function AccountDropdown({
 }: AccountDropdownProps) {
   const { activeAccountIds, accountNameByIdMap } = useAccounts();
 
-  console.log(accountsList);
   return (
     <DropdownList
       items={accountsList || activeAccountIds}

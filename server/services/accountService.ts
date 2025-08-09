@@ -3,6 +3,7 @@ import TransactionModel from "../models/transaction.model";
 import {
   getAggregatedInvestmentsByAccount,
   getAggregatedInvestmentTimelineByAccount,
+  getInvestmentTransactionHistoryByAccount,
 } from "../services/investmentService";
 import { addOneDay } from "../utils/dateutils";
 
@@ -249,6 +250,14 @@ export const getAccountBalancesById = async ({
     {}
   );
 
+  const investmentTransactionHistoryByAccount =
+    await getInvestmentTransactionHistoryByAccount({
+      userId,
+      accountId: id === "All" ? undefined : id,
+      startDate,
+      endDate,
+    });
+
   let currentDate = startDate;
   const result: {
     date: string;
@@ -258,7 +267,9 @@ export const getAccountBalancesById = async ({
   }[] = [];
 
   while (currentDate <= endDate) {
-    transactionTotal += transactionBalancesByDate[currentDate] || 0;
+    transactionTotal +=
+      transactionBalancesByDate[currentDate] ||
+      0 - (investmentTransactionHistoryByAccount[currentDate] || 0);
     result.push({
       date: currentDate,
       balance: transactionTotal,
