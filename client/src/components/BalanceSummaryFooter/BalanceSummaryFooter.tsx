@@ -22,10 +22,8 @@ export default function BalanceSummaryFooter({
   type,
   initialType,
 }: BalanceSummaryFooterProps) {
-  if (!account) return null;
-
   const getParsedInitialAmount = () => {
-    if (account._id !== initialAccountId) return 0;
+    if (account && account._id !== initialAccountId) return 0;
 
     return (
       Number(initialAmount || 0) *
@@ -33,7 +31,7 @@ export default function BalanceSummaryFooter({
     );
   };
 
-  const currentBalance = account.balance;
+  const currentBalance = account?.balance;
 
   const rawAmount = isNaN(amount) ? 0 : amount;
   const parsedAmount = Number(

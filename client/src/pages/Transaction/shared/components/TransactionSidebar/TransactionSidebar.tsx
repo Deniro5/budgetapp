@@ -16,8 +16,7 @@ import { format } from "date-fns";
 
 import { TransactionOverlayType, View } from "../../../TransactionsPage";
 import { formatToCurrency } from "utils";
-
-import useAccountStore from "store/account/accountStore";
+import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
 
 type TransactionSidebarProps = {
   activeTransaction: Transaction | PresetTransaction | null;
@@ -36,7 +35,7 @@ export const TransactionSidebar = ({
   view,
 }: TransactionSidebarProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const { accountIdToNameMap } = useAccountStore();
+  const { accountNameByIdMap } = useAccounts();
   const sidebarTransaction = activeTransaction;
   const isTransfer =
     sidebarTransaction?.category === TransactionCategory.Transfer;
@@ -66,7 +65,7 @@ export const TransactionSidebar = ({
 
   const transactionVendorName =
     sidebarTransaction?.category === TransactionCategory.Transfer
-      ? accountIdToNameMap[sidebarTransaction?.vendor || ""]
+      ? accountNameByIdMap[sidebarTransaction?.vendor || ""]
       : sidebarTransaction?.vendor;
 
   const getSidebarContent = () => {

@@ -8,8 +8,8 @@ import DatePopoverMenu from "./DatePopoverMenu";
 type DateMenuProps = {
   startDate: string;
   endDate: string;
-  setStartDate: React.Dispatch<React.SetStateAction<string>>;
-  setEndDate: React.Dispatch<React.SetStateAction<string>>;
+  setStartDate: (newStartDate: string) => void;
+  setEndDate: (newEndDate: string) => void;
 };
 
 function DateMenu({

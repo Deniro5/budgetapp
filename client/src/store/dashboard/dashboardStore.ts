@@ -1,31 +1,24 @@
-import { TransactionFilter } from "types/Transaction";
 import {
   getCurrentDateFormatted,
   getDateDaysAgoFormatted,
 } from "../../utils/DateUtils";
 import { create } from "zustand";
-export interface TransactionStore {
+export interface DashboardStore {
   startDate: string;
   endDate: string;
   setStartDate: (newStartDate: string) => void;
   setEndDate: (newEndDate: string) => void;
-  filter: TransactionFilter;
-  setFilter: (newFilter: TransactionFilter) => void;
 }
 
-const useTransactionStore = create<TransactionStore>((set) => ({
+const useDashboardStore = create<DashboardStore>((set) => ({
   startDate: getDateDaysAgoFormatted(30),
   endDate: getCurrentDateFormatted(),
-  filter: {},
   setStartDate: (newStartDate) => {
     set({ startDate: newStartDate });
   },
   setEndDate: (newEndDate) => {
     set({ endDate: newEndDate });
   },
-  setFilter: (newFilter) => {
-    set({ filter: newFilter });
-  },
 }));
 
-export default useTransactionStore;
+export default useDashboardStore;

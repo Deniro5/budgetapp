@@ -3,18 +3,14 @@ import { SPACING } from "theme";
 import { TransactionFilterTag } from "./TransactionFilterTag";
 import { TransactionFilter } from "types/Transaction";
 import { formatCamelCaseToTitleCase, formatToCurrency } from "utils";
-import useAccountStore from "store/account/accountStore";
+import useTransactionStore from "store/transaction/transactionStore";
+import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
 
-type TransactionFilterRowProps = {
-  filter: TransactionFilter;
-  setFilter: React.Dispatch<React.SetStateAction<TransactionFilter>>;
-};
+export function TransactionFilterRow() {
+  const { filter, setFilter } = useTransactionStore();
+  const { accountNameByIdMap } = useAccounts();
 
-export function TransactionFilterRow({
-  filter,
-  setFilter,
-}: TransactionFilterRowProps) {
-  const { accountIdToNameMap } = useAccountStore();
+  console.log(filter);
   const removeFilter = (filterName: keyof TransactionFilter) => {
     setFilter({ ...filter, [filterName]: undefined });
   };
@@ -22,9 +18,8 @@ export function TransactionFilterRow({
   const getFilterLabel = (key: keyof TransactionFilter) => {
     let label: string | number | string[];
     if (key === "account") {
-      label = accountIdToNameMap[filter[key]!] || "";
-    }
-    if (key === "maxAmount" || key === "minAmount") {
+      label = accountNameByIdMap[filter[key]!] || "";
+    } else if (key === "maxAmount" || key === "minAmount") {
       label = formatToCurrency(filter[key] || 0);
     } else {
       label = filter[key] || "";
@@ -44,6 +39,10 @@ export function TransactionFilterRow({
           />
         ) : null;
       })}
+      <TransactionFilterTag
+        name={"Clear Filters"}
+        onClick={() => setFilter({})}
+      />
     </Container>
   );
 }

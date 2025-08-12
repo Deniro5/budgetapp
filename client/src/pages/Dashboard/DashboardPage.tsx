@@ -5,14 +5,14 @@ import { DashboardCard } from "./DashboardCard/DashboardCard.tsx";
 import { IncomeExpenseWidget } from "./IncomeExpenseWidget/IncomeExpenseWidget.tsx";
 import { RecentTransactionsWidget } from "./RecentTransactionsWidget/RecentTransactionsWidget.tsx";
 
-import useCalendar from "../../hooks/useCalendar.ts";
 import DateMenu from "components/DateMenu/index.tsx";
 import { CategoryLineWidget } from "./CategoryLineWidget/CategoryLineWidget.tsx";
 import { BudgetWidget } from "./BudgetWidget/BudgetWidget.tsx";
 import { AccountWidget } from "./AccountWidget/AccountWidget.tsx";
+import useDashboardStore from "store/dashboard/dashboardStore.ts";
 
 export const DashboardPage = () => {
-  const { startDate, setStartDate, endDate, setEndDate } = useCalendar();
+  const { startDate, setStartDate, endDate, setEndDate } = useDashboardStore();
 
   return (
     <PageContainer>

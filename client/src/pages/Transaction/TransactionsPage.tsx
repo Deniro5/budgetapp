@@ -18,8 +18,6 @@ import {
 import DateMenu from "../../components/DateMenu/index.tsx";
 import { AddPresetTransactionModal } from "./PresetTransactions/modals/AddPresetTransactionModal/AddPresetTransactionModal.tsx";
 
-import useCalendar from "../../hooks/useCalendar.ts";
-
 import usePresetTransactions from "./PresetTransactions/hooks/usePresetTransactions.ts";
 
 import { isPresetTransaction, isTransaction } from "./shared/utils/index.ts";
@@ -42,6 +40,7 @@ import {
   CopyPresetTransactionModal,
   DeletePresetTransactionModal,
 } from "./PresetTransactions/modals";
+import useTransactionStore from "store/transaction/transactionStore.ts";
 
 export enum TransactionOverlayType {
   ADD = "add",
@@ -63,8 +62,10 @@ export type View = "Transactions" | "Preset";
 
 export default function TransactionsPage() {
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<TransactionFilter>({});
+  const { filter, setFilter } = useTransactionStore();
   const [view, setView] = useState<View>("Transactions");
+  const { startDate, endDate, setStartDate, setEndDate } =
+    useTransactionStore();
 
   const [sidebarTransactionId, setSidebarTransactionId] = useState<
     string | null
@@ -81,8 +82,6 @@ export default function TransactionsPage() {
     top: 0,
     left: 0,
   });
-
-  const { startDate, setStartDate, endDate, setEndDate } = useCalendar();
 
   const { transactions, transactionCount, loadMore, isLoading, error } =
     useTransactions({

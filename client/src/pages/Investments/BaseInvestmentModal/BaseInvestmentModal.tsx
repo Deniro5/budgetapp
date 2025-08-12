@@ -57,7 +57,7 @@ export function BaseInvestmentModal({
     setValue,
     watch,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isSubmitted },
   } = useForm<RawInvestment>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
@@ -203,7 +203,7 @@ export function BaseInvestmentModal({
               handleAccountChange={handleAccountChange}
               accountsList={filteredAccountIds}
             />
-            {errors.account && (
+            {errors.account && isSubmitted && (
               <ErrorMessage>{errors.account.message}</ErrorMessage>
             )}
           </InputContainer>

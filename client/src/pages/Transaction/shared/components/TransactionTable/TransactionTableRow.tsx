@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { transactionCategoryImageMap } from "../../constants/transactionCategoryImageMap";
 
-import useAccountStore from "store/account/accountStore";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
 import {
@@ -12,6 +11,7 @@ import {
 } from "types/Transaction";
 import { formatToCurrency } from "utils";
 import { isPresetTransaction } from "../../utils";
+import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
 
 type TransactionTableRowProps = {
   transaction: Transaction | PresetTransaction;
@@ -33,7 +33,7 @@ export function TransactionTableRow({
   onDoubleClick,
   isSelected,
 }: TransactionTableRowProps) {
-  const { accountIdToNameMap } = useAccountStore();
+  const { accountNameByIdMap } = useAccounts();
 
   const handleClick = () => {
     if (isSelected) {
@@ -58,7 +58,7 @@ export function TransactionTableRow({
     if (!transaction.vendor) return emptyString;
 
     return transaction.category === TransactionCategory.Transfer
-      ? accountIdToNameMap[transaction.vendor]
+      ? accountNameByIdMap[transaction.vendor]
       : transaction.vendor;
   };
 
