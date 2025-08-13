@@ -234,21 +234,12 @@ export const getAccountBalancesById = async ({
     {}
   );
 
-  const investmentBalances = await getAggregatedInvestmentTimelineByAccount({
+  const investmentBalancesMap = await getAggregatedInvestmentTimelineByAccount({
     userId,
     accountId: id === "All" ? undefined : id,
     startDate,
     endDate,
-    appendHistory: true,
   });
-
-  const investmentBalancesMap = investmentBalances.reduce(
-    (acc: Record<string, number>, cur: { date: string; value: number }) => {
-      acc[cur.date] = cur.value;
-      return acc;
-    },
-    {}
-  );
 
   const investmentTransactionHistoryByAccount =
     await getInvestmentTransactionHistoryByAccount({

@@ -40,6 +40,8 @@ export function AccountCard({
     setActiveAccount(account);
   };
 
+  console.log(account.investmentSummary);
+
   const assetTotal = account.investmentSummary.reduce((total, item) => {
     return total + item.price * item.quantity;
   }, 0);

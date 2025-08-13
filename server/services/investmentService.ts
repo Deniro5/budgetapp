@@ -5,6 +5,7 @@ import AccountModel from "../models/account.model";
 import AssetPriceHistoryModel from "../models/assetpricehistory.model";
 import axios from "axios";
 import { addOneDay, getTodayDate } from "../utils/dateutils";
+import { start } from "repl";
 
 const API_URL = "https://www.alphavantage.co/query";
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -13,6 +14,12 @@ interface Investment {
   asset: {
     symbol: string;
   };
+  entries: any[];
+  quantity: number;
+  price: number;
+  date: string;
+  account: string;
+  userId: string;
 }
 
 interface CustomRequest extends Request {
@@ -129,9 +136,11 @@ export const getAggregatedInvestments = async (
 
 export const getAggregatedInvestmentsByAccount = async (
   userId: string,
-  accountId: string,
-  appendHistory?: boolean
+  accountId: string
 ) => {
+  //get investments with a positive quantity by account id.
+  //attach history to them
+  //get the last price and return it with the investment
   const investments = await InvestmentModel.aggregate([
     {
       $match: {
@@ -146,7 +155,6 @@ export const getAggregatedInvestmentsByAccount = async (
           userId: "$userId",
         },
         name: { $first: "$asset.name" },
-        exchange: { $first: "$asset.exchange" },
         totalQuantity: { $sum: "$quantity" },
         totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
       },
@@ -158,158 +166,44 @@ export const getAggregatedInvestmentsByAccount = async (
         asset: {
           symbol: "$_id.symbol",
           name: "$name",
-          exchange: "$exchange",
         },
         quantity: "$totalQuantity",
+      },
+    },
+    {
+      $lookup: {
+        from: "assetpricehistories",
+        localField: "asset.symbol",
+        foreignField: "symbol",
+        as: "historyDoc",
+      },
+    },
+    {
+      $unwind: {
+        path: "$historyDoc",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $addFields: {
         price: {
-          $cond: [
-            { $eq: ["$totalQuantity", 0] },
-            0,
-            { $divide: ["$totalValue", "$totalQuantity"] },
-          ],
+          $arrayElemAt: ["$historyDoc.history.price", -1],
         },
       },
     },
-    {
-      $sort: { "asset.symbol": 1 },
-    },
-  ]);
-  return appendHistory ? updateAssetPriceHistory(investments) : investments;
-};
-export const getAggregatedInvestmentTimelineByAccount = async ({
-  userId,
-  accountId,
-  appendHistory,
-  startDate,
-  endDate,
-}: {
-  userId: string;
-  accountId?: string;
-  appendHistory?: boolean;
-  startDate: string;
-  endDate: string;
-}) => {
-  const investments = await InvestmentModel.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(userId),
-        ...(accountId
-          ? { account: new mongoose.Types.ObjectId(accountId) }
-          : {}),
-      },
-    },
-    {
-      $group: {
-        _id: {
-          symbol: "$asset.symbol",
-          userId: "$userId",
-        },
-        name: { $first: "$asset.name" },
-        exchange: { $first: "$asset.exchange" },
-        totalQuantity: { $sum: "$quantity" },
-        totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
-        entries: { $push: "$$ROOT" },
-      },
-    },
-    { $match: { totalQuantity: { $gt: 0 } } },
+
     {
       $project: {
-        _id: 0,
-        asset: {
-          symbol: "$_id.symbol",
-          name: "$name",
-          exchange: "$exchange",
-        },
-        entries: 1,
+        asset: 1,
+        quantity: 1,
+        price: 1,
       },
     },
-    {
-      $sort: { "asset.symbol": 1 },
-    },
+
+    { $sort: { "asset.symbol": 1 } },
   ]);
-  const investmentsWithHistory = appendHistory
-    ? await updateAssetPriceHistory(investments)
-    : investments;
 
-  const test = investmentsWithHistory.map((inv) => {
-    const { history } = inv.asset;
-    const { entries } = inv;
-    // Sort entries and history to ensure they're chronological
-    const sortedEntries = [...entries].sort((a, b) =>
-      a.date.localeCompare(b.date)
-    );
-    const sortedHistory = [...history].sort((a, b) =>
-      a.date.localeCompare(b.date)
-    );
-
-    const today = getTodayDate();
-
-    if (
-      sortedHistory.length > 0 &&
-      sortedHistory[sortedHistory.length - 1].date !== today
-    ) {
-      sortedHistory.push({
-        date: today,
-        price: sortedHistory[sortedHistory.length - 1].price,
-      });
-    }
-
-    console.log(sortedHistory);
-    let cumulativeQty = 0;
-    let entryIndex = 0;
-
-    const dailyValue = sortedHistory.map(({ date, price }) => {
-      // Accumulate quantity from entries up to and including this date
-      while (
-        entryIndex < sortedEntries.length &&
-        sortedEntries[entryIndex].date <= date
-      ) {
-        cumulativeQty += sortedEntries[entryIndex].quantity; // buy = positive, sell = negative
-        entryIndex++;
-      }
-
-      const value = cumulativeQty * price;
-
-      return {
-        date,
-        value,
-      };
-    });
-
-    return dailyValue;
-  });
-
-  //if there are no investments, or the date is out of the range of the data
-  if (
-    test.length === 0 ||
-    endDate < test[0][0].date ||
-    startDate > test[0][test[0].length - 1].date
-  )
-    return [];
-
-  let result = [];
-  let lastValue = 0;
-  let currDate = startDate;
-  //go through every date and get the current value. There are gaps on the weekends so we have to manually fill them with the last known value.
-  while (currDate <= endDate) {
-    let total = 0;
-    //find a date in the test that matches the start date
-    const index = test[0].findIndex((item) => item.date === currDate);
-
-    if (index < 0) {
-      //if theres no date found just use the last value
-      result.push({ date: currDate, value: lastValue });
-    } else {
-      //add up all the investments for that day
-      for (let i = 0; i < test.length; i++) {
-        total += test[i][index].value;
-      }
-      result.push({ date: currDate, value: total });
-      lastValue = total;
-    }
-    currDate = addOneDay(currDate);
-  }
-  return result;
+  return investments;
 };
 
 export const getInvestmentTransactionHistoryByAccount = async ({
@@ -363,6 +257,97 @@ export const searchStocks = (query: string) => {
   ).slice(0, 20);
 };
 
+export const getAggregatedInvestmentTimelineByAccount = async ({
+  userId,
+  accountId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  accountId?: string;
+  startDate: string;
+  endDate: string;
+}) => {
+  //Final structure: {date: string, value: number}[] where value is the total value of all investments on that day
+  const investments = await InvestmentModel.aggregate([
+    {
+      $match: {
+        userId: new mongoose.Types.ObjectId(userId),
+        ...(accountId
+          ? { account: new mongoose.Types.ObjectId(accountId) }
+          : {}),
+      },
+    },
+    {
+      $group: {
+        _id: {
+          symbol: "$asset.symbol",
+          userId: "$userId",
+        },
+        symbol: { $first: "$asset.symbol" },
+        entries: { $push: "$$ROOT" },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        asset: {
+          symbol: "$_id.symbol",
+        },
+        entries: 1,
+      },
+    },
+  ]);
+  const investmentsWithHistory = await updateAssetPriceHistory(investments);
+
+  const investmentTotalsByDate: Record<string, number> = {};
+
+  //we need to sort the entries
+  investmentsWithHistory.forEach((inv) => {
+    const { history } = inv.asset;
+    const { entries } = inv;
+    const entriesKeyedByDate = entries.reduce(
+      (
+        acc: Record<string, number>,
+        entry: { date: string; quantity: number }
+      ) => {
+        if (entry.date <= startDate) {
+          acc[startDate] = (acc[startDate] || 0) + entry.quantity;
+        } else {
+          acc[entry.date] = (acc[entry.date] || 0) + entry.quantity;
+        }
+
+        return acc;
+      },
+      {}
+    );
+
+    const historyKeyedByDate = history.reduce((acc: any, entry: any) => {
+      acc[entry.date] = entry;
+      return acc;
+    }, {});
+
+    let cumulativeQty = 0;
+    let currDate = startDate;
+    let lastQuantity = 0;
+    let lastPrice = 0;
+
+    while (currDate <= endDate) {
+      const entry = entriesKeyedByDate[currDate];
+      if (entry) {
+        cumulativeQty += entry;
+        lastQuantity = cumulativeQty;
+      }
+      lastPrice = historyKeyedByDate[currDate]?.price || lastPrice;
+      investmentTotalsByDate[currDate] =
+        (investmentTotalsByDate[currDate] || 0) + cumulativeQty * lastPrice;
+      currDate = addOneDay(currDate);
+    }
+  });
+
+  return investmentTotalsByDate;
+};
+
 export const updateAssetPriceHistory = async (investments: Investment[]) => {
   const now = Date.now();
   const investmentsWithHistory = [];
@@ -403,6 +388,32 @@ export const updateAssetPriceHistory = async (investments: Investment[]) => {
         (a: any, b: any) =>
           new Date(a.date).getTime() - new Date(b.date).getTime()
       );
+
+      const res = [];
+      let index = 0;
+      let curr = history[0].date;
+      let end = history[history.length - 1].date;
+      let lastPrice = 0;
+
+      while (curr < end) {
+        const currentItem = history[index];
+        while (currentItem.date !== curr) {
+          res.push({
+            date: curr,
+            price: lastPrice,
+          });
+          curr = addOneDay(curr);
+        }
+        res.push({
+          date: curr,
+          price: currentItem.price,
+        });
+        lastPrice = currentItem.price;
+        curr = addOneDay(curr);
+        index++;
+      }
+
+      history = res;
 
       await AssetPriceHistoryModel.findOneAndUpdate(
         { symbol },

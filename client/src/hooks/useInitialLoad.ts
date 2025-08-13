@@ -14,7 +14,7 @@ const useInitialLoad = () => {
     const fetchData = async () => {
       await fetchBudget();
       await fetchPresetTransactions();
-      await fetchAccounts();
+      // await fetchAccounts();
     };
 
     fetchData();
