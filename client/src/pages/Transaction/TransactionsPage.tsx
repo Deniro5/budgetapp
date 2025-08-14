@@ -19,8 +19,13 @@ import DateMenu from "../../components/DateMenu/index.tsx";
 import { AddPresetTransactionModal } from "./PresetTransactions/modals/AddPresetTransactionModal/AddPresetTransactionModal.tsx";
 
 import usePresetTransactions from "./PresetTransactions/hooks/usePresetTransactions.ts";
+import useRecurringTransactions from "./RecurringTransactions/hooks/useRecurringTransactions.ts";
 
-import { isPresetTransaction, isTransaction } from "./shared/utils/index.ts";
+import {
+  isPresetTransaction,
+  isRecurringTransaction,
+  isTransaction,
+} from "./shared/utils/index.ts";
 import useTransactions from "./Transactions/hooks/useTransactions.ts";
 import {
   AddTransactionModal,
@@ -40,6 +45,12 @@ import {
   CopyPresetTransactionModal,
   DeletePresetTransactionModal,
 } from "./PresetTransactions/modals";
+import {
+  AddRecurringTransactionModal,
+  CopyRecurringTransactionModal,
+  DeleteRecurringTransactionModal,
+  EditRecurringTransactionModal,
+} from "./RecurringTransactions/modals";
 import useTransactionStore from "store/transaction/transactionStore.ts";
 
 export enum TransactionOverlayType {
@@ -56,9 +67,13 @@ export enum TransactionOverlayType {
   COPY_PRESET = "copyPreset",
   DELETE_PRESET = "deletePreset",
   EDIT_PRESET = "editPreset",
+  ADD_RECURRING = "addRecurring",
+  COPY_RECURRING = "copyRecurring",
+  DELETE_RECURRING = "deleteRecurring",
+  EDIT_RECURRING = "editRecurring",
 }
 
-export type View = "Transactions" | "Preset";
+export type View = "Transactions" | "Preset" | "Recurring";
 
 export default function TransactionsPage() {
   const [search, setSearch] = useState("");
@@ -104,6 +119,19 @@ export default function TransactionsPage() {
     endDate,
   });
 
+  const {
+    recurringTransactions,
+    recurringTransactionCount,
+    loadMore: loadMoreRecurring,
+    isLoading: isLoadingRecurring,
+    error: errorRecurring,
+  } = useRecurringTransactions({
+    search,
+    filter,
+    startDate,
+    endDate,
+  });
+
   const handleCloseOverlay = () => {
     setActiveOverlay(null);
     setActiveTransaction(null);
@@ -111,22 +139,70 @@ export default function TransactionsPage() {
 
   const hasFilters = Object.values(filter).some((val) => !!val);
 
-  const currentTransactions =
-    view === "Transactions" ? transactions : presetTransactions;
-  const currentLoading = view === "Transactions" ? isLoading : isLoadingPreset;
-  const currentError = view === "Transactions" ? error : errorPreset;
-  const currentCount =
-    view === "Transactions" ? transactionCount : presetTransactionCount;
+  const getCurrentTransactions = () => {
+    if (view === "Transactions") {
+      return transactions;
+    } else if (view === "Preset") {
+      return presetTransactions;
+    } else {
+      return recurringTransactions;
+    }
+  };
+
+  const getCurrentLoading = () => {
+    if (view === "Transactions") {
+      return isLoading;
+    } else if (view === "Preset") {
+      return isLoadingPreset;
+    } else {
+      return isLoadingRecurring;
+    }
+  };
+
+  const getCurrentError = () => {
+    if (view === "Transactions") {
+      return error;
+    } else if (view === "Preset") {
+      return errorPreset;
+    } else {
+      return errorRecurring;
+    }
+  };
+
+  const getCurrentCount = () => {
+    if (view === "Transactions") {
+      return transactionCount;
+    } else if (view === "Preset") {
+      return presetTransactionCount;
+    } else {
+      return recurringTransactionCount;
+    }
+  };
+
+  const currentTransactions = getCurrentTransactions();
+  const currentLoading = getCurrentLoading();
+  const currentError = getCurrentError();
+  const currentCount = getCurrentCount();
 
   const handleLoadMore = () => {
     if (currentError) return;
 
     if (view === "Transactions") {
       loadMore();
-    } else {
+    } else if (view === "Preset") {
       loadMorePreset();
+    } else {
+      loadMoreRecurring();
     }
   };
+
+  const getTransactionLabel = () => {
+    if (view === "Preset") return "Preset Transaction";
+    if (view === "Recurring") return "Recurring Transaction";
+    return "Transaction";
+  };
+
+  const transactionLabel = getTransactionLabel();
 
   return (
     <PageContainer>
@@ -169,10 +245,11 @@ export default function TransactionsPage() {
               setActiveOverlay={setActiveOverlay}
               setContextMenuPosition={setContextMenuPosition}
               view={view}
+              transactionLabel={transactionLabel}
             />
             <TransactionCount>
               Showing {currentTransactions.length} of {currentCount}{" "}
-              {view === "Transactions" ? "transactions" : "preset transactions"}
+              {transactionLabel}s
             </TransactionCount>
           </TableFlexContainer>
           <TransactionSidebar
@@ -216,6 +293,7 @@ export default function TransactionsPage() {
             setActiveOverlay={setActiveOverlay}
             top={contextMenuPosition.top}
             left={contextMenuPosition.left}
+            view={view}
           />
         )}
       {activeOverlay === TransactionOverlayType.ADD_TRANSFER && (
@@ -261,10 +339,33 @@ export default function TransactionsPage() {
             onClose={handleCloseOverlay}
           />
         )}
-
       {activeOverlay === TransactionOverlayType.DELETE_PRESET &&
         isPresetTransaction(activeTransaction) && (
           <DeletePresetTransactionModal
+            transaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.ADD_RECURRING && (
+        <AddRecurringTransactionModal onClose={handleCloseOverlay} />
+      )}
+      {activeOverlay === TransactionOverlayType.COPY_RECURRING &&
+        isRecurringTransaction(activeTransaction) && (
+          <CopyRecurringTransactionModal
+            initialTransaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.EDIT_RECURRING &&
+        isRecurringTransaction(activeTransaction) && (
+          <EditRecurringTransactionModal
+            initialTransaction={activeTransaction}
+            onClose={handleCloseOverlay}
+          />
+        )}
+      {activeOverlay === TransactionOverlayType.DELETE_RECURRING &&
+        isRecurringTransaction(activeTransaction) && (
+          <DeleteRecurringTransactionModal
             transaction={activeTransaction}
             onClose={handleCloseOverlay}
           />

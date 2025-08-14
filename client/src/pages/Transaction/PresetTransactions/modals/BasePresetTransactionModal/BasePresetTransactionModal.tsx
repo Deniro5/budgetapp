@@ -185,16 +185,7 @@ export function BasePresetTransactionModal({
 
         <Divider />
         <SubTitle> Additional Fields </SubTitle>
-        <Row>
-          <InputContainer>
-            <InputLabel>Frequency</InputLabel>
-            <BaseSelect>
-              <option value="">Select frequency</option>
-              <option value="one-time">One-Time</option>
-              <option value="recurring">Recurring</option>
-            </BaseSelect>
-          </InputContainer>
-        </Row>
+
         <Row>
           <TagInputContainer>
             <InputLabel>Tags</InputLabel>

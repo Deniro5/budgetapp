@@ -9,8 +9,8 @@ import {
   TransactionCategory,
   TransactionType,
 } from "types/Transaction";
-import { formatToCurrency } from "utils";
-import { isPresetTransaction } from "../../utils";
+import { capitalize, formatToCurrency } from "utils";
+import { isPresetTransaction, isRecurringTransaction } from "../../utils";
 import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
 
 type TransactionTableRowProps = {
@@ -96,6 +96,9 @@ export function TransactionTableRow({
         )}
       </CategoryTd>
       <td> {transaction.account?.name || emptyString} </td>
+      {isRecurringTransaction(transaction) && (
+        <td> {capitalize(transaction.interval)} </td>
+      )}
     </Container>
   );
 }

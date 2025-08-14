@@ -106,7 +106,6 @@ export function ViewAccountModal({ account, onClose }: ViewAccountModalProps) {
           {formatTimestampToYYYYMMDD(account.createdAt)}
         </InputContainer>
       </Row>
-      <Divider />
       <Row>
         <InputContainer>
           <InputLabel>Investments</InputLabel>

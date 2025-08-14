@@ -63,7 +63,7 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
           labelFormatter={(label: TransactionCategory) => label}
         />
         <Legend />
-        <Bar dataKey="totalAmount" fill="#4285F4" name="Spent">
+        <Bar dataKey="totalAmount" fill={COLORS.darkGreen} name="Spent">
           <LabelList
             dx={-4}
             fontSize={12}
@@ -71,7 +71,7 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
             position="top"
           />
         </Bar>
-        <Bar dataKey="budget" fill="#EA4335" name="Budget Limit">
+        <Bar dataKey="budget" fill="#ff7979" name="Budget Limit">
           <LabelList fontSize={12} dataKey="rawBudget" position="top" dx={4} />
         </Bar>
       </BarChart>

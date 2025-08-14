@@ -11,90 +11,63 @@ import {
 } from "styles";
 import { useForm } from "react-hook-form";
 import TagInput from "components/Global/TagInput";
-
 import {
-  RawTransaction,
-  Transaction,
   TransactionCategory,
   TransactionType,
-  PresetTransaction,
+  RecurringTransaction,
+  RawRecurringTransaction,
+  RecurringTransactionInterval,
 } from "types/Transaction";
-import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
-import { useEffect, useState } from "react";
-import PresetTransactionMenuItem from "./PresetTransactionMenuItem";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
-import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
-import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
-import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
-import useAccount from "../../../../Accounts/hooks/useAccount";
+import { capitalize } from "utils";
 
-type BaseTransactionModalProps = {
+type BaseRecurringTransactionModalProps = {
   title: string;
   confirmText?: string;
   onClose: () => void;
-  onSubmit: (transaction: RawTransaction, callback?: () => void) => void;
-  isPresetModal?: boolean;
-  initialTransaction?: Transaction;
-  ignoreInitialAmount?: boolean;
+  onSubmit: (
+    transaction: RawRecurringTransaction,
+    callback?: () => void
+  ) => void;
+  initialTransaction?: RecurringTransaction;
 };
 
-export function BaseTransactionModal({
+export function BaseRecurringTransactionModal({
   title,
   onClose,
   onSubmit,
-  confirmText = "Add Transaction",
+  confirmText = "Add Recurring Transaction",
+
   initialTransaction,
-  ignoreInitialAmount,
-}: BaseTransactionModalProps) {
-  const [presetSearch, setPresetSearch] = useState("");
-
-  const { presetTransactions } = usePresetTransactionSearch({
-    search: presetSearch,
-  });
-  const userPreferences = getUserPreferences();
-
-  const [currentPreset, setCurrentPreset] = useState<PresetTransaction | null>(
-    null
-  );
-
+}: BaseRecurringTransactionModalProps) {
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     clearErrors,
-    reset,
+
     formState: { errors },
-  } = useForm<RawTransaction>({
+  } = useForm<RawRecurringTransaction>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
     defaultValues: {
+      name: initialTransaction?.name,
       description: initialTransaction?.description,
       vendor: initialTransaction?.vendor,
       amount: initialTransaction?.amount,
       type: initialTransaction?.type,
       date: initialTransaction?.date,
-      account:
-        initialTransaction?.account?._id ||
-        userPreferences?.defaultAccount?._id,
+      account: initialTransaction?.account?._id,
       category: initialTransaction?.category,
       tags: initialTransaction?.tags || [],
+      interval: initialTransaction?.interval,
     },
   });
+
   const currentValues = watch();
-
-  const { account } = useAccount(currentValues.account);
-
-  useEffect(() => {
-    register("category", {
-      required: "Category is required",
-    });
-    register("account", {
-      required: "Account is required",
-    });
-  }, [register]);
 
   const handleTagsChange = (tags: string[]) => {
     setValue("tags", tags);
@@ -108,16 +81,7 @@ export function BaseTransactionModal({
     setValue("account", accountId, { shouldValidate: true });
   };
 
-  const handlePresetSelect = (preset: PresetTransaction) => {
-    setCurrentPreset(preset);
-    reset({ ...currentValues, ...preset, account: preset.account?._id });
-  };
-
-  const presetRenderer = (presetTransaction: PresetTransaction) => (
-    <PresetTransactionMenuItem presetTransaction={presetTransaction} />
-  );
-
-  const onSubmitForm = async (data: RawTransaction) => {
+  const onSubmitForm = async (data: RawRecurringTransaction) => {
     onSubmit(data);
     onClose();
   };
@@ -126,33 +90,13 @@ export function BaseTransactionModal({
     <>
       <Title>{title}</Title>
       <form onSubmit={handleSubmit(onSubmitForm)}>
-        <Row>
-          <InputContainer>
-            <InputLabel>Prefill With Preset</InputLabel>
-            <SearchDropdown
-              width={620}
-              value={presetSearch}
-              setValue={setPresetSearch}
-              items={presetTransactions}
-              placeholder="Search for preset transaction"
-              selected={currentPreset}
-              onSelect={function (item: PresetTransaction): void {
-                handlePresetSelect(item);
-              }}
-              itemRenderer={presetRenderer}
-              itemToString={({ name }) => `${name}`}
-            />
-          </InputContainer>
-        </Row>
-        <Divider />
-
         <SubTitle> Required Fields </SubTitle>
         <Row>
           <InputContainer>
             <InputLabel>Vendor</InputLabel>
             <BaseInput
               {...register("vendor", {
-                required: "Vendor is required",
+                required: false,
                 pattern: {
                   value: /^[a-zA-Z0-9 ]*$/,
                   message: "Alphanumeric values only",
@@ -169,8 +113,8 @@ export function BaseTransactionModal({
             <InputLabel>Amount</InputLabel>
             <BaseInput
               {...register("amount", {
-                required: "Amount is required",
-                validate: (value) => !isNaN(value) || "Invalid number",
+                required: false,
+                validate: (value) => !isNaN(value || 0) || "Invalid number",
                 onChange: () => clearErrors("amount"),
               })}
               placeholder="Enter amount"
@@ -194,10 +138,10 @@ export function BaseTransactionModal({
 
         <Row>
           <InputContainer>
-            <InputLabel>Date</InputLabel>
+            <InputLabel>Initial Date</InputLabel>
             <BaseInput
               {...register("date", {
-                required: "Date is required",
+                required: false,
                 onChange: () => clearErrors("date"),
               })}
               type="date"
@@ -207,7 +151,7 @@ export function BaseTransactionModal({
           <InputContainer>
             <InputLabel>Account</InputLabel>
             <AccountDropdown
-              selectedAccountId={currentValues.account}
+              selectedAccountId={currentValues.account ?? null}
               handleAccountChange={handleAccountChange}
             />
             {errors.account && (
@@ -217,12 +161,29 @@ export function BaseTransactionModal({
           <InputContainer>
             <InputLabel>Category</InputLabel>
             <CategoryDropdown
-              selectedCategory={currentValues.category}
+              selectedCategory={currentValues.category ?? null}
               handleCategoryChange={handleCategoryChange}
             />
             {errors.category && (
               <ErrorMessage>{errors.category.message}</ErrorMessage>
             )}
+          </InputContainer>
+        </Row>
+        <Row>
+          <InputContainer>
+            <InputLabel>Frequency</InputLabel>
+            <BaseSelect
+              {...register("interval", {
+                required: "Interval is required",
+                onChange: () => clearErrors("interval"),
+              })}
+            >
+              {Object.values(RecurringTransactionInterval).map((value) => (
+                <option key={value} value={value}>
+                  {capitalize(value)}
+                </option>
+              ))}
+            </BaseSelect>
           </InputContainer>
         </Row>
 
@@ -256,15 +217,6 @@ export function BaseTransactionModal({
             )}
           </InputContainer>
         </Row>
-
-        <BalanceSummaryFooter
-          initialAccountId={initialTransaction?.account?._id}
-          account={account}
-          amount={currentValues.amount}
-          initialAmount={ignoreInitialAmount ? 0 : initialTransaction?.amount}
-          type={currentValues.type}
-          initialType={initialTransaction?.type}
-        />
 
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>

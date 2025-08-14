@@ -111,3 +111,37 @@ export type RawPresetTransaction = Omit<
 > & {
   account?: string;
 };
+
+export enum RecurringTransactionInterval {
+  DAILY = "daily",
+  WEEKLY = "weekly",
+  BI_WEEKLY = "bi-weekly",
+  MONTHLY = "monthly",
+}
+export type RecurringTransaction = {
+  _id: string;
+  name: string;
+  account: {
+    _id: string;
+    name: string;
+  };
+  type: TransactionType;
+  userId: string;
+  amount: number;
+  date: string;
+  category: TransactionCategory;
+  description?: string;
+  vendor?: string;
+  tags?: string[];
+  updatedAt: Date;
+  createdAt: Date;
+  nextRunDate: string;
+  interval: RecurringTransactionInterval;
+};
+
+export type RawRecurringTransaction = Omit<
+  RecurringTransaction,
+  "_id" | "userId" | "account"
+> & {
+  account?: string;
+};

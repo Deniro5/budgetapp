@@ -23,9 +23,27 @@ type TransactionTableProps = {
     React.SetStateAction<{ top: number; left: number }>
   >;
   view: View;
+  transactionLabel?: string;
 };
 
-const tableColumns = ["Vendor", "Date", "Amount", "Category", "Account"];
+const transactionColumns = ["Vendor", "Date", "Amount", "Category", "Account"];
+const presetTransactionColumns = [
+  "Name",
+  "Vendor",
+  "Date",
+  "Amount",
+  "Category",
+  "Account",
+];
+
+const recurringTransactionColumns = [
+  "Vendor",
+  "Next Date",
+  "Amount",
+  "Category",
+  "Account",
+  "Frequency",
+];
 
 export function TransactionTable({
   transactions,
@@ -36,6 +54,7 @@ export function TransactionTable({
   setActiveOverlay,
   setContextMenuPosition,
   view,
+  transactionLabel = "Transaction",
 }: TransactionTableProps) {
   const handleRightClick = (
     e: React.MouseEvent<HTMLTableRowElement>,
@@ -46,13 +65,17 @@ export function TransactionTable({
     setContextMenuPosition({ top: e.clientY, left: e.clientX });
   };
 
-  const isPreset = view === "Preset";
-  const transactionLabel = isPreset ? "preset transaction" : "transaction";
   const handleDoubleClick = (
     transaction: Transaction | PresetTransaction | null
   ) => {
     setActiveTransaction(transaction);
     setActiveOverlay(TransactionOverlayType.EDIT);
+  };
+
+  const getTableColumns = () => {
+    if (view === "Preset") return presetTransactionColumns;
+    if (view === "Recurring") return recurringTransactionColumns;
+    return transactionColumns;
   };
 
   if (loading) {
@@ -63,11 +86,9 @@ export function TransactionTable({
       <ScrollableTable>
         <TableHead>
           <tr>
-            {[...(isPreset ? ["Name"] : []), ...tableColumns].map(
-              (column, index) => (
-                <th key={index}>{column}</th>
-              )
-            )}
+            {getTableColumns().map((column, index) => (
+              <th key={index}>{column}</th>
+            ))}
           </tr>
         </TableHead>
         <ScrollBody>
@@ -87,8 +108,7 @@ export function TransactionTable({
       {transactions.length === 0 && (
         <NoResult>
           No {transactionLabel}s to show. Create a {transactionLabel} by
-          clicking the "Add
-          {transactionLabel}" button at the top of the page.
+          clicking the "Add {transactionLabel}" button at the top of the page.
         </NoResult>
       )}
     </TableWrapper>
