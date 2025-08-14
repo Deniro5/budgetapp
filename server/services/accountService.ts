@@ -1,3 +1,4 @@
+import { all } from "axios";
 import AccountModel from "../models/account.model";
 import TransactionModel from "../models/transaction.model";
 import {
@@ -223,6 +224,7 @@ export const getAccountBalancesById = async ({
 
     allTransactionsAfterStartDate.push(...transactionsFromStartToEnd);
   }
+
   //use reduce to get a map from date to transaction total on that date
   const transactionBalancesByDate = allTransactionsAfterStartDate.reduce(
     (acc, curr) => {
@@ -258,9 +260,10 @@ export const getAccountBalancesById = async ({
   }[] = [];
 
   while (currentDate <= endDate) {
+    console.log(transactionBalancesByDate[currentDate]);
     transactionTotal +=
-      transactionBalancesByDate[currentDate] ||
-      0 - (investmentTransactionHistoryByAccount[currentDate] || 0);
+      (transactionBalancesByDate[currentDate] || 0) -
+      (investmentTransactionHistoryByAccount[currentDate] || 0);
     result.push({
       date: currentDate,
       balance: transactionTotal,

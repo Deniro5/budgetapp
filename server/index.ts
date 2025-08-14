@@ -8,10 +8,12 @@ import userRoutes from "./routes/user.routes";
 import transactionRoutes from "./routes/transaction.routes";
 import presetTransactionRoutes from "./routes/presettransaction.routes";
 import accountRoutes from "./routes/account.routes";
+import recurringTransactionRoutes from "./routes/recurringtransaction.routes";
 import budgetRoutes from "./routes/budget.routes";
 import transferRoutes from "./routes/transfer.routes";
 import investmentRoutes from "./routes/investment.routes";
 import TransactionModel from "./models/transaction.model";
+import { processRecurringTransactions } from "./services/recurringTransactionService";
 
 const app = express();
 
@@ -33,6 +35,7 @@ app.use("/auth", authRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/transfers", transferRoutes);
 app.use("/preset-transactions", presetTransactionRoutes);
+app.use("/recurring-transactions", recurringTransactionRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/budget", budgetRoutes);
 app.use("/investments", investmentRoutes);
@@ -43,8 +46,13 @@ mongoose.connect(
 
 const PORT = process.env.PORT || 8000;
 
+const onStartServer = () => {
+  processRecurringTransactions();
+};
+
 app.listen(PORT, () => {
   console.log("server is running on port " + PORT);
+  onStartServer();
 });
 
 app.get("/", (req: Request, res: Response) => {

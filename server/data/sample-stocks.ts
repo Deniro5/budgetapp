@@ -328,9 +328,15 @@ export const SampleStocks = [
     exchange: "TSX",
   },
   { symbol: "ENB.TO", name: "Enbridge Inc.", exchange: "TSX" },
+  { symbol: "ENB.TO", name: "Enbridge Inc.", exchange: "TSX" },
   { symbol: "PPL.TO", name: "Pembina Pipeline Corp.", exchange: "TSX" },
   { symbol: "BNS.TO", name: "Bank of Nova Scotia", exchange: "TSX" },
   { symbol: "TRP.TO", name: "TC Energy Corporation", exchange: "TSX" },
   { symbol: "MFC.TO", name: "Manulife Financial Corporation", exchange: "TSX" },
   { symbol: "GIL.TO", name: "Gildan Activewear Inc.", exchange: "TSX" },
+  {
+    symbol: "FBTC.TO",
+    name: "Fidelity Advantage Bitcoin ETF",
+    exchange: "TSX",
+  },
 ];
