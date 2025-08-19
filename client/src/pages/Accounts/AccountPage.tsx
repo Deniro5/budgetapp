@@ -1,10 +1,8 @@
-import { Flex, PageContainer } from "../../styles.ts";
+import { Flex, PageContainer, ScrollablePageContainer } from "styles";
 import styled from "styled-components";
 import { SPACING } from "theme";
 import { useState } from "react";
-
-import { Account } from "types/account.ts";
-
+import { Account } from "types/account";
 import { AccountCard, AccountHeader } from "./components";
 import useAccounts from "./hooks/useAccounts.ts";
 import {
@@ -14,15 +12,9 @@ import {
 } from "./modals";
 import { ViewAccountModal } from "./modals/ViewAccountModal/ViewAccountModal.tsx";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader.tsx";
+import { AccountOverlayType } from "./account.types.ts";
 
-export enum AccountOverlayType {
-  ADD = "add",
-  EDIT = "edit",
-  DELETE = "delete",
-  VIEW = "view",
-}
-
-function Accounts() {
+export default function Accounts() {
   const { activeAccounts, isLoading, error } = useAccounts();
   const [activeAccount, setActiveAccount] = useState<Account | null>(null);
   const [activeOverlay, setActiveOverlay] = useState<AccountOverlayType | null>(
@@ -54,7 +46,9 @@ function Accounts() {
     <PageContainer>
       <AccountHeader setActiveOverlay={setActiveOverlay} />
       <PageColumnFlexContainer>
-        <ContentContainer>{getPageContent()}</ContentContainer>
+        <ScrollablePageContainer>
+          <ContentContainer>{getPageContent()}</ContentContainer>
+        </ScrollablePageContainer>
       </PageColumnFlexContainer>
       {activeOverlay === AccountOverlayType.ADD && (
         <AddAccountModal onClose={handleCloseOverlay} />
@@ -92,5 +86,3 @@ const ContentContainer = styled(Flex)`
   align-items: center;
   flex-wrap: wrap;
 `;
-
-export default Accounts;

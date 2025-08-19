@@ -3,16 +3,10 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BaseButton, BaseInput } from "styles";
 import { ChangeEvent, useEffect, useState } from "react";
+import useTransactionStore from "store/transaction/transactionStore";
 
-type TransactionSearchBarProps = {
-  search: string;
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-};
-
-export function TransactionSearchBar({
-  search,
-  setSearch,
-}: TransactionSearchBarProps) {
+export function TransactionSearchBar() {
+  const { search, setSearch } = useTransactionStore();
   const [inputValue, setInputValue] = useState(search);
 
   useEffect(() => {

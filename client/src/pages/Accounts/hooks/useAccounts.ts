@@ -1,10 +1,9 @@
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import { useQueryWithError } from "hooks/useQueryWithError";
 import axios from "axios";
-import { BASE_API_URL } from "../../../constants";
+import { BASE_API_URL } from "appConstants";
 import { Account } from "types/account";
 import { useMemo } from "react";
 
-// Hook
 export default function useAccounts() {
   const { data, isLoading, error } = useQueryWithError<Account[], Error>(
     ["accounts"],

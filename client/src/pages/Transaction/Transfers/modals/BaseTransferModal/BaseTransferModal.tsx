@@ -17,7 +17,7 @@ import { useEffect } from "react";
 
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
-import useAccount from "../../../../Accounts/hooks/useAccount";
+import useAccount from "pages/Accounts/hooks/useAccount";
 
 type BaseTransferModalProps = {
   title?: string;

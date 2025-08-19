@@ -1,16 +1,16 @@
-import { Flex, PageContainer } from "../../styles.ts";
+import { Flex, PageContainer, ScrollablePageContainer } from "styles";
 import { useState } from "react";
-import { InvestmentsHeader } from "./InvestmentsHeader/InvestmentsHeader.tsx";
-import AddInvestmentModal from "./AddInvestmentModal/AddInvestmentModal.tsx";
-import { RawInvestment } from "types/investment.ts";
-import { useCreateInvestment } from "./hooks/useCreateInvestment.ts";
-import { useFetchInvestments } from "./hooks/useFetchInvestments.ts";
-import { InvestmentCard } from "./InvestmentCard/InvestmentCard.tsx";
+import { InvestmentsHeader } from "./InvestmentsHeader/InvestmentsHeader";
+import AddInvestmentModal from "./AddInvestmentModal/AddInvestmentModal";
+import { RawInvestment } from "types/investment";
+import { useCreateInvestment } from "./hooks/useCreateInvestment";
+import { useFetchInvestments } from "./hooks/useFetchInvestments";
+import { InvestmentCard } from "./InvestmentCard/InvestmentCard";
 import styled from "styled-components";
 import { SPACING } from "theme";
-import SellInvestmentModal from "./SellInvestmentModal/SellInvestmentModal.tsx";
-import { InvestmentHistoryModal } from "./InvestmentHistoryModal/InvestmentHistoryModal.tsx";
-import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader.tsx";
+import SellInvestmentModal from "./SellInvestmentModal/SellInvestmentModal";
+import { InvestmentHistoryModal } from "./InvestmentHistoryModal/InvestmentHistoryModal";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 export enum InvestmentsOverlayType {
   ADD = "add",
@@ -18,7 +18,7 @@ export enum InvestmentsOverlayType {
   HISTORY = "history",
 }
 
-export const InvestmentsPage = () => {
+export default function InvestmentsPage() {
   const { mutate } = useCreateInvestment();
   const { results, getInvestmentsByAccount, isLoading, error } =
     useFetchInvestments();
@@ -58,7 +58,7 @@ export const InvestmentsPage = () => {
   return (
     <PageContainer>
       <InvestmentsHeader setActiveOverlay={setActiveOverlay} />
-      {getPageContent()}
+      <ScrollablePageContainer>{getPageContent()}</ScrollablePageContainer>
       {activeOverlay === InvestmentsOverlayType.ADD && (
         <AddInvestmentModal
           onClose={handleCloseOverlay}
@@ -83,11 +83,12 @@ export const InvestmentsPage = () => {
       )}
     </PageContainer>
   );
-};
+}
 
 const InvestmentCardContainer = styled(Flex)`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: ${SPACING.spacing6x};
-  justify-content: center; /* Horizontally center the grid */
+  justify-content: center;
+  align-items: stretch;
 `;

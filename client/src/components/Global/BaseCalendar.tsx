@@ -1,7 +1,7 @@
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import styled from "styled-components";
-import { COLORS, FONTSIZE, SPACING } from "../../Theme";
+import { COLORS, FONTSIZE, SPACING } from "theme";
 import {
   BaseButton,
   InputContainer,
@@ -9,13 +9,13 @@ import {
   Row,
   SecondaryButton,
   BaseInput,
-} from "../../styles";
+} from "styles";
 import { useState } from "react";
 import {
   dateToFormattedString,
   formatDateToYYYYMMDD,
   parseDate,
-} from "../../utils/DateUtils";
+} from "utils/DateUtils";
 
 type BaseCalendarProps = {
   isOpen: boolean;

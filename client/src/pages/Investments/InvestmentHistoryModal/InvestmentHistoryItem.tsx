@@ -1,14 +1,19 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
+import { Flex, IconButton } from "styles";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Investment } from "types/investment";
 import { formatToCurrency } from "utils";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 type InvestmentHistoryItemProps = {
   investment: Investment;
+  onClickDelete: (id: string) => void;
 };
 
 export const InvestmentHistoryItem = ({
   investment,
+  onClickDelete,
 }: InvestmentHistoryItemProps) => {
   const { quantity, price, date, asset, account } = investment;
   const isPurchase = quantity > 0;
@@ -22,12 +27,16 @@ export const InvestmentHistoryItem = ({
           {actionText} {multiplier * quantity} {asset.symbol}
         </MainText>
         <DateText>
-          {" "}
-          Date: {date} | Account: {account} | Price: {formatToCurrency(price)}
+          Date: {date} | Account: {account.name} | Price:{" "}
+          {formatToCurrency(price)}
         </DateText>
       </SubContainer>
-
-      <MainText>{formatToCurrency(Math.abs(price * quantity))}</MainText>
+      <Flex>
+        <MainText>{formatToCurrency(Math.abs(price * quantity))}</MainText>
+        <IconButton onClick={() => onClickDelete(investment._id)}>
+          <FontAwesomeIcon icon={faTrash} />
+        </IconButton>
+      </Flex>
     </Container>
   );
 };

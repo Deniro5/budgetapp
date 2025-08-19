@@ -28,7 +28,7 @@ import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
 import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
-import useAccount from "../../../../Accounts/hooks/useAccount";
+import useAccount from "pages/Accounts/hooks/useAccount";
 
 type BaseTransactionModalProps = {
   title: string;

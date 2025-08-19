@@ -1,8 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useMutationWithSuccessAndError } from "../../../hooks/useMutationWithSuccessAndError";
-import { BASE_API_URL } from "../../../constants";
+import { useMutationWithSuccessAndError } from "hooks/useMutationWithSuccessAndError";
+import { BASE_API_URL } from "appConstants";
 import axios from "axios";
-import { BudgetType } from "../../../types/budget";
+import { BudgetType } from "types/budget";
 
 export const useUpdateBudget = () => {
   const queryClient = useQueryClient();

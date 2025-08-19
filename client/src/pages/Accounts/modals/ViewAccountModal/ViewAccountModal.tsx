@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import { BaseButton, Divider, InputContainer, InputLabel, Row } from "styles";
+import { BaseButton, InputContainer, InputLabel, Row } from "styles";
 import { Account, AccountInvestmentSummaryItem } from "types/account";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import Modal from "components/Global/Modal";
-import { formatTimestampToYYYYMMDD } from "../../../../utils/DateUtils";
+import { formatTimestampToYYYYMMDD } from "utils/DateUtils";
 import { formatToCurrency } from "utils";
 
 type ViewAccountModalProps = {

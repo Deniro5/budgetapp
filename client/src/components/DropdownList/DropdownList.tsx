@@ -1,7 +1,7 @@
 // Import dependencies
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { COLORS, FONTSIZE, SPACING } from "../../Theme";
+import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Popover } from "react-tiny-popover";
 import PopoverContent from "../Global/PopoverContent";
 import DropdownListItem from "./DropdownListItem";

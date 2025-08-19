@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { COLORS, SPACING } from "../../Theme";
+import { COLORS, SPACING } from "theme";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,7 +14,7 @@ import {
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
-import { getFirstPath } from "../../utils";
+import { getFirstPath } from "utils";
 
 type SidebarItem = {
   href: string;
@@ -82,6 +82,7 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
         <MenuItem
           isActive={sidebarItem.isActive}
           onClick={() => navigate(sidebarItem.href)}
+          key={sidebarItem.href}
         >
           <IconContainer>
             <FontAwesomeIcon color={COLORS.lightFont} icon={sidebarItem.icon} />

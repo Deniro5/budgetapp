@@ -1,6 +1,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { useContext } from "react";
-import { ToastContext } from "../Context/Toast";
+import { ToastContext } from "../context/Toast";
 
 export function useMutationWithSuccessAndError<TData, TError, TVariables>({
   options,

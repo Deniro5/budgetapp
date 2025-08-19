@@ -34,8 +34,8 @@ export function BaseAccountModal({
     clearErrors,
     formState: { errors },
   } = useForm<Account>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: initialAccount || {
       name: "",
       baselineAmount: 0,

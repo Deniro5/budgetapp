@@ -14,8 +14,12 @@ export type Investment = {
   quantity: number;
   price: number;
   date: string;
-  account: string;
+  account: {
+    _id: string;
+    name: string;
+  };
   entries: Entry[];
+  _id: string;
 };
 
 export type RawInvestment = {

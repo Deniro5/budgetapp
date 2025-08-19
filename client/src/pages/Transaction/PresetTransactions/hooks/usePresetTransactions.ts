@@ -1,8 +1,8 @@
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 import { PresetTransaction, TransactionFilter } from "types/Transaction";
-import { BASE_API_URL } from "../../../../constants";
-import { useInfiniteQueryWithError } from "../../../../hooks/useInfiniteQueryWithError";
+import { BASE_API_URL } from "appConstants";
+import { useInfiniteQueryWithError } from "hooks/useInfiniteQueryWithError";
 
 type FetchPresetTransactionsArgs = {
   search: string;

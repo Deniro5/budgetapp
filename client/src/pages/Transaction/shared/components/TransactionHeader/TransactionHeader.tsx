@@ -3,15 +3,8 @@ import { BaseButton, Flex, PageTitle, SecondaryButton } from "styles";
 import { COLORS, SPACING } from "theme";
 import { faAdd, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { TransactionOverlayType, View } from "../../../TransactionsPage";
-
-type TransactionHeaderProps = {
-  setActiveOverlay: React.Dispatch<
-    React.SetStateAction<TransactionOverlayType | null>
-  >;
-  view: View;
-  setView: React.Dispatch<React.SetStateAction<View>>;
-};
+import { TransactionOverlayType, View } from "../../../transactions.types";
+import useTransactionStore from "store/transaction/transactionStore";
 
 const tabs = [
   { display: "Transactions", value: "Transactions" },
@@ -19,11 +12,8 @@ const tabs = [
   { display: "Recurring Transactions", value: "Recurring" },
 ] as const;
 
-export function TransactionHeader({
-  setActiveOverlay,
-  view,
-  setView,
-}: TransactionHeaderProps) {
+export function TransactionHeader() {
+  const { view, setView, setActiveOverlay } = useTransactionStore();
   const handleAddClick = () => {
     setActiveOverlay(TransactionOverlayType.ADD);
   };

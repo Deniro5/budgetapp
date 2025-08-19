@@ -2,7 +2,7 @@ import "@testing-library/jest-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Sidebar from "..";
 import { MemoryRouter } from "react-router-dom";
-import { COLORS } from "../../../Theme";
+import { COLORS } from "theme";
 
 const Providers = (props: { children: React.ReactNode }) => {
   const { children } = props;

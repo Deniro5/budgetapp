@@ -2,27 +2,16 @@ import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { TransactionTableRow } from "./TransactionTableRow";
 import { PresetTransaction, Transaction } from "types/Transaction";
-import { TransactionOverlayType, View } from "../../../TransactionsPage";
+import { TransactionOverlayType, View } from "../../../transactions.types";
 import { Waypoint } from "react-waypoint";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type TransactionTableProps = {
   transactions: Transaction[] | PresetTransaction[];
   error: string | Error | null;
   loading: boolean;
-  sidebarTransactionId: string | null;
   loadMore?: () => void;
-  setSidebarTransactionId: React.Dispatch<React.SetStateAction<string | null>>;
-  setActiveTransaction: React.Dispatch<
-    React.SetStateAction<Transaction | PresetTransaction | null>
-  >;
-  setActiveOverlay: React.Dispatch<
-    React.SetStateAction<TransactionOverlayType | null>
-  >;
-  setContextMenuPosition: React.Dispatch<
-    React.SetStateAction<{ top: number; left: number }>
-  >;
-  view: View;
   transactionLabel?: string;
 };
 
@@ -49,13 +38,44 @@ export function TransactionTable({
   transactions,
   loadMore,
   loading,
-  sidebarTransactionId,
-  setActiveTransaction,
-  setActiveOverlay,
-  setContextMenuPosition,
-  view,
   transactionLabel = "Transaction",
 }: TransactionTableProps) {
+  const {
+    setActiveOverlay,
+    setContextMenuPosition,
+    setActiveTransaction,
+    sidebarTransactionId,
+    setSelectedTransactions,
+    selectedTransactions,
+    view,
+  } = useTransactionStore();
+
+  const isTransactionSelected = (id: string) =>
+    selectedTransactions.some((t) => t._id === id);
+
+  const handleClick = (
+    e: React.MouseEvent,
+    transaction: Transaction | PresetTransaction | null
+  ) => {
+    if (!transaction) return;
+
+    if (e.metaKey) {
+      if (isTransactionSelected(transaction._id)) {
+        setSelectedTransactions(
+          selectedTransactions.filter((t) => t._id !== transaction._id)
+        );
+      } else {
+        setSelectedTransactions([...selectedTransactions, transaction]);
+      }
+    } else if (e.shiftKey) {
+      console.log("Shift key pressed");
+    } else {
+      setActiveTransaction(transaction);
+      setSelectedTransactions([transaction]);
+    }
+
+    setActiveTransaction(transaction);
+  };
   const handleRightClick = (
     e: React.MouseEvent<HTMLTableRowElement>,
     transaction: Transaction | PresetTransaction | null
@@ -96,8 +116,8 @@ export function TransactionTable({
             <TransactionTableRow
               key={index}
               transaction={transaction}
-              isSelected={transaction._id === sidebarTransactionId}
-              onClick={setActiveTransaction}
+              isSelected={isTransactionSelected(transaction._id)}
+              onClick={handleClick}
               onRightClick={handleRightClick}
               onDoubleClick={handleDoubleClick}
             />

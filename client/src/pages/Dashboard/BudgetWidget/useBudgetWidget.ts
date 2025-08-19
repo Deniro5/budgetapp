@@ -1,10 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { TransactionCategory } from "types/Transaction";
 import axios from "axios";
-import { BASE_API_URL } from "../../../constants";
-import { getAggregatedValue } from "../../../utils/DateUtils";
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
-import { useBudget } from "../../../pages/Budget/hooks/useBudget";
+import { BASE_API_URL } from "appConstants";
+import { getAggregatedValue } from "utils/DateUtils";
+import { useQueryWithError } from "hooks/useQueryWithError";
+import { useBudget } from "pages/Budget/hooks/useBudget";
+import { BudgetCategories } from "types/budget";
 
 type useBudgetWidgetProps = {
   startDate: string;
@@ -23,6 +24,15 @@ type IncomeExpenseData = {
   income: number;
   expense: number;
 }[];
+
+type CategoryWithAggregatedBudget = {
+  category: TransactionCategory;
+  totalAmount: number;
+  budget: number;
+  rawTotalAmount: number;
+  rawBudget: number;
+  isOverBudget: boolean;
+};
 
 const fetchTransactionCategoriesByAmount = async (
   startDate: string,
@@ -65,24 +75,42 @@ export const useBudgetWidget = ({
   const categoryTotals = data?.categoryTotals;
 
   const getAggregatedCategoriesWithBudget = () => {
-    if (!budgetCategories || !categoryTotals) return categoryTotals;
+    if (!budgetCategories || !categoryTotals) return [];
 
-    return categoryTotals.map((categoryTotal) => {
-      const rawTotalAmount = categoryTotal.totalAmount;
-      const rawBudget = getAggregatedValue(
-        startDate,
-        endDate,
-        budgetCategories[categoryTotal.category] || 0
-      );
+    const categoryTotalsKeyedByCategory: Record<string, number> =
+      categoryTotals.reduce((acc: Record<string, number>, cur) => {
+        acc[cur.category] = cur.totalAmount;
+        return acc;
+      }, {});
 
-      return {
-        ...categoryTotal,
-        totalAmount: Math.sqrt(rawTotalAmount),
-        budget: Math.sqrt(rawBudget),
-        rawTotalAmount: rawTotalAmount,
-        rawBudget: rawBudget,
-      };
-    });
+    const budgetKeys = Object.keys(
+      budgetCategories
+    ) as (keyof BudgetCategories)[];
+
+    const categoriesWithAggregatedBudget = budgetKeys.reduce(
+      (acc: CategoryWithAggregatedBudget[], category) => {
+        const budgetLimit = budgetCategories[category] || 0;
+        const rawTotalAmount = categoryTotalsKeyedByCategory[category] || 0;
+
+        if (!budgetLimit && !rawTotalAmount) return acc;
+        const rawBudget = getAggregatedValue(startDate, endDate, budgetLimit);
+
+        acc.push({
+          category,
+          rawBudget,
+          totalAmount: Math.sqrt(rawTotalAmount),
+          budget: Math.sqrt(rawBudget),
+          rawTotalAmount,
+          isOverBudget: rawTotalAmount > rawBudget,
+        });
+        return acc;
+      },
+      []
+    );
+    categoriesWithAggregatedBudget.sort(
+      (a, b) => b.rawTotalAmount - a.rawTotalAmount
+    );
+    return categoriesWithAggregatedBudget;
   };
 
   const getAggregatedTotalBudget = () => {

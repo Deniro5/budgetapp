@@ -4,6 +4,7 @@ import {
   getAllInvestments,
   getCurrentAggregatedInvestments,
   searchStocks,
+  deleteInvestment,
 } from "../controllers/investment.controller";
 import { verifyToken } from "../middleware/verifyToken";
 
@@ -13,5 +14,6 @@ router.get("/search", verifyToken, searchStocks);
 router.get("/", verifyToken, getCurrentAggregatedInvestments);
 router.get("/history", verifyToken, getAllInvestments);
 router.post("/", verifyToken, createInvestment);
+router.delete("/:id", verifyToken, deleteInvestment);
 
 export default router;

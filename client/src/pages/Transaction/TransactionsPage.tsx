@@ -1,10 +1,8 @@
-import { Flex, PageContainer } from "../../styles.ts";
+import { Flex, PageContainer } from "styles";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
 import { useState } from "react";
 
-import { PresetTransaction, Transaction } from "types/Transaction";
-import { TransactionFilter } from "src/types/Transaction.ts";
 import {
   TransactionContextMenu,
   TransactionSearchBar,
@@ -15,18 +13,18 @@ import {
   TransactionTable,
 } from "./shared/components";
 
-import DateMenu from "../../components/DateMenu/index.tsx";
-import { AddPresetTransactionModal } from "./PresetTransactions/modals/AddPresetTransactionModal/AddPresetTransactionModal.tsx";
+import DateMenu from "components/DateMenu";
+import { AddPresetTransactionModal } from "./PresetTransactions/modals/AddPresetTransactionModal/AddPresetTransactionModal";
 
-import usePresetTransactions from "./PresetTransactions/hooks/usePresetTransactions.ts";
-import useRecurringTransactions from "./RecurringTransactions/hooks/useRecurringTransactions.ts";
+import usePresetTransactions from "./PresetTransactions/hooks/usePresetTransactions";
+import useRecurringTransactions from "./RecurringTransactions/hooks/useRecurringTransactions";
 
 import {
   isPresetTransaction,
   isRecurringTransaction,
   isTransaction,
 } from "./shared/utils/index.ts";
-import useTransactions from "./Transactions/hooks/useTransactions.ts";
+import useTransactions from "./Transactions/hooks/useTransactions";
 import {
   AddTransactionModal,
   CopyTransactionModal,
@@ -51,52 +49,23 @@ import {
   DeleteRecurringTransactionModal,
   EditRecurringTransactionModal,
 } from "./RecurringTransactions/modals";
-import useTransactionStore from "store/transaction/transactionStore.ts";
-
-export enum TransactionOverlayType {
-  ADD = "add",
-  EDIT = "edit",
-  DELETE = "delete",
-  CONTEXT = "context",
-  COPY = "copy",
-  ADD_TRANSFER = "addTransfer",
-  COPY_TRANSFER = "copyTransfer",
-  DELETE_TRANSFER = "deleteTransfer",
-  EDIT_TRANSFER = "editTransfer",
-  ADD_PRESET = "addPreset",
-  COPY_PRESET = "copyPreset",
-  DELETE_PRESET = "deletePreset",
-  EDIT_PRESET = "editPreset",
-  ADD_RECURRING = "addRecurring",
-  COPY_RECURRING = "copyRecurring",
-  DELETE_RECURRING = "deleteRecurring",
-  EDIT_RECURRING = "editRecurring",
-}
-
-export type View = "Transactions" | "Preset" | "Recurring";
+import useTransactionStore from "store/transaction/transactionStore";
+import { TransactionOverlayType } from "./transactions.types.ts";
 
 export default function TransactionsPage() {
   const [search, setSearch] = useState("");
-  const { filter, setFilter } = useTransactionStore();
-  const [view, setView] = useState<View>("Transactions");
-  const { startDate, endDate, setStartDate, setEndDate } =
-    useTransactionStore();
-
-  const [sidebarTransactionId, setSidebarTransactionId] = useState<
-    string | null
-  >(null);
-  const [activeTransaction, setActiveTransaction] = useState<
-    Transaction | PresetTransaction | null
-  >(null);
-  const [activeOverlay, setActiveOverlay] =
-    useState<TransactionOverlayType | null>(null);
-  const [contextMenuPosition, setContextMenuPosition] = useState<{
-    top: number;
-    left: number;
-  }>({
-    top: 0,
-    left: 0,
-  });
+  const { filter } = useTransactionStore();
+  const {
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
+    setActiveOverlay,
+    activeOverlay,
+    setActiveTransaction,
+    activeTransaction,
+    view,
+  } = useTransactionStore();
 
   const { transactions, transactionCount, loadMore, isLoading, error } =
     useTransactions({
@@ -206,18 +175,14 @@ export default function TransactionsPage() {
 
   return (
     <PageContainer>
-      <TransactionHeader
-        setActiveOverlay={setActiveOverlay}
-        setView={setView}
-        view={view}
-      />
+      <TransactionHeader />
 
       <PageColumnFlexContainer
         gap={hasFilters ? SPACING.spacing4x : SPACING.spacing9x}
       >
         <FiltersContainer>
-          <TransactionSearchBar setSearch={setSearch} search={search} />
-          <TransactionFilterButton setFilter={setFilter} filter={filter} />
+          <TransactionSearchBar />
+          <TransactionFilterButton />
           {/* Ony show date menu if view is transactions */}
           {view === "Transactions" && (
             <DateMenu
@@ -229,9 +194,7 @@ export default function TransactionsPage() {
           )}
         </FiltersContainer>
 
-        {hasFilters && (
-          <TransactionFilterRow filter={filter} setFilter={setFilter} />
-        )}
+        {hasFilters && <TransactionFilterRow />}
         <ContentContainer>
           <TableFlexContainer hasFilters={hasFilters}>
             <TransactionTable
@@ -239,12 +202,6 @@ export default function TransactionsPage() {
               loading={currentLoading}
               loadMore={handleLoadMore}
               error={currentError}
-              sidebarTransactionId={sidebarTransactionId}
-              setSidebarTransactionId={setSidebarTransactionId}
-              setActiveTransaction={setActiveTransaction}
-              setActiveOverlay={setActiveOverlay}
-              setContextMenuPosition={setContextMenuPosition}
-              view={view}
               transactionLabel={transactionLabel}
             />
             <TransactionCount>
@@ -252,12 +209,7 @@ export default function TransactionsPage() {
               {transactionLabel}s
             </TransactionCount>
           </TableFlexContainer>
-          <TransactionSidebar
-            activeTransaction={activeTransaction}
-            setActiveTransaction={setActiveTransaction}
-            setActiveOverlay={setActiveOverlay}
-            view={view}
-          />
+          <TransactionSidebar />
         </ContentContainer>
       </PageColumnFlexContainer>
       {activeOverlay === TransactionOverlayType.ADD && (
@@ -287,14 +239,7 @@ export default function TransactionsPage() {
         )}
       {activeOverlay === TransactionOverlayType.CONTEXT &&
         activeTransaction && (
-          <TransactionContextMenu
-            activeTransaction={activeTransaction}
-            onClose={handleCloseOverlay}
-            setActiveOverlay={setActiveOverlay}
-            top={contextMenuPosition.top}
-            left={contextMenuPosition.left}
-            view={view}
-          />
+          <TransactionContextMenu onClose={handleCloseOverlay} />
         )}
       {activeOverlay === TransactionOverlayType.ADD_TRANSFER && (
         <AddTransferModal onClose={handleCloseOverlay} />

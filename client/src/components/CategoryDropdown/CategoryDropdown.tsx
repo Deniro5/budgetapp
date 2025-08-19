@@ -1,5 +1,6 @@
 import DropdownList from "components/DropdownList/DropdownList";
 import { getUserTransactionCategories } from "store/user/userSelectors";
+import useUserStore from "store/user/userStore";
 import { TransactionCategory } from "types/Transaction";
 
 interface CategoryDropdownProps {

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import useStore from "../../store/user/userStore";
+import useStore from "store/user/userStore";
 import { useNavigate } from "react-router-dom";
 
 type RouteProtectorProps = {

@@ -3,7 +3,7 @@ import { BaseButton, PageTitle } from "styles";
 import { SPACING } from "theme";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AccountOverlayType } from "../../AccountPage";
+import { AccountOverlayType } from "../../account.types";
 type AccountsHeaderProps = {
   setActiveOverlay: React.Dispatch<
     React.SetStateAction<AccountOverlayType | null>

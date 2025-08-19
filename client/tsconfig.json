@@ -22,15 +22,17 @@
     "types": ["webrtc"],
 
     /* Aliases */
-    "baseUrl": "./",
+    "baseUrl": "src",
     "paths": {
-      "types/*": ["src/types/*"],
-      "store/*": ["src/store/*"],
-      "components/*": ["src/components/*"],
-      "constants/*": ["src/pages/Transaction/shared/constants/*"],
-      "styles": ["src/styles"],
-      "theme": ["src/Theme"],
-      "utils": ["src/utils"]
+      "lib/*": ["lib/*"],
+      "types/*": ["types/*"],
+      "store/*": ["store/*"],
+      "components/*": ["components/*"],
+      "appConstants": ["appConstants"],
+      "styles": ["styles"],
+      "theme": ["theme"],
+      "utils/*": ["utils/*"],
+      "context/*": ["context/*"]
     }
   },
   "include": ["src"],

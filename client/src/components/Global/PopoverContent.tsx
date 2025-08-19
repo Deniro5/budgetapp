@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { COLORS, SPACING } from "../../Theme";
+import { COLORS, SPACING } from "theme";
 import React from "react";
 
 type MenuItem = {

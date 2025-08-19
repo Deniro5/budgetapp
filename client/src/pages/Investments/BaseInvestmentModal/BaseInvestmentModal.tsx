@@ -10,7 +10,7 @@ import {
 import { useForm } from "react-hook-form";
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import Modal from "components/Global/Modal";
 import { Asset, RawInvestment } from "types/investment";
@@ -18,8 +18,8 @@ import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import AssetMenuItem from "./AssetMenuItem";
 import BalanceSummaryFooter from "components/BalanceSummaryFooter/BalanceSummaryFooter";
 import { TransactionType } from "types/Transaction";
-import useAccount from "../../Accounts/hooks/useAccount";
-import useAccounts from "../../../pages/Accounts/hooks/useAccounts";
+import useAccount from "pages/Accounts/hooks/useAccount";
+import useAccounts from "pages/Accounts/hooks/useAccounts";
 
 type BaseInvestmentModalProps = {
   title: string;

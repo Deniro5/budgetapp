@@ -1,33 +1,20 @@
-import React from "react";
 import PopoverContent from "components/Global/PopoverContent";
 import { Popover } from "react-tiny-popover";
-import {
-  PresetTransaction,
-  Transaction,
-  TransactionCategory,
-} from "types/Transaction";
-import { TransactionOverlayType, View } from "../../../TransactionsPage";
-import { isPresetTransaction } from "../../utils";
+import { TransactionCategory } from "types/Transaction";
+import { TransactionOverlayType, View } from "../../../transactions.types";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type TransactionContextMenuProps = {
-  activeTransaction: Transaction | PresetTransaction;
   onClose: () => void;
-  setActiveOverlay: React.Dispatch<
-    React.SetStateAction<TransactionOverlayType | null>
-  >;
-  top: number;
-  left: number;
-  view: View;
 };
 
 export function TransactionContextMenu({
-  activeTransaction,
   onClose,
-  setActiveOverlay,
-  top,
-  left,
-  view,
 }: TransactionContextMenuProps) {
+  const { setActiveOverlay, activeTransaction, view, contextMenuPosition } =
+    useTransactionStore();
+
+  if (!activeTransaction) return null;
   const isTransfer =
     activeTransaction.category === TransactionCategory.Transfer;
 
@@ -115,8 +102,8 @@ export function TransactionContextMenu({
         padding={4}
         onClickOutside={handleOutsideClick}
         containerStyle={{
-          top: `${top}px`,
-          left: `${left}px`,
+          top: `${contextMenuPosition.top}px`,
+          left: `${contextMenuPosition.left}px`,
           position: "absolute",
         }}
         content={<PopoverContent menuItems={menuItems} width={getWidth()} />}

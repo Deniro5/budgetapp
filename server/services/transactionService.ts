@@ -1,28 +1,6 @@
 import TransactionModel from "../models/transaction.model";
-import AccountModel from "../models/account.model";
 import mongoose from "mongoose";
-
-interface UpdateAccountBalanceArgs {
-  userId: string;
-  accountId: string;
-  change: number;
-}
-
-const updateAccountBalance = async ({
-  userId,
-  accountId,
-  change,
-}: UpdateAccountBalanceArgs): Promise<void> => {
-  const account = await AccountModel.findOne({ _id: accountId, userId });
-  if (!account) throw new Error("Account not found");
-
-  const updateData = {
-    ...account.toObject(),
-    balance: account.balance + Number(change),
-  };
-
-  await AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
-};
+import { updateAccountBalance } from "./accountService";
 
 interface CreateTransactionArgs {
   userId: string;
@@ -66,7 +44,6 @@ export const createTransaction = async (
   const savedTransaction = await newTransaction.save();
 
   await updateAccountBalance({
-    userId,
     accountId: account,
     change: type === "Expense" ? -amount : amount,
   });
@@ -182,14 +159,12 @@ export const updateTransaction = async (
   if (transaction.account === updatedTransaction.account) {
     const change = updatedTransaction.amount - transaction.amount;
     await updateAccountBalance({
-      userId,
       accountId: transaction.account,
       change: transaction.type === "Expense" ? -change : change,
     });
   } else {
     //if the account has changed we need to add or subtract the original amount from the original accounts
     await updateAccountBalance({
-      userId,
       accountId: transaction.account,
       change:
         transaction.type === "Expense"
@@ -198,7 +173,6 @@ export const updateTransaction = async (
     });
     //then we add or subtract the new amount from the new account
     await updateAccountBalance({
-      userId,
       accountId: updatedTransaction.account,
       change:
         transaction.type === "Expense"
@@ -222,7 +196,6 @@ export const deleteTransaction = async (
   const { type, amount, account } = transaction;
 
   await updateAccountBalance({
-    userId,
     accountId: account,
     change: type === "Expense" ? amount : -amount,
   });

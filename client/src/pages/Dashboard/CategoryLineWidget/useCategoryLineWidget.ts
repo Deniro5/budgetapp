@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { BASE_API_URL } from "../../../constants";
+import { BASE_API_URL } from "appConstants";
 import { TransactionCategory } from "types/Transaction";
 import axios from "axios";
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
-import { useBudget } from "../../../pages/Budget/hooks/useBudget";
-import { getAggregatedValue } from "../../../utils/DateUtils";
+import { useQueryWithError } from "hooks/useQueryWithError";
+import { useBudget } from "pages/Budget/hooks/useBudget";
+import { getAggregatedValue } from "utils/DateUtils";
 
 type useCategoryLineWidgetProps = {
   startDate: string;

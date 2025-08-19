@@ -6,34 +6,23 @@ import {
   faChevronRight,
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import { BaseButton, DeleteButton, Divider } from "styles";
-import {
-  PresetTransaction,
-  Transaction,
-  TransactionCategory,
-} from "types/Transaction";
+import { BaseButton, DeleteButton, Divider, Flex, Tag } from "styles";
+import { TransactionCategory } from "types/Transaction";
 import { format } from "date-fns";
 
-import { TransactionOverlayType, View } from "../../../TransactionsPage";
+import { TransactionOverlayType } from "../../../transactions.types";
 import { formatToCurrency } from "utils";
-import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
+import useAccounts from "pages/Accounts/hooks/useAccounts";
+import useTransactionStore from "store/transaction/transactionStore";
 
-type TransactionSidebarProps = {
-  activeTransaction: Transaction | PresetTransaction | null;
-  setActiveTransaction: React.Dispatch<
-    React.SetStateAction<Transaction | PresetTransaction | null>
-  >;
-  setActiveOverlay: React.Dispatch<
-    React.SetStateAction<TransactionOverlayType | null>
-  >;
-  view: View;
-};
+export const TransactionSidebar = () => {
+  const {
+    setActiveOverlay,
+    activeTransaction,
 
-export const TransactionSidebar = ({
-  activeTransaction,
-  setActiveOverlay,
-  view,
-}: TransactionSidebarProps) => {
+    view,
+  } = useTransactionStore();
+
   const [isExpanded, setIsExpanded] = useState(true);
   const { accountNameByIdMap } = useAccounts();
   const sidebarTransaction = activeTransaction;
@@ -88,9 +77,6 @@ export const TransactionSidebar = ({
               <b> Vendor: </b> <span> {transactionVendorName} </span>
             </Row>
             <Row>
-              <b> Vendor: </b> <span> {transactionVendorName} </span>
-            </Row>
-            <Row>
               <b> Date: </b> <span> {sidebarTransaction.date} </span>
             </Row>
             <Row>
@@ -109,15 +95,17 @@ export const TransactionSidebar = ({
             <Divider />
             {!isTransfer && (
               <>
-                <Row>
+                <DescriptionRow>
                   <b> Tags: </b>{" "}
-                  {sidebarTransaction.tags &&
-                    sidebarTransaction.tags.map((tag) => <span> {tag} </span>)}
-                </Row>
-                <Row>
+                  <TagContainer>
+                    {sidebarTransaction.tags &&
+                      sidebarTransaction.tags.map((tag) => <Tag> {tag} </Tag>)}
+                  </TagContainer>
+                </DescriptionRow>
+                <DescriptionRow>
                   <b> Description: </b>{" "}
-                  <span> {sidebarTransaction.description} </span>
-                </Row>
+                  <p> {sidebarTransaction.description} </p>
+                </DescriptionRow>
                 <Divider />
               </>
             )}
@@ -193,7 +181,7 @@ const SidebarHeader = styled.div`
 const Row = styled.div`
   display: flex;
   justify-content: flex-start;
-  padding: ${SPACING.spacing3x} 0;
+  padding: ${SPACING.spacing2x} 0;
   gap: ${SPACING.spacing2x};
   p {
     margin: 0;
@@ -203,6 +191,15 @@ const Row = styled.div`
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+`;
+
+const DescriptionRow = styled(Row)`
+  flex-direction: column;
+`;
+
+const TagContainer = styled(Flex)`
+  flex-wrap: wrap;
+  gap: ${SPACING.spacing2x};
 `;
 
 const IconContainer = styled.div`

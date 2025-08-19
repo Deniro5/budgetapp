@@ -11,7 +11,6 @@ import styled from "styled-components";
 import { Flex } from "styles";
 import { FONTSIZE, SPACING } from "theme";
 import { TransactionCategory } from "types/Transaction";
-import { getAggregatedCategoryBudgetLine } from "store/budget/budgetSelectors";
 import { useCategoryLineWidget } from "./useCategoryLineWidget";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
 import renderChart from "../Hocs/renderChart";

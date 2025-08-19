@@ -7,6 +7,7 @@ import {
   getInvestmentTransactionHistoryByAccount,
 } from "../services/investmentService";
 import { addOneDay } from "../utils/dateutils";
+import InvestmentModel from "../models/investment.model";
 
 interface AccountInput {
   userId: string;
@@ -260,7 +261,6 @@ export const getAccountBalancesById = async ({
   }[] = [];
 
   while (currentDate <= endDate) {
-    console.log(transactionBalancesByDate[currentDate]);
     transactionTotal +=
       (transactionBalancesByDate[currentDate] || 0) -
       (investmentTransactionHistoryByAccount[currentDate] || 0);
@@ -284,39 +284,46 @@ export const getAccountTransactionTotalAfterBaseline = async ({
   accountId: string;
   baselineDate: string;
 }) => {
-  const transactions = await TransactionModel.find({
+  const transactionHistory = await TransactionModel.find({
     userId,
     account: accountId,
     date: { $gte: baselineDate, $lte: new Date().toISOString().split("T")[0] },
   });
-
-  return transactions.reduce((total, transaction) => {
+  const transactionTotal = transactionHistory.reduce((total, transaction) => {
     return (
       total +
       (transaction.type === "Income" ? transaction.amount : -transaction.amount)
     );
   }, 0);
+  const investmentTransactionHistory: Record<string, number> =
+    await getInvestmentTransactionHistoryByAccount({
+      userId,
+      accountId: accountId,
+      startDate: baselineDate,
+      endDate: new Date().toISOString().split("T")[0],
+    });
+
+  const investmentTransactionTotal: number = Object.values(
+    investmentTransactionHistory
+  ).reduce((acc: number, cur: number) => {
+    return acc - cur;
+  }, 0);
+
+  return transactionTotal + investmentTransactionTotal;
 };
 
-export const getAccountInvestmentTotalBaseline = async ({
-  userId,
-  accountId,
-  baselineDate,
-}: {
-  userId: string;
+interface UpdateAccountBalanceArgs {
   accountId: string;
-  baselineDate: string;
-}) => {
-  const transactions = await TransactionModel.find({
-    userId,
-    account: accountId,
-    date: { $gte: baselineDate, $lte: new Date().toISOString().split("T")[0] },
-  });
+  change: number;
+}
 
-  return transactions.reduce((total, transaction) => {
-    return (
-      total +
-      (transaction.type === "Income" ? transaction.amount : -transaction.amount)
-    );
-  }, 0);
+export const updateAccountBalance = async ({
+  accountId,
+  change,
+}: UpdateAccountBalanceArgs): Promise<void> => {
+  await AccountModel.findByIdAndUpdate(
+    accountId,
+    { $inc: { balance: change } },
+    { new: true }
+  );
 };

@@ -10,27 +10,21 @@ import {
   BaseInput,
   Row,
 } from "styles";
-import {
-  TransactionCategory,
-  TransactionFilter,
-  TransactionType,
-} from "types/Transaction";
+import { TransactionCategory, TransactionType } from "types/Transaction";
 import { ChangeEvent, useState } from "react";
 import TagInput from "components/Global/TagInput";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type TransactionFilterPopoverMenuProps = {
-  filter: TransactionFilter;
-  setFilter: React.Dispatch<React.SetStateAction<TransactionFilter>>;
   handleClose: () => void;
 };
 
 function TransactionFilterPopoverMenu({
-  filter,
-  setFilter,
   handleClose,
 }: TransactionFilterPopoverMenuProps) {
+  const { filter, setFilter } = useTransactionStore();
   const [tempFilter, setTempFilter] = useState(filter);
 
   const handleFilterChange = (
@@ -122,15 +116,15 @@ function TransactionFilterPopoverMenu({
               }
             />
           </InputContainer>
-          <InputContainer>
-            <InputLabel>Tags</InputLabel>
-            <TagInput
-              value={tempFilter.tags || []}
-              setValue={(tags: string[]) => handleTagInputChange(tags, "tags")}
-            />
-          </InputContainer>
         </Row>
 
+        <InputContainer>
+          <InputLabel>Tags</InputLabel>
+          <TagInput
+            value={tempFilter.tags || []}
+            setValue={(tags: string[]) => handleTagInputChange(tags, "tags")}
+          />
+        </InputContainer>
         <ButtonContainer>
           <BaseButton onClick={updateFilters}>Update Filters</BaseButton>
           <SecondaryButton onClick={handleClose}>Cancel</SecondaryButton>

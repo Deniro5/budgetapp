@@ -1,5 +1,5 @@
 import DropdownList from "components/DropdownList/DropdownList";
-import useAccounts from "../../pages/Accounts/hooks/useAccounts";
+import useAccounts from "pages/Accounts/hooks/useAccounts";
 
 interface AccountDropdownProps {
   selectedAccountId: string | null;

@@ -1,8 +1,8 @@
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 import { Transaction, TransactionFilter } from "types/Transaction";
-import { BASE_API_URL } from "../../../../constants";
-import { useInfiniteQueryWithError } from "../../../../hooks/useInfiniteQueryWithError"; // adjust path
+import { BASE_API_URL } from "appConstants";
+import { useInfiniteQueryWithError } from "hooks/useInfiniteQueryWithError"; // adjust path
 
 type FetchTransactionsArgs = {
   search: string;

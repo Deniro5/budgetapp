@@ -2,6 +2,7 @@
   "name": "budget-app",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "start": "vite",
     "dev": "vite",
@@ -32,13 +33,13 @@
     "recharts": "^2.15.1",
     "styled-components": "^6.1.8",
     "validator": "^13.12.0",
-    "vite-tsconfig-paths": "^5.1.4",
     "zustand": "^4.5.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^14.2.1",
     "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.17.20",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@types/validator": "^13.12.2",
@@ -56,6 +57,7 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

@@ -9,8 +9,6 @@ export function getFirstPath() {
   return firstPath;
 }
 
-//Date
-
 //Auth
 
 export function sanitizeUsername(username: string) {
@@ -28,6 +26,10 @@ export function formatCamelCaseToTitleCase(input: string) {
   return input
     .replace(/([a-z])([A-Z])/g, "$1 $2") // Insert space before uppercase letters
     .replace(/^./, (char) => char.toUpperCase()); // Capitalize the first letter
+}
+
+export function truncateString(input: string, maxLength: number): string {
+  return input.slice(0, maxLength) + (input.length > maxLength ? "..." : "");
 }
 
 //string validation

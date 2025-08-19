@@ -16,7 +16,7 @@ export enum TransactionCategory {
   Gas = "Gas",
   Gifts = "Gifts",
   Groceries = "Groceries",
-  HealthAndFitness = "Health & Fitness",
+  HealthAndFitness = "Health And Fitness",
   Hobbies = "Hobbies",
   HomeImprovement = "Home Improvement",
   Housing = "Housing",
@@ -38,8 +38,13 @@ export enum TransactionCategory {
 }
 
 export const budgetOnlyCategories = Object.values(TransactionCategory).filter(
-  (cat) => cat !== TransactionCategory.Transfer
+  (cat) =>
+    cat !== TransactionCategory.Transfer && cat !== TransactionCategory.Salary
 );
+
+export const transactionOnlyCategories = Object.values(
+  TransactionCategory
+).filter((cat) => cat !== TransactionCategory.Transfer);
 
 export type Transaction = {
   _id: string;

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { COLORS, FONTSIZE, SPACING } from "./Theme";
+import { COLORS, FONTSIZE, SPACING } from "./theme";
 
 // -------------------- Containers --------------------------
 
@@ -86,6 +86,9 @@ export const IconButton = styled.button`
   &:focus {
     outline: ${COLORS.lightPrimary};
   }
+  &:hover {
+    color: ${COLORS.primary};
+  }
 `;
 
 // -------------------- Forms --------------------------
@@ -167,4 +170,27 @@ export const BaseCheckboxContainer = styled.button`
   &:hover {
     color: ${COLORS.pureBlack};
   }
+`;
+
+export const ScrollablePageContainer = styled.div`
+  overflow: scroll;
+  scrollbar-width: none;
+  padding-bottom: ${SPACING.spacingBase};
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  height: calc(100vh - 136px);
+`;
+
+export const Tag = styled.div`
+  background-color: ${COLORS.primary};
+  color: ${COLORS.pureWhite};
+  padding: ${SPACING.spacingBase} ${SPACING.spacing2x};
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  gap: 4px;
+  width: fit-content;
+  font-weight: bold;
 `;

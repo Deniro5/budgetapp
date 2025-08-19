@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import styled from "styled-components";
-import { SPACING } from "../../../Theme";
+import { SPACING } from "theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
-import { IconButton, SecondaryButton } from "../../../styles";
+import { IconButton } from "styles";
 
 type ModalProps = {
   isOpen: boolean;

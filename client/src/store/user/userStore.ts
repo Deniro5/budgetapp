@@ -1,8 +1,8 @@
 // store.ts
 import { create } from "zustand";
-import { RawUser, User } from "../../types/user";
+import { RawUser, User } from "types/user";
 import axios from "axios";
-import { queryClient } from "../../main";
+import { queryClient } from "lib/queryClient";
 
 axios.defaults.withCredentials = true;
 const BASE_URL = "http://localhost:8000";

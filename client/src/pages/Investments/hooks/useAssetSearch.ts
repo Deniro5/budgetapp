@@ -1,7 +1,7 @@
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import { useQueryWithError } from "hooks/useQueryWithError";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { BASE_API_URL } from "../../../constants";
+import { BASE_API_URL } from "appConstants";
 import { Asset } from "types/investment";
 
 export const useAssetSearch = () => {

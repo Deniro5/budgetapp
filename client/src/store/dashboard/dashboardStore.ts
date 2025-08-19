@@ -1,7 +1,7 @@
 import {
   getCurrentDateFormatted,
   getDateDaysAgoFormatted,
-} from "../../utils/DateUtils";
+} from "utils/DateUtils";
 import { create } from "zustand";
 export interface DashboardStore {
   startDate: string;

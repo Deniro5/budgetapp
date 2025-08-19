@@ -1,6 +1,6 @@
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import { useQueryWithError } from "hooks/useQueryWithError";
 import axios from "axios";
-import { BASE_API_URL } from "../../../constants";
+import { BASE_API_URL } from "appConstants";
 import { Transaction } from "types/Transaction";
 
 const fetchRecentTransactions = async (): Promise<Transaction[]> => {

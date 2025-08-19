@@ -18,7 +18,7 @@ import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import renderChart from "../Hocs/renderChart";
 import { formatCurrencyShort, formatToCurrency } from "utils";
-import useAccounts from "../../../pages/Accounts/hooks/useAccounts";
+import useAccounts from "pages/Accounts/hooks/useAccounts";
 
 type AccountWidgetProps = {
   startDate: string;
@@ -73,7 +73,6 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
           </linearGradient>
         </defs>
 
-        {/* Area for balance */}
         <Area
           type="monotone"
           dataKey="total"
@@ -81,7 +80,6 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
           fill="url(#colorIncome)"
         />
 
-        {/* Line for investment value */}
         <Line
           type="natural"
           dataKey="value"
@@ -112,7 +110,7 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
   });
 
   const lastEntry = accountWithBalances[accountWithBalances.length - 1];
-  const lastTotal = lastEntry?.value || 0 + lastEntry?.balance || 0;
+  const lastTotal = (lastEntry?.value || 0) + (lastEntry?.balance || 0);
 
   return (
     <>

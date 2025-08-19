@@ -1,7 +1,7 @@
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import { useQueryWithError } from "hooks/useQueryWithError";
 import axios from "axios";
-import { BASE_API_URL } from "../../../constants";
-import { Investment } from "../../../types/investment";
+import { BASE_API_URL } from "appConstants";
+import { Investment } from "types/investment";
 
 export const useFetchInvestmentHistory = () => {
   const { data, isLoading, error } = useQueryWithError<Investment[], Error>(

@@ -1,4 +1,4 @@
-import { Flex, PageTitle } from "../../styles.ts";
+import { Flex, PageTitle, ScrollablePageContainer } from "styles";
 import styled from "styled-components";
 import { SPACING } from "theme";
 import { DashboardCard } from "./DashboardCard/DashboardCard.tsx";
@@ -11,7 +11,7 @@ import { BudgetWidget } from "./BudgetWidget/BudgetWidget.tsx";
 import { AccountWidget } from "./AccountWidget/AccountWidget.tsx";
 import useDashboardStore from "store/dashboard/dashboardStore.ts";
 
-export const DashboardPage = () => {
+export default function DashboardPage() {
   const { startDate, setStartDate, endDate, setEndDate } = useDashboardStore();
 
   return (
@@ -25,36 +25,38 @@ export const DashboardPage = () => {
           setEndDate={setEndDate}
         />
       </Flex>
-      <DashboardContainer>
-        <Column gridArea={"account"}>
-          <DashboardCard>
-            <AccountWidget startDate={startDate} endDate={endDate} />
-          </DashboardCard>
-        </Column>
-        <Column gridArea={"income"}>
-          <DashboardCard>
-            <IncomeExpenseWidget startDate={startDate} endDate={endDate} />
-          </DashboardCard>
-        </Column>
-        <Column gridArea={"budget"}>
-          <DashboardCard>
-            <BudgetWidget startDate={startDate} endDate={endDate} />
-          </DashboardCard>
-        </Column>
-        <Column gridArea="categoryline">
-          <DashboardCard>
-            <CategoryLineWidget startDate={startDate} endDate={endDate} />
-          </DashboardCard>
-        </Column>
-        <Column gridArea={"recent"}>
-          <DashboardCard>
-            <RecentTransactionsWidget />
-          </DashboardCard>
-        </Column>
-      </DashboardContainer>
+      <ScrollablePageContainer>
+        <DashboardContainer>
+          <Column gridArea={"account"}>
+            <DashboardCard>
+              <AccountWidget startDate={startDate} endDate={endDate} />
+            </DashboardCard>
+          </Column>
+          <Column gridArea={"income"}>
+            <DashboardCard>
+              <IncomeExpenseWidget startDate={startDate} endDate={endDate} />
+            </DashboardCard>
+          </Column>
+          <Column gridArea={"budget"}>
+            <DashboardCard>
+              <BudgetWidget startDate={startDate} endDate={endDate} />
+            </DashboardCard>
+          </Column>
+          <Column gridArea="categoryline">
+            <DashboardCard>
+              <CategoryLineWidget startDate={startDate} endDate={endDate} />
+            </DashboardCard>
+          </Column>
+          <Column gridArea={"recent"}>
+            <DashboardCard>
+              <RecentTransactionsWidget />
+            </DashboardCard>
+          </Column>
+        </DashboardContainer>
+      </ScrollablePageContainer>
     </PageContainer>
   );
-};
+}
 
 const PageContainer = styled.div`
   display: flex;
@@ -65,11 +67,11 @@ const PageContainer = styled.div`
 const DashboardContainer = styled.div`
   display: grid;
   grid-template-areas:
-    "account income income income"
-    "budget budget budget categoryline"
+    "account income income categoryline"
+    "budget budget budget budget"
     "recent recent recent recent";
-  grid-template-columns: 1fr 1fr 1fr 1fr; /* 3 equal columns */
-  grid-template-rows: auto auto auto; /* Two rows */
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 equal columns */
+  grid-template-rows: auto auto auto; /* Three rows */
   gap: ${SPACING.spacing6x};
 `;
 

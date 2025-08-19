@@ -5,26 +5,17 @@ import { Flex, SecondaryButton } from "styles";
 import { faAdd } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { TransactionTable } from "../../Transaction/shared/components";
+import { TransactionTable } from "pages/Transaction/shared/components";
 import { useRecentTransactionsWidget } from "./useRecentTransactionsWidget";
-import { AddTransactionModal } from "../../Transaction/Transactions/modals";
+import { AddTransactionModal } from "pages/Transaction/Transactions/modals";
 import renderChart from "../Hocs/renderChart";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
 export const RecentTransactionsWidget = () => {
-  const { recentTransactions, isLoading, error, refetch } =
+  const { recentTransactions, isLoading, error } =
     useRecentTransactionsWidget();
 
-  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-
-  const handleAddClick = () => {
-    setShowModal(true);
-  };
-
-  const addTransactionCallback = () => {
-    refetch();
-  };
 
   const chartElement = (
     <>
@@ -44,7 +35,6 @@ export const RecentTransactionsWidget = () => {
           View All Transactions
         </ViewMoreLink>
       </TableContainer>
-      {showModal && <AddTransactionModal onClose={() => setShowModal(false)} />}
     </>
   );
 
@@ -59,10 +49,6 @@ export const RecentTransactionsWidget = () => {
     <>
       <WidgetHeader>
         <Name> Recent Transactions </Name>
-        <SecondaryButton onClick={handleAddClick}>
-          <FontAwesomeIcon icon={faAdd} />
-          Add Transaction{" "}
-        </SecondaryButton>
       </WidgetHeader>
       {chartContent}
     </>

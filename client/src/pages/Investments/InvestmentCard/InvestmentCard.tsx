@@ -7,7 +7,6 @@ import { Investment, RawInvestment } from "types/investment";
 import { InvestmentsOverlayType } from "../InvestmentsPage";
 import { AssetChart } from "./AssetChart/AssetChart";
 import { formatToCurrency } from "utils";
-import { format } from "date-fns";
 
 type InvestmentCardProps = {
   investment: Investment;

@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { COLORS } from "theme";
 import { AssetWithPrice } from "types/investment";
 import { formatCurrencyShort } from "utils";
 
@@ -32,7 +33,7 @@ export const AssetChart = ({ asset }: AssetChartProps) => {
         <Line
           type="monotone"
           dataKey="price"
-          stroke="#8884d8"
+          stroke={COLORS.darkGreen}
           strokeWidth={2}
           dot={false}
         />

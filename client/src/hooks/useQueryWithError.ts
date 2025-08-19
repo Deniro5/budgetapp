@@ -3,7 +3,7 @@ import {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { ToastContext } from "../Context/Toast";
+import { ToastContext } from "../context/Toast";
 import { useContext, useEffect } from "react";
 
 export function useQueryWithError<TData, TError, TQueryFnData = TData>(

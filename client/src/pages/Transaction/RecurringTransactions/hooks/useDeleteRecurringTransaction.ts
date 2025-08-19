@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useMutationWithSuccessAndError } from "../../../../hooks/useMutationWithSuccessAndError";
-import { BASE_API_URL } from "../../../../constants";
+import { useMutationWithSuccessAndError } from "hooks/useMutationWithSuccessAndError";
+import { BASE_API_URL } from "appConstants";
 import axios from "axios";
 
 export const useDeleteRecurringTransaction = () => {

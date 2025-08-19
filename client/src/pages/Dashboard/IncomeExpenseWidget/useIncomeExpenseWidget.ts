@@ -1,6 +1,6 @@
-import { BASE_API_URL } from "../../../constants";
+import { BASE_API_URL } from "appConstants";
 import axios from "axios";
-import { useQueryWithError } from "../../../hooks/useQueryWithError";
+import { useQueryWithError } from "hooks/useQueryWithError";
 
 type useIncomeExpenseWidgetProps = {
   startDate: string;

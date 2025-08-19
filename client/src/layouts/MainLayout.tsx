@@ -1,27 +1,21 @@
 import { Route, Routes } from "react-router";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "components/Sidebar";
 import styled from "styled-components";
-import { COLORS, SPACING } from "../Theme";
+import { COLORS, SPACING } from "theme";
 import { useEffect, useState } from "react";
-import Transactions from "../pages/Transaction/TransactionsPage";
-import Settings from "../pages/Settings";
 
-import Accounts from "../pages/Accounts/AccountPage";
-import Budget from "../pages/Budget";
-import useInitialLoad from "../hooks/useInitialLoad";
-import { DashboardPage } from "../pages/Dashboard/DashboardPage";
-import { InvestmentsPage } from "../pages/Investments/InvestmentsPage";
-import { ToastProvider } from "../Context/Toast";
+import { ToastProvider } from "context/Toast";
 
-const accountsElement = <Accounts />;
-const budgetElement = <Budget />;
-const dashboardElement = <DashboardPage />;
-const investmentsElement = <InvestmentsPage />;
-const settingsElement = <Settings />;
+import { lazy, Suspense } from "react";
 
-const transactionsElement = <Transactions />;
+const Accounts = lazy(() => import("pages/Accounts/AccountPage"));
+const Budget = lazy(() => import("pages/Budget"));
+const DashboardPage = lazy(() => import("pages/Dashboard/DashboardPage"));
+const InvestmentsPage = lazy(() => import("pages/Investments/InvestmentsPage"));
+const Settings = lazy(() => import("pages/Settings"));
+const Transactions = lazy(() => import("pages/Transaction/TransactionsPage"));
+
 function MainLayout() {
-  useInitialLoad();
   const [isExpanded, setIsExpanded] = useState(true);
 
   const toggleExpanded = () => {
@@ -47,17 +41,19 @@ function MainLayout() {
         <Sidebar isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
 
         <ContentContainer isExpanded={isExpanded}>
-          <Routes>
-            <Route path="/" element={dashboardElement} />
-            <Route path="/transactions" element={transactionsElement} />
-            <Route path="/accounts" element={accountsElement} />
-            <Route path="/budget" element={budgetElement} />
-            <Route path="/reports" element={<p> reports </p>} />
-            <Route path="/savings" element={<p> savings </p>} />
-            <Route path="/debts" element={<p> debts </p>} />
-            <Route path="/settings" element={settingsElement} />
-            <Route path="/investments" element={investmentsElement} />
-          </Routes>
+          <Suspense fallback={<p>Loading...</p>}>
+            <Routes>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/transactions" element={<Transactions />} />
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/budget" element={<Budget />} />
+              <Route path="/reports" element={<p> reports </p>} />
+              <Route path="/savings" element={<p> savings </p>} />
+              <Route path="/debts" element={<p> debts </p>} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/investments" element={<InvestmentsPage />} />
+            </Routes>
+          </Suspense>
         </ContentContainer>
       </ToastProvider>
     </AppContainer>

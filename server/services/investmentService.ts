@@ -1,11 +1,10 @@
 import InvestmentModel from "../models/investment.model";
 import { SampleStocks } from "../data/sample-stocks";
 import mongoose from "mongoose";
-import AccountModel from "../models/account.model";
 import AssetPriceHistoryModel from "../models/assetpricehistory.model";
 import axios from "axios";
-import { addOneDay, getTodayDate } from "../utils/dateutils";
-import { start } from "repl";
+import { addOneDay } from "../utils/dateutils";
+import { updateAccountBalance } from "./accountService";
 
 const API_URL = "https://www.alphavantage.co/query";
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -22,10 +21,6 @@ interface Investment {
   userId: string;
 }
 
-interface CustomRequest extends Request {
-  investments?: Investment[];
-}
-
 interface TimeSeriesEntry {
   [date: string]: {
     "1. open": string;
@@ -38,27 +33,6 @@ interface TimeSeriesEntry {
     "8. split coefficient"?: string;
   };
 }
-interface UpdateAccountBalanceArgs {
-  userId: string;
-  accountId: string;
-  change: number;
-}
-
-const updateAccountBalance = async ({
-  userId,
-  accountId,
-  change,
-}: UpdateAccountBalanceArgs): Promise<void> => {
-  const account = await AccountModel.findOne({ _id: accountId, userId });
-  if (!account) throw new Error("Account not found");
-
-  const updateData = {
-    ...account.toObject(),
-    balance: account.balance + Number(change),
-  };
-
-  await AccountModel.findByIdAndUpdate(accountId, updateData, { new: true });
-};
 
 export const createInvestment = async (data: {
   userId: string;
@@ -75,7 +49,6 @@ export const createInvestment = async (data: {
   const amount = quantity * price;
 
   await updateAccountBalance({
-    userId,
     accountId: account,
     change: -amount,
   });
@@ -83,8 +56,30 @@ export const createInvestment = async (data: {
   return savedInvestment;
 };
 
+export const deleteInvestment = async (
+  userId: string,
+  id: string
+): Promise<any> => {
+  const investment = await InvestmentModel.findOne({ _id: id, userId });
+  if (!investment) throw new Error("Unauthorized to delete this transaction");
+
+  await InvestmentModel.findByIdAndDelete(id);
+
+  const { quantity, price, account } = investment;
+
+  await updateAccountBalance({
+    accountId: account,
+    change: quantity * price,
+  });
+
+  return investment;
+};
+
 export const getAllInvestments = async (userId: string) => {
-  return await InvestmentModel.find({ userId }).sort({ date: -1, _id: -1 });
+  console.log(userId);
+  return await InvestmentModel.find({ userId })
+    .sort({ date: -1, _id: -1 })
+    .populate({ path: "account", select: "name _id" });
 };
 
 export const getAggregatedInvestments = async (

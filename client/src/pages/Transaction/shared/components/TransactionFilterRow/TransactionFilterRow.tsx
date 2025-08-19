@@ -4,13 +4,12 @@ import { TransactionFilterTag } from "./TransactionFilterTag";
 import { TransactionFilter } from "types/Transaction";
 import { formatCamelCaseToTitleCase, formatToCurrency } from "utils";
 import useTransactionStore from "store/transaction/transactionStore";
-import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
+import useAccounts from "pages/Accounts/hooks/useAccounts";
 
 export function TransactionFilterRow() {
   const { filter, setFilter } = useTransactionStore();
   const { accountNameByIdMap } = useAccounts();
 
-  console.log(filter);
   const removeFilter = (filterName: keyof TransactionFilter) => {
     setFilter({ ...filter, [filterName]: undefined });
   };

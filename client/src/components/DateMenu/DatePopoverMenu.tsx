@@ -6,7 +6,7 @@ import {
   getDateDaysAgoFormatted,
   getFirstDayOfMonthFormatted,
   getFirstDayOfYearFormatted,
-} from "../../utils/DateUtils";
+} from "utils/DateUtils";
 
 type DatePopoverMenuProps = {
   setStartDate: React.Dispatch<React.SetStateAction<string>>;

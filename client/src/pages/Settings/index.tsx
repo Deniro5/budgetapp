@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import useUserStore from "../../store/user/userStore";
+import { useState } from "react";
+import useUserStore from "store/user/userStore";
 import {
   BaseButton,
   BaseCheckbox,
@@ -7,13 +7,16 @@ import {
   Flex,
   PageContainer,
   PageTitle,
-} from "../../styles";
+} from "styles";
 import styled from "styled-components";
-import { SPACING, FONTSIZE } from "../../Theme";
-import { getUserPreferences } from "../../store/user/userSelectors";
-import { RawUserPreferences } from "../../types/user";
+import { SPACING, FONTSIZE } from "theme";
+import { getUserPreferences } from "store/user/userSelectors";
+import { RawUserPreferences } from "types/user";
 import { useNavigate } from "react-router";
-import { budgetOnlyCategories, TransactionCategory } from "types/Transaction";
+import {
+  transactionOnlyCategories,
+  TransactionCategory,
+} from "types/Transaction";
 
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 
@@ -66,7 +69,7 @@ export default function Settings() {
       <SettingRow>
         <SettingName>Enabled Categories</SettingName>
         <CategoryContainer>
-          {Object.values(budgetOnlyCategories).map((item) => (
+          {Object.values(transactionOnlyCategories).map((item) => (
             <BaseCheckboxContainer
               onClick={() => handleCategoryChange(item)}
               key={item}

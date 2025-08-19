@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { COLORS, FONTSIZE, SPACING } from "../../../Theme";
-import { BaseInput } from "../../../styles";
+import { COLORS, FONTSIZE, SPACING } from "theme";
+import { BaseInput, Tag } from "styles";
 import { isAlpha } from "validator";
 
 interface TagInputProps {
@@ -58,6 +58,7 @@ const TagInput: React.FC<TagInputProps> = ({
     tag: string
   ) => {
     e.stopPropagation();
+    e.preventDefault();
     setValue(value.filter((t) => t !== tag));
   };
 
@@ -90,24 +91,12 @@ const InputContainer = styled.div`
   flex-wrap: wrap;
   gap: 8px;
   padding: ${SPACING.spacingBase} ${SPACING.spacing2x};
-  padding-left: 0;
   border: 1px solid ${COLORS.darkGrey};
   border-radius: 4px;
   background-color: ${COLORS.pureWhite};
   &:focus-within {
     border-color: ${COLORS.primary};
   }
-`;
-
-const Tag = styled.div`
-  background-color: ${COLORS.primary};
-  color: ${COLORS.pureWhite};
-  padding: ${SPACING.spacingBase} ${SPACING.spacing2x};
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  gap: 4px;
 `;
 
 const RemoveButton = styled.button`

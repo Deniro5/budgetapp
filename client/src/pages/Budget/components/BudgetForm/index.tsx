@@ -14,7 +14,7 @@ import { budgetOnlyCategories, TransactionCategory } from "types/Transaction";
 import { formatToCurrency } from "utils";
 
 type BudgetProps = {
-  initialBudgetCategories: BudgetCategories;
+  initialBudgetCategories: Omit<BudgetCategories, TransactionCategory.Salary>;
   onSubmit: (transaction: BudgetCategories) => void;
   budgetTotal: number;
 };
@@ -29,21 +29,15 @@ export default function BudgetForm({
   onSubmit,
   budgetTotal,
 }: BudgetProps) {
-  const {
-    register,
-    handleSubmit,
-    clearErrors,
-    formState: { errors },
-    watch,
-    reset,
-  } = useForm<BudgetCategories>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
-    defaultValues: {
-      ...defaultValues,
-      ...initialBudgetCategories,
-    },
-  });
+  const { register, handleSubmit, clearErrors, watch, reset } =
+    useForm<BudgetCategories>({
+      mode: "onSubmit", // Validation only on submit
+      reValidateMode: "onSubmit", // No revalidation on field changes
+      defaultValues: {
+        ...defaultValues,
+        ...initialBudgetCategories,
+      },
+    });
 
   const currentValues = watch();
 

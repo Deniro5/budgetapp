@@ -1,13 +1,13 @@
-import { Flex, PageContainer, PageTitle } from "../../styles.ts";
+import { Flex, PageContainer, PageTitle } from "styles";
 import styled from "styled-components";
 import { SPACING } from "theme";
-import BudgetForm from "./components/BudgetForm/index.tsx";
-import { BudgetCategories } from "types/budget.ts";
-import { useUpdateBudget } from "./hooks/useUpdateBudget.ts";
-import { useBudget } from "./hooks/useBudget.ts";
-import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader.tsx";
+import BudgetForm from "./components/BudgetForm";
+import { BudgetCategories } from "types/budget";
+import { useUpdateBudget } from "./hooks/useUpdateBudget";
+import { useBudget } from "./hooks/useBudget";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
-function Budget() {
+export default function Budget() {
   const { mutate } = useUpdateBudget();
   const { budget, isLoading, error, getTotalBudget } = useBudget();
 
@@ -51,5 +51,3 @@ const PageColumnFlexContainer = styled.div`
 const ContentContainer = styled(Flex)`
   align-items: flex-start;
 `;
-
-export default Budget;

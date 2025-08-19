@@ -36,6 +36,31 @@ export const createInvestment = async (
   }
 };
 
+export const deleteInvestment = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { userId } = req;
+    const { id } = req.params;
+    if (!userId) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    const deletedTransaction = await investmentService.deleteInvestment(
+      userId,
+      id
+    );
+
+    res.json(deletedTransaction);
+  } catch (err: any) {
+    res
+      .status(500)
+      .json({ error: err.message || "Failed to delete transaction" });
+  }
+};
+
 export const getAllInvestments = async (
   req: CustomRequest,
   res: Response
@@ -48,6 +73,7 @@ export const getAllInvestments = async (
     }
 
     const investments = await investmentService.getAllInvestments(userId);
+    console.log(investments);
     res.json(investments);
   } catch (err) {
     console.error("Error fetching investments:", err);

@@ -1,0 +1,5 @@
+{
+  "watch": ["dist/index.js"],
+  "ext": "js",
+  "ignore": ["src", "dist/**/*.map"]
+}

@@ -5,7 +5,7 @@ import {
   QueryFunctionContext,
 } from "@tanstack/react-query";
 import { useContext, useEffect } from "react";
-import { ToastContext } from "../Context/Toast";
+import { ToastContext } from "../context/Toast";
 
 export function useInfiniteQueryWithError<
   TQueryKey extends readonly unknown[],

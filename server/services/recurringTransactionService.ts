@@ -131,8 +131,6 @@ export const updateRecurringTransaction = async (
   });
   if (!transaction) return null;
 
-  console.log(updateData);
-
   return RecurringTransactionModel.findByIdAndUpdate(id, updateData, {
     new: true,
   }).populate({ path: "account", select: "name _id" });
@@ -171,13 +169,13 @@ const getNextRunDate = (interval: string, date: string) => {
 export const processRecurringTransactions = async () => {
   const transactions = await RecurringTransactionModel.find();
   const currentDate = getTodayDate();
-  transactions.forEach(async (transaction) => {
+  for (const transaction of transactions) {
     //if the transaction date is less than or equal to the current date
     let nextDate = transaction.date;
     let shouldUpdate = false;
     //loop through until the next date is greater than the current date. This will allow us to create multiple transactions if we need to
     while (nextDate <= currentDate) {
-      createTransaction({
+      await createTransaction({
         userId: transaction.userId,
         description: transaction.description,
         amount: transaction.amount,
@@ -192,10 +190,10 @@ export const processRecurringTransactions = async () => {
       shouldUpdate = true;
     }
     if (shouldUpdate) {
-      updateRecurringTransaction(transaction._id, transaction.userId, {
+      await updateRecurringTransaction(transaction._id, transaction.userId, {
         date: nextDate,
       });
     }
-  }); //
+  }
   return { transactions };
 };

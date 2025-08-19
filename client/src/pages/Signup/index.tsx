@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import { sanitizeUsername } from "../../utils";
-import useStore from "../../store/user/userStore";
-import { Flex } from "../../styles";
-import { COLORS } from "../../Theme";
+import { sanitizeUsername } from "utils";
+import useStore from "store/user/userStore";
+import { COLORS } from "theme";
 
 export default function SignUp() {
   const [username, setUsername] = useState("");

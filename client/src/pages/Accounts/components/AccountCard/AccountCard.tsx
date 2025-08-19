@@ -11,7 +11,7 @@ import {
 } from "styles";
 import { FONTSIZE, SPACING } from "theme";
 import { Account } from "types/account";
-import { AccountOverlayType } from "../../AccountPage";
+import { AccountOverlayType } from "../../account.types";
 import { formatToCurrency } from "utils";
 
 type AccountCardProps = {
@@ -39,8 +39,6 @@ export function AccountCard({
     setActiveOverlay(AccountOverlayType.DELETE);
     setActiveAccount(account);
   };
-
-  console.log(account.investmentSummary);
 
   const assetTotal = account.investmentSummary.reduce((total, item) => {
     return total + item.price * item.quantity;

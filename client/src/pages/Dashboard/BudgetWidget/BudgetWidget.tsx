@@ -6,6 +6,7 @@ import {
   Legend,
   ResponsiveContainer,
   LabelList,
+  Cell,
 } from "recharts";
 
 import styled from "styled-components";
@@ -15,8 +16,7 @@ import { TransactionCategory } from "types/Transaction";
 import { useBudgetWidget } from "./useBudgetWidget";
 import renderChart from "../Hocs/renderChart";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
-import { formatToCurrency } from "utils";
-import { format } from "date-fns";
+import { formatToCurrency, truncateString } from "utils";
 
 type BudgetWidgetProps = {
   startDate: string;
@@ -39,14 +39,17 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
         data={categoriesWithBudget}
         margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
         barCategoryGap={10}
-        barGap={0}
+        barGap={2}
+        barSize={100}
       >
         <XAxis
           dataKey="category"
           angle={-45}
           textAnchor="end"
           height={80}
-          tickFormatter={(category: TransactionCategory) => category}
+          tickFormatter={(category: TransactionCategory) =>
+            truncateString(category as string, 12)
+          }
         />
 
         <Tooltip
@@ -62,17 +65,34 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
           }}
           labelFormatter={(label: TransactionCategory) => label}
         />
-        <Legend />
-        <Bar dataKey="totalAmount" fill={COLORS.darkGreen} name="Spent">
-          <LabelList
-            dx={-4}
-            fontSize={12}
-            dataKey="rawTotalAmount"
-            position="top"
-          />
+        <Legend
+          payload={[
+            { value: "Budget Limit", type: "square", color: COLORS.lightFont },
+            {
+              value: "Spent (Within Budget)",
+              type: "square",
+              color: COLORS.darkGreen,
+            },
+            {
+              value: "Spent (Over Budget)",
+              type: "square",
+              color: COLORS.deleteRed,
+            },
+          ]}
+          verticalAlign="top"
+          wrapperStyle={{ marginTop: "-20px" }}
+        />
+        <Bar dataKey="budget" fill={COLORS.lightFont} name="Budget Limit">
+          <LabelList fontSize={13} dataKey="rawBudget" position="top" />
         </Bar>
-        <Bar dataKey="budget" fill="#ff7979" name="Budget Limit">
-          <LabelList fontSize={12} dataKey="rawBudget" position="top" dx={4} />
+        <Bar dataKey="totalAmount" name="Spent">
+          {categoriesWithBudget.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.isOverBudget ? COLORS.deleteRed : COLORS.darkGreen}
+            />
+          ))}
+          <LabelList fontSize={13} dataKey="rawTotalAmount" position="top" />
         </Bar>
       </BarChart>
     </ResponsiveContainer>
@@ -96,7 +116,6 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
             <p>{formatToCurrency(totalBudget)} </p>
           </InfoSection>
           <InfoSection>
-            {" "}
             <Label>Budget Remaining:</Label>
             <ChangeLabel isIncrease={isWithinBudget}>
               {formatToCurrency(availableBudget)}

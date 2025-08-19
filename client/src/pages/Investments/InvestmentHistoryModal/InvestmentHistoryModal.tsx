@@ -1,12 +1,11 @@
 import styled from "styled-components";
 import { BaseButton, Divider, ScrollableContainer } from "styles";
-
 import { SPACING, FONTSIZE, COLORS } from "theme";
-
 import Modal from "components/Global/Modal";
 import { useFetchInvestmentHistory } from "../hooks/useFetchInvestmentHistory";
 import { InvestmentHistoryItem } from "./InvestmentHistoryItem";
-import { getAccountNameByIdMap } from "store/account/accountSelectors";
+import { useState } from "react";
+import { DeleteInvestmentModal } from "./DeleteInvestmentModal";
 
 type InvestmentHistoryModalProps = {
   onClose: () => void;
@@ -16,8 +15,15 @@ export function InvestmentHistoryModal({
   onClose,
 }: InvestmentHistoryModalProps) {
   const { results, isLoading, error } = useFetchInvestmentHistory();
+  const [idToDelete, setIdToDelete] = useState<string | null>(null);
 
-  const accountNameByIdMap = getAccountNameByIdMap();
+  const handleDeleteClick = (id: string) => {
+    setIdToDelete(id);
+  };
+
+  const handleDeleteClose = () => {
+    setIdToDelete(null);
+  };
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
       <Title>{"Investment History"}</Title>
@@ -30,11 +36,9 @@ export function InvestmentHistoryModal({
         <ResultsContainer>
           {results.map((investment) => (
             <InvestmentHistoryItem
-              key={investment.asset.symbol}
-              investment={{
-                ...investment,
-                account: accountNameByIdMap[investment.account],
-              }}
+              key={investment._id}
+              investment={investment}
+              onClickDelete={handleDeleteClick}
             />
           ))}
         </ResultsContainer>
@@ -42,6 +46,13 @@ export function InvestmentHistoryModal({
       <ButtonContainer>
         <BaseButton onClick={onClose}>Close</BaseButton>
       </ButtonContainer>
+
+      {idToDelete && (
+        <DeleteInvestmentModal
+          investmentId={idToDelete}
+          onClose={handleDeleteClose}
+        />
+      )}
     </Modal>
   );
 }

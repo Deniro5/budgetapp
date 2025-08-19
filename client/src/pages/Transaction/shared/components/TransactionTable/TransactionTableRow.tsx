@@ -11,11 +11,14 @@ import {
 } from "types/Transaction";
 import { capitalize, formatToCurrency } from "utils";
 import { isPresetTransaction, isRecurringTransaction } from "../../utils";
-import useAccounts from "../../../../../pages/Accounts/hooks/useAccounts";
+import useAccounts from "pages/Accounts/hooks/useAccounts";
 
 type TransactionTableRowProps = {
   transaction: Transaction | PresetTransaction;
-  onClick: (transaction: Transaction | PresetTransaction | null) => void;
+  onClick: (
+    e: React.MouseEvent<HTMLTableRowElement>,
+    transaction: Transaction | PresetTransaction | null
+  ) => void;
   onRightClick: (
     e: React.MouseEvent<HTMLTableRowElement>,
     transaction: Transaction | PresetTransaction | null
@@ -35,18 +38,17 @@ export function TransactionTableRow({
 }: TransactionTableRowProps) {
   const { accountNameByIdMap } = useAccounts();
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
     if (isSelected) {
-      onClick(null);
+      onClick(e, null);
       return;
     }
-    onClick(transaction);
+    onClick(e, transaction);
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    handleClick();
     onRightClick(e, transaction);
   };
 
@@ -110,7 +112,7 @@ const Container = styled.tr<{ isSelected: boolean }>`
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected ? COLORS.lightPrimary : COLORS.pureWhite};
-
+  user-select: none; /* Prevent text highlighting */
   &:hover {
     background: ${COLORS.lightPrimary};
   }
