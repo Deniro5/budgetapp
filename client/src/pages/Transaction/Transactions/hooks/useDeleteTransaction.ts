@@ -8,9 +8,11 @@ export const useDeleteTransaction = () => {
 
   return useMutationWithSuccessAndError({
     options: {
-      mutationFn: (transactionId: string) =>
+      mutationFn: (transactionIds: string[]) =>
         axios
-          .delete(`${BASE_API_URL}/transactions/${transactionId}`)
+          .delete(`${BASE_API_URL}/transactions`, {
+            data: transactionIds, // sends array in the body
+          })
           .then((res) => res.data), // returning deleted transaction data
       onSuccess: (deletedTransaction) => {
         queryClient.invalidateQueries({ queryKey: ["transactions"] });

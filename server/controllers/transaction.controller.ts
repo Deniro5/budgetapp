@@ -61,19 +61,21 @@ export const deleteTransaction = async (
 ): Promise<void> => {
   try {
     const { userId } = req;
-    const { id } = req.params;
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const deletedTransaction = await transactionService.deleteTransaction(
+    const transactionids = req.body;
+
+    const deletedTransactions = await transactionService.deleteTransactions(
       userId,
-      id
+      transactionids
     );
 
-    res.json(deletedTransaction);
+    res.json(deletedTransactions);
   } catch (err: any) {
+    console.log(err);
     res
       .status(500)
       .json({ error: err.message || "Failed to delete transaction" });

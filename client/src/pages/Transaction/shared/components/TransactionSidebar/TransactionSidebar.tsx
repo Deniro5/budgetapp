@@ -99,7 +99,9 @@ export const TransactionSidebar = () => {
                   <b> Tags: </b>{" "}
                   <TagContainer>
                     {sidebarTransaction.tags &&
-                      sidebarTransaction.tags.map((tag) => <Tag> {tag} </Tag>)}
+                      sidebarTransaction.tags.map((tag) => (
+                        <Tag key={tag}> {tag} </Tag>
+                      ))}
                   </TagContainer>
                 </DescriptionRow>
                 <DescriptionRow>

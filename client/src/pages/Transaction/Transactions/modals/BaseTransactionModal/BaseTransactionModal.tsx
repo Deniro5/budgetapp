@@ -18,6 +18,7 @@ import {
   TransactionCategory,
   TransactionType,
   PresetTransaction,
+  BatchEditTransaction,
 } from "types/Transaction";
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
@@ -34,10 +35,14 @@ type BaseTransactionModalProps = {
   title: string;
   confirmText?: string;
   onClose: () => void;
-  onSubmit: (transaction: RawTransaction, callback?: () => void) => void;
+  onSubmit: (
+    transaction: RawTransaction | BatchEditTransaction,
+    callback?: () => void
+  ) => void;
   isPresetModal?: boolean;
-  initialTransaction?: Transaction;
+  initialTransactions?: Transaction[];
   ignoreInitialAmount?: boolean;
+  isEditModal?: boolean;
 };
 
 export function BaseTransactionModal({
@@ -45,8 +50,9 @@ export function BaseTransactionModal({
   onClose,
   onSubmit,
   confirmText = "Add Transaction",
-  initialTransaction,
+  initialTransactions = [],
   ignoreInitialAmount,
+  isEditModal,
 }: BaseTransactionModalProps) {
   const [presetSearch, setPresetSearch] = useState("");
 
@@ -59,6 +65,42 @@ export function BaseTransactionModal({
     null
   );
 
+  const firstTransaction = initialTransactions[0];
+
+  // string-like fields can return "Multiple Values"
+  function getDefaultValue<K extends "description" | "vendor" | "date">(
+    field: K
+  ): string | undefined;
+
+  // strict typed fields just return their actual type or undefined
+  function getDefaultValue<
+    K extends "amount" | "type" | "account" | "tags" | "category"
+  >(field: K): Transaction[K] | undefined;
+
+  // implementation
+  function getDefaultValue<K extends keyof Transaction>(
+    field: K
+  ): Transaction[K] | string | undefined {
+    if (!firstTransaction) return undefined;
+
+    return initialTransactions.every(
+      (t) => t[field] === firstTransaction[field]
+    )
+      ? firstTransaction[field]
+      : typeof firstTransaction[field] === "string"
+      ? "Multiple Values"
+      : undefined;
+  }
+
+  function getDefaultAccountValue() {
+    if (!firstTransaction) return userPreferences?.defaultAccount?._id;
+    return initialTransactions.every(
+      (account) => account.account._id === firstTransaction.account._id
+    )
+      ? firstTransaction.account._id
+      : undefined;
+  }
+
   const {
     register,
     handleSubmit,
@@ -66,21 +108,19 @@ export function BaseTransactionModal({
     watch,
     clearErrors,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<RawTransaction>({
     mode: "onSubmit", // Validation only on submit
     reValidateMode: "onSubmit", // No revalidation on field changes
     defaultValues: {
-      description: initialTransaction?.description,
-      vendor: initialTransaction?.vendor,
-      amount: initialTransaction?.amount,
-      type: initialTransaction?.type,
-      date: initialTransaction?.date,
-      account:
-        initialTransaction?.account?._id ||
-        userPreferences?.defaultAccount?._id,
-      category: initialTransaction?.category,
-      tags: initialTransaction?.tags || [],
+      description: getDefaultValue("description"),
+      vendor: getDefaultValue("vendor"),
+      date: getDefaultValue("date"),
+      amount: getDefaultValue("amount"),
+      type: getDefaultValue("type"),
+      account: getDefaultAccountValue(),
+      category: getDefaultValue("category"),
+      tags: getDefaultValue("tags"),
     },
   });
   const currentValues = watch();
@@ -118,7 +158,21 @@ export function BaseTransactionModal({
   );
 
   const onSubmitForm = async (data: RawTransaction) => {
-    onSubmit(data);
+    if (isEditModal) {
+      const updates: BatchEditTransaction = Object.keys(dirtyFields).reduce(
+        (acc, key) => {
+          const k = key as keyof BatchEditTransaction;
+          acc[k] = data[k as keyof RawTransaction] as any; // 'as any' only if TS complains about value types
+          return acc;
+        },
+        {} as BatchEditTransaction
+      );
+      console.log(updates);
+      // onSubmit(updates);
+    } else {
+      console.log(data);
+      // onSubmit(data);
+    }
     onClose();
   };
 
@@ -257,14 +311,16 @@ export function BaseTransactionModal({
           </InputContainer>
         </Row>
 
-        <BalanceSummaryFooter
-          initialAccountId={initialTransaction?.account?._id}
-          account={account}
-          amount={currentValues.amount}
-          initialAmount={ignoreInitialAmount ? 0 : initialTransaction?.amount}
-          type={currentValues.type}
-          initialType={initialTransaction?.type}
-        />
+        {initialTransactions?.length <= 1 && (
+          <BalanceSummaryFooter
+            initialAccountId={firstTransaction?.account?._id}
+            account={account}
+            amount={currentValues.amount}
+            initialAmount={ignoreInitialAmount ? 0 : firstTransaction?.amount}
+            type={currentValues.type}
+            initialType={firstTransaction?.type}
+          />
+        )}
 
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>

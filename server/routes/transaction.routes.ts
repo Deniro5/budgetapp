@@ -28,6 +28,6 @@ router.get(
 router.get("/:id", verifyToken, getTransactionById);
 router.get("/", verifyToken, getTransactions);
 router.put("/:id", verifyToken, updateTransaction);
-router.delete("/:id", verifyToken, deleteTransaction);
+router.delete("/", verifyToken, deleteTransaction);
 
 export default router;

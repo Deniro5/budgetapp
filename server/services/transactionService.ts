@@ -184,23 +184,41 @@ export const updateTransaction = async (
   return updatedTransaction;
 };
 
-export const deleteTransaction = async (
+export const deleteTransactions = async (
   userId: string,
-  id: string
-): Promise<any> => {
-  const transaction = await TransactionModel.findOne({ _id: id, userId });
-  if (!transaction) throw new Error("Unauthorized to delete this transaction");
-
-  await TransactionModel.findByIdAndDelete(id);
-
-  const { type, amount, account } = transaction;
-
-  await updateAccountBalance({
-    accountId: account,
-    change: type === "Expense" ? amount : -amount,
+  transactionIds: string[]
+) => {
+  // Optional: validate ownership first
+  const transactions = await TransactionModel.find({
+    _id: { $in: transactionIds },
+    userId,
   });
 
-  return transaction;
+  if (transactions.length !== transactionIds.length) {
+    throw new Error("Unauthorized to delete one or more transactions");
+  }
+
+  await TransactionModel.deleteMany({
+    _id: { $in: transactionIds },
+    userId,
+  });
+
+  const accountChangesByAccount = transactions.reduce((acc, cur) => {
+    acc[cur.account] =
+      Number(cur.type === "Expense" ? cur.amount : -cur.amount) +
+      (acc[cur.account] || 0);
+
+    return acc;
+  }, {});
+
+  Object.keys(accountChangesByAccount).forEach(async (accountId) => {
+    await updateAccountBalance({
+      accountId,
+      change: accountChangesByAccount[accountId],
+    });
+  });
+
+  return transactions;
 };
 
 export const getTransactionCategoriesByAmount = async (

@@ -44,7 +44,6 @@ export function TransactionTable({
     setActiveOverlay,
     setContextMenuPosition,
     setActiveTransaction,
-    sidebarTransactionId,
     setSelectedTransactions,
     selectedTransactions,
     view,
@@ -55,10 +54,12 @@ export function TransactionTable({
 
   const handleClick = (
     e: React.MouseEvent,
-    transaction: Transaction | PresetTransaction | null
+    transaction: Transaction | PresetTransaction | null,
+    index: number
   ) => {
     if (!transaction) return;
 
+    // if command key is pressed
     if (e.metaKey) {
       if (isTransactionSelected(transaction._id)) {
         setSelectedTransactions(
@@ -67,19 +68,51 @@ export function TransactionTable({
       } else {
         setSelectedTransactions([...selectedTransactions, transaction]);
       }
-    } else if (e.shiftKey) {
-      console.log("Shift key pressed");
-    } else {
+    }
+    // if shift key is pressed
+    else if (e.shiftKey && !isTransactionSelected(transaction._id)) {
+      //if there is a selected transaction before the current transaction or after , select the transactions in between. before takes precedent
+      for (let i = index - 1; i >= 0; i--) {
+        if (isTransactionSelected(transactions[i]._id)) {
+          setSelectedTransactions([
+            ...selectedTransactions,
+            ...transactions.slice(i + 1, index + 1),
+          ]);
+          return;
+        }
+      }
+      for (let i = index + 1; i < transactions.length; i++) {
+        if (isTransactionSelected(transactions[i]._id)) {
+          setSelectedTransactions([
+            ...selectedTransactions,
+            ...transactions.slice(index, i),
+          ]);
+          return;
+        }
+      }
+      //if there is no selected transaction right now select all previous transactions in the list
+      setSelectedTransactions([
+        ...selectedTransactions,
+        ...transactions.slice(0, index + 1),
+      ]);
+    }
+    //if no key is pressed
+    else {
       setActiveTransaction(transaction);
       setSelectedTransactions([transaction]);
     }
-
     setActiveTransaction(transaction);
   };
+
   const handleRightClick = (
     e: React.MouseEvent<HTMLTableRowElement>,
     transaction: Transaction | PresetTransaction | null
   ) => {
+    if (!transaction) return;
+    if (!isTransactionSelected(transaction._id)) {
+      setSelectedTransactions([transaction]);
+    }
+
     setActiveTransaction(transaction);
     setActiveOverlay(TransactionOverlayType.CONTEXT);
     setContextMenuPosition({ top: e.clientY, left: e.clientX });
@@ -114,12 +147,13 @@ export function TransactionTable({
         <ScrollBody>
           {transactions.map((transaction, index) => (
             <TransactionTableRow
-              key={index}
+              key={transaction._id}
               transaction={transaction}
               isSelected={isTransactionSelected(transaction._id)}
               onClick={handleClick}
               onRightClick={handleRightClick}
               onDoubleClick={handleDoubleClick}
+              index={index}
             />
           ))}
         </ScrollBody>

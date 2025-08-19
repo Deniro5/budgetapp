@@ -51,9 +51,10 @@ import {
 } from "./RecurringTransactions/modals";
 import useTransactionStore from "store/transaction/transactionStore";
 import { TransactionOverlayType } from "./transactions.types.ts";
+import { useTableClickListener } from "./hooks/useTableClickListener.ts";
 
 export default function TransactionsPage() {
-  const [search, setSearch] = useState("");
+  const tableRef = useTableClickListener();
   const { filter } = useTransactionStore();
   const {
     startDate,
@@ -65,6 +66,7 @@ export default function TransactionsPage() {
     setActiveTransaction,
     activeTransaction,
     view,
+    search,
   } = useTransactionStore();
 
   const { transactions, transactionCount, loadMore, isLoading, error } =
@@ -196,7 +198,7 @@ export default function TransactionsPage() {
 
         {hasFilters && <TransactionFilterRow />}
         <ContentContainer>
-          <TableFlexContainer hasFilters={hasFilters}>
+          <TableFlexContainer hasFilters={hasFilters} ref={tableRef}>
             <TransactionTable
               transactions={currentTransactions}
               loading={currentLoading}
@@ -232,10 +234,7 @@ export default function TransactionsPage() {
         )}
       {activeOverlay === TransactionOverlayType.DELETE &&
         isTransaction(activeTransaction) && (
-          <DeleteTransactionModal
-            transaction={activeTransaction}
-            onClose={handleCloseOverlay}
-          />
+          <DeleteTransactionModal onClose={handleCloseOverlay} />
         )}
       {activeOverlay === TransactionOverlayType.CONTEXT &&
         activeTransaction && (

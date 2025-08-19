@@ -72,6 +72,10 @@ export type RawTransaction = Omit<
   account: string;
 };
 
+export type BatchEditTransaction = Partial<
+  Omit<Transaction, "_id" | "userId" | "createdAt" | "updatedAt" | "account">
+>;
+
 export type TransactionFilter = {
   search?: string;
   startDate?: string;

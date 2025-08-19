@@ -11,8 +11,13 @@ type TransactionContextMenuProps = {
 export function TransactionContextMenu({
   onClose,
 }: TransactionContextMenuProps) {
-  const { setActiveOverlay, activeTransaction, view, contextMenuPosition } =
-    useTransactionStore();
+  const {
+    setActiveOverlay,
+    activeTransaction,
+    view,
+    contextMenuPosition,
+    selectedTransactions,
+  } = useTransactionStore();
 
   if (!activeTransaction) return null;
   const isTransfer =
@@ -26,31 +31,12 @@ export function TransactionContextMenu({
   };
 
   const transactionLabel = getTransactionLabel();
-
-  const editLabel = `Edit ${transactionLabel}`;
-  const copyLabel = `Copy ${transactionLabel}`;
-  const deleteLabel = `Delete ${transactionLabel}`;
-
-  const menuItems = [
-    {
-      label: editLabel,
-      function: () => {
-        handleEditClick();
-      },
-    },
-    {
-      label: copyLabel,
-      function: () => {
-        handleCopyClick();
-      },
-    },
-    {
-      label: deleteLabel,
-      function: () => {
-        handleDeleteClick();
-      },
-    },
-  ];
+  const multipleTransactionsSelected = selectedTransactions.length > 1;
+  const pluralize =
+    multipleTransactionsSelected && selectedTransactions.length > 1 ? "s" : "";
+  const editLabel = `Edit ${transactionLabel}${pluralize}`;
+  const copyLabel = `Copy ${transactionLabel}${pluralize}`;
+  const deleteLabel = `Delete ${transactionLabel}${pluralize}`;
 
   const handleEditClick = () => {
     if (view === "Recurring")
@@ -84,6 +70,25 @@ export function TransactionContextMenu({
       else setActiveOverlay(TransactionOverlayType.COPY);
     }
   };
+
+  const menuItems = [
+    {
+      label: editLabel,
+      function: handleEditClick,
+    },
+    ...(!multipleTransactionsSelected
+      ? [
+          {
+            label: copyLabel,
+            function: handleCopyClick,
+          },
+        ]
+      : []),
+    {
+      label: deleteLabel,
+      function: handleDeleteClick,
+    },
+  ];
 
   const getWidth = () => {
     if (view === "Recurring" || view === "Preset") return 240;

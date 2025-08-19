@@ -2,20 +2,21 @@ import Modal from "components/Global/Modal";
 import { Transaction } from "types/Transaction";
 import ConfirmModal from "components/Global/ConfirmModal";
 import { useDeleteTransaction } from "../../hooks/useDeleteTransaction";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type DeleteTransactionModalProps = {
-  transaction: Transaction;
   onClose: () => void;
 };
 
 export function DeleteTransactionModal({
-  transaction,
   onClose,
 }: DeleteTransactionModalProps) {
   const { mutate } = useDeleteTransaction();
+  const { selectedTransactions } = useTransactionStore();
+  const areMultipleSelected = selectedTransactions.length > 1;
 
   const handleConfirm = () => {
-    mutate(transaction._id);
+    mutate(selectedTransactions.map((transaction) => transaction._id));
     onClose();
   };
 
@@ -24,7 +25,9 @@ export function DeleteTransactionModal({
       <ConfirmModal
         handleCancel={onClose}
         handleConfirm={handleConfirm}
-        text={"Are you sure you want to delete this transaction?"}
+        text={`Are you sure you want to delete ${
+          areMultipleSelected ? "these transactions" : "this transaction"
+        }?`}
       />
     </Modal>
   );

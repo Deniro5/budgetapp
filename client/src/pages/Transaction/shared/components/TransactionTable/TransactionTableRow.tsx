@@ -17,7 +17,8 @@ type TransactionTableRowProps = {
   transaction: Transaction | PresetTransaction;
   onClick: (
     e: React.MouseEvent<HTMLTableRowElement>,
-    transaction: Transaction | PresetTransaction | null
+    transaction: Transaction | PresetTransaction | null,
+    index: number
   ) => void;
   onRightClick: (
     e: React.MouseEvent<HTMLTableRowElement>,
@@ -25,6 +26,7 @@ type TransactionTableRowProps = {
   ) => void;
   onDoubleClick: (transaction: Transaction | PresetTransaction | null) => void;
   isSelected: boolean;
+  index: number;
 };
 
 const emptyString = "N/A";
@@ -35,15 +37,12 @@ export function TransactionTableRow({
   onRightClick,
   onDoubleClick,
   isSelected,
+  index,
 }: TransactionTableRowProps) {
   const { accountNameByIdMap } = useAccounts();
 
   const handleClick = (e: React.MouseEvent<HTMLTableRowElement>) => {
-    if (isSelected) {
-      onClick(e, null);
-      return;
-    }
-    onClick(e, transaction);
+    onClick(e, transaction, index);
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
