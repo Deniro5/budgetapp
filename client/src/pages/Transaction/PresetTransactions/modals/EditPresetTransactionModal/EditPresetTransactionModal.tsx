@@ -1,23 +1,23 @@
 import Modal from "components/Global/Modal";
 import { BasePresetTransactionModal } from "../BasePresetTransactionModal/BasePresetTransactionModal";
-import { PresetTransaction, RawPresetTransaction } from "types/Transaction";
+import { RawPresetTransaction } from "types/Transaction";
 import { useEditPresetTransaction } from "../../hooks/useEditPresetTransaction";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type PresetTransactionModalProps = {
   onClose: () => void;
-  initialTransaction: PresetTransaction;
 };
 
 export function EditPresetTransactionModal({
   onClose,
-  initialTransaction,
 }: PresetTransactionModalProps) {
   const { mutate } = useEditPresetTransaction();
+  const { selectedTransactions } = useTransactionStore();
 
-  const handleModalSubmit = (transaction: RawPresetTransaction) => {
+  const handleModalSubmit = (updatedFields: RawPresetTransaction) => {
     mutate({
-      presetTransactionId: initialTransaction._id,
-      updatedPresetTransaction: transaction,
+      presetTransactionIds: selectedTransactions.map((t) => t._id),
+      updatedFields,
     });
   };
 
@@ -27,7 +27,8 @@ export function EditPresetTransactionModal({
         title="Edit Preset Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransaction={initialTransaction}
+        initialTransactions={selectedTransactions}
+        mode="edit"
       />
     </Modal>
   );

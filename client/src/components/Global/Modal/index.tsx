@@ -37,7 +37,10 @@ function Modal({ isOpen, onClose, children, width }: ModalProps) {
   );
 }
 
-const StyledOverlay = styled.div<{ isOpen: boolean }>`
+// Overlay
+const StyledOverlay = styled(({ isOpen, ...rest }: { isOpen: boolean }) => (
+  <div {...rest} />
+))<{ isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -48,10 +51,12 @@ const StyledOverlay = styled.div<{ isOpen: boolean }>`
   z-index: 999;
 `;
 
-const StyledDialog = styled.dialog<{
-  isOpen: boolean;
-  width: number | undefined;
-}>`
+// Dialog
+const StyledDialog = styled(
+  ({ isOpen, width, ...rest }: { isOpen: boolean; width?: number }) => (
+    <dialog {...rest} />
+  )
+)<{ isOpen: boolean; width?: number }>`
   position: absolute;
   top: 40%;
   transform: translateY(-40%);

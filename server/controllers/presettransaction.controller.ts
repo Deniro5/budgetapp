@@ -116,69 +116,58 @@ export const getPresetTransactions = async (
   }
 };
 
-export const updatePresetTransaction = async (
+export const updatePresetTransactions = async (
   req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
     const { userId } = req;
-    const { id } = req.params;
-    const updateData = req.body;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
+    console.log(req.body);
+    const { presetTransactionIds, updatedFields } = req.body;
+    console.log(presetTransactionIds, updatedFields);
 
-    const updatedTransaction =
-      await presetTransactionService.updatePresetTransaction(
-        id,
-        userId,
-        updateData
-      );
-
-    if (!updatedTransaction) {
-      res.status(403).json({
-        error: "You are not authorized to update this preset transaction",
-      });
-      return;
-    }
-
-    res.json(updatedTransaction);
+    await presetTransactionService.updatePresetTransactions(
+      presetTransactionIds,
+      userId,
+      updatedFields
+    );
+    res
+      .status(201)
+      .json({ messsage: "Preset Transactions updated successfully" });
   } catch (err) {
     console.error("Error updating preset transaction:", err);
     res.status(500).json({ error: "Failed to update preset transaction" });
   }
 };
 
-export const deletePresetTransaction = async (
+export const deletePresetTransactions = async (
   req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
     const { userId } = req;
-    const { id } = req.params;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const deleted = await presetTransactionService.deletePresetTransaction(
-      id,
+    const presetTransactionIds: string[] = req.body;
+
+    const deleted = await presetTransactionService.deletePresetTransactions(
+      presetTransactionIds,
       userId
     );
 
-    if (!deleted) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to delete this transaction" });
-      return;
-    }
-
-    res.json({ message: "Transaction deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting transaction:", err);
-    res.status(500).json({ error: "Failed to delete transaction" });
+    res
+      .status(201)
+      .json({ messsage: "Preset Transactions deleted successfully" });
+  } catch (err: any) {
+    console.error("Error deleting preset transactions:", err);
+    res.status(500).json({ error: "Failed to delete preset transactions" });
   }
 };

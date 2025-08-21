@@ -4,9 +4,9 @@ import { BASE_API_URL } from "appConstants";
 import axios from "axios";
 import { RawRecurringTransaction } from "types/Transaction";
 
-type EditRecurringTransactionProps = {
-  recurringTransactionId: string;
-  updatedRecurringTransaction: RawRecurringTransaction;
+type EditRecurringTransactionsProps = {
+  recurringTransactionIds: string[];
+  updatedFields: Partial<RawRecurringTransaction>;
 };
 
 export const useEditRecurringTransaction = () => {
@@ -15,17 +15,19 @@ export const useEditRecurringTransaction = () => {
   return useMutationWithSuccessAndError({
     options: {
       mutationFn: ({
-        recurringTransactionId,
-        updatedRecurringTransaction,
-      }: EditRecurringTransactionProps) =>
-        axios.put(
-          `${BASE_API_URL}/recurring-transactions/${recurringTransactionId}`,
-          updatedRecurringTransaction
-        ),
+        recurringTransactionIds,
+        updatedFields,
+      }: EditRecurringTransactionsProps) =>
+        axios
+          .put(`${BASE_API_URL}/recurring-transactions`, {
+            recurringTransactionIds,
+            updatedFields,
+          })
+          .then((res) => res.data), // Return updated transactions
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["recurringTransactions"] });
       },
     },
-    customSuccess: "Recurring transaction updated successfully",
+    customSuccess: "Recurring transactions updated successfully",
   });
 };

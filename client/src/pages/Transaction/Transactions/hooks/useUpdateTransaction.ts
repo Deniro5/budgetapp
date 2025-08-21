@@ -2,11 +2,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMutationWithSuccessAndError } from "hooks/useMutationWithSuccessAndError";
 import { BASE_API_URL } from "appConstants";
 import axios from "axios";
-import { RawTransaction } from "types/Transaction";
+import { BatchEditTransaction } from "types/Transaction";
 
 type UpdateTransactionProps = {
-  transactionId: string;
-  updatedTransaction: RawTransaction;
+  transactionIds: string[];
+  updatedFields: BatchEditTransaction;
 };
 
 export const useUpdateTransaction = () => {
@@ -14,15 +14,12 @@ export const useUpdateTransaction = () => {
 
   return useMutationWithSuccessAndError({
     options: {
-      mutationFn: ({
-        transactionId,
-        updatedTransaction,
-      }: UpdateTransactionProps) =>
+      mutationFn: ({ transactionIds, updatedFields }: UpdateTransactionProps) =>
         axios
-          .put(
-            `${BASE_API_URL}/transactions/${transactionId}`,
-            updatedTransaction
-          )
+          .put(`${BASE_API_URL}/transactions`, {
+            updatedFields,
+            transactionIds,
+          })
           .then((res) => res.data), // Return only the updated transaction
       onSuccess: (updatedTransaction) => {
         queryClient.invalidateQueries({ queryKey: ["transactions"] });

@@ -8,7 +8,7 @@ const recurringTransactionSchema: Schema = new Schema(
     account: { type: Schema.Types.ObjectId, ref: "Account", required: true }, // Reference to the Account
     category: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the User
-    vendor: { type: String, required: false },
+    vendor: { type: String, required: true },
     tags: { type: [String], required: false },
     description: { type: String, required: false },
     date: { type: String, required: true },

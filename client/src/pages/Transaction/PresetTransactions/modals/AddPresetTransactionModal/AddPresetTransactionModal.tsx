@@ -22,6 +22,7 @@ export function AddPresetTransactionModal({
         title="Add Preset Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
+        mode="create"
       />
     </Modal>
   );

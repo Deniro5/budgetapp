@@ -1,21 +1,21 @@
 import Modal from "components/Global/Modal";
-import { PresetTransaction } from "types/Transaction";
 import ConfirmModal from "components/Global/ConfirmModal";
 import { useDeletePresetTransaction } from "../../hooks/useDeletePresetTransaction";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type DeletePresetTransactionModalProps = {
-  transaction: PresetTransaction;
   onClose: () => void;
 };
 
 export function DeletePresetTransactionModal({
-  transaction,
   onClose,
 }: DeletePresetTransactionModalProps) {
   const { mutate } = useDeletePresetTransaction();
+  const { selectedTransactions } = useTransactionStore();
+  const areMultipleSelected = selectedTransactions.length > 1;
 
   const handleConfirm = () => {
-    mutate(transaction._id);
+    mutate(selectedTransactions.map((transaction) => transaction._id));
     onClose();
   };
 
@@ -24,7 +24,11 @@ export function DeletePresetTransactionModal({
       <ConfirmModal
         handleCancel={onClose}
         handleConfirm={handleConfirm}
-        text={"Are you sure you want to delete this preset transaction?"}
+        text={`Are you sure you want to delete ${
+          areMultipleSelected
+            ? "these preset transactions"
+            : "this preset transaction"
+        }?`}
       />
     </Modal>
   );

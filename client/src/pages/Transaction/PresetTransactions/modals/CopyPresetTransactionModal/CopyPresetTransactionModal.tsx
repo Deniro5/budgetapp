@@ -23,7 +23,8 @@ export function CopyPresetTransactionModal({
         title="Copy Preset Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransaction={initialTransaction}
+        initialTransactions={[initialTransaction]}
+        mode="create"
       />
     </Modal>
   );

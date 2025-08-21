@@ -216,7 +216,9 @@ export function BaseInvestmentModal({
         />
         <ButtonContainer>
           <BaseButton type="submit">Confirm</BaseButton>
-          <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          <SecondaryButton type="button" onClick={onClose}>
+            Cancel
+          </SecondaryButton>
         </ButtonContainer>
       </form>
     </Modal>

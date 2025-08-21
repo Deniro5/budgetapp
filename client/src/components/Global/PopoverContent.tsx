@@ -29,7 +29,10 @@ function PopoverContent({
   const getPopoverContent = () => {
     if (menuItems) {
       return menuItems.map((menuItem) => (
-        <PopoverMenuItem onClick={(e) => handleClick(e, menuItem.function)}>
+        <PopoverMenuItem
+          key={menuItem.label}
+          onClick={(e) => handleClick(e, menuItem.function)}
+        >
           {menuItem.label}
         </PopoverMenuItem>
       ));

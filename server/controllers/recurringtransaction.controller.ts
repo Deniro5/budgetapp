@@ -116,67 +116,58 @@ export const getRecurringTransactions = async (
   }
 };
 
-export const updateRecurringTransaction = async (
+export const updateRecurringTransactions = async (
   req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
     const { userId } = req;
-    const { id } = req.params;
-    const updateData = req.body;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const updatedTransaction =
-      await recurringTransactionService.updateRecurringTransaction(
-        id,
-        userId,
-        updateData
-      );
+    const { recurringTransactionIds, updatedFields } = req.body;
 
-    if (!updatedTransaction) {
-      res.status(403).json({
-        error: "You are not authorized to update this recurring transaction",
-      });
-      return;
-    }
+    // Call service to handle bulk update
+    await recurringTransactionService.updateRecurringTransactions(
+      recurringTransactionIds,
+      userId,
+      updatedFields
+    );
 
-    res.json(updatedTransaction);
+    res
+      .status(201)
+      .json({ message: "Recurring transactions updated successfully" });
   } catch (err) {
-    console.error("Error updating recurring transaction:", err);
-    res.status(500).json({ error: "Failed to update recurring transaction" });
+    console.error("Error updating recurring transactions:", err);
+    res.status(500).json({ error: "Failed to update recurring transactions" });
   }
 };
 
-export const deleteRecurringTransaction = async (
+export const deleteRecurringTransactions = async (
   req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
     const { userId } = req;
-    const { id } = req.params;
-
     if (!userId) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    const deleted =
-      await recurringTransactionService.deleteRecurringTransaction(id, userId);
+    const recurringTransactionIds: string[] = req.body;
 
-    if (!deleted) {
-      res
-        .status(403)
-        .json({ error: "You are not authorized to delete this transaction" });
-      return;
-    }
+    await recurringTransactionService.deleteRecurringTransactions(
+      recurringTransactionIds,
+      userId
+    );
 
-    res.json({ message: "Transaction deleted successfully" });
+    res
+      .status(201)
+      .json({ message: "Recurring transactions deleted successfully" });
   } catch (err) {
-    console.error("Error deleting transaction:", err);
-    res.status(500).json({ error: "Failed to delete transaction" });
+    console.error("Error deleting recurring transactions:", err);
+    res.status(500).json({ error: "Failed to delete recurring transactions" });
   }
 };

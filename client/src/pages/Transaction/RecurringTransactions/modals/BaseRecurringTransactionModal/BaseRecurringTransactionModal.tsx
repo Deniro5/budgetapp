@@ -21,68 +21,109 @@ import {
 import { SPACING, FONTSIZE, COLORS } from "theme";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
-import { capitalize } from "utils";
+import { capitalize } from "lodash";
 
-type BaseRecurringTransactionModalProps = {
-  title: string;
-  confirmText?: string;
-  onClose: () => void;
-  onSubmit: (
-    transaction: RawRecurringTransaction,
-    callback?: () => void
-  ) => void;
-  initialTransaction?: RecurringTransaction;
-};
+type BaseRecurringTransactionModalProps =
+  | {
+      mode: "create";
+      title: string;
+      confirmText?: string;
+      onClose: () => void;
+      onSubmit: (transaction: RawRecurringTransaction) => void;
+      initialTransactions?: never;
+    }
+  | {
+      mode: "edit";
+      title: string;
+      confirmText?: string;
+      onClose: () => void;
+      onSubmit: (transaction: Partial<RawRecurringTransaction>) => void;
+      initialTransactions: RecurringTransaction[];
+    };
 
 export function BaseRecurringTransactionModal({
+  mode,
   title,
   onClose,
   onSubmit,
-  confirmText = "Add Recurring Transaction",
-
-  initialTransaction,
+  confirmText = mode === "edit" ? "Save Changes" : "Add Recurring Transaction",
+  initialTransactions = [],
 }: BaseRecurringTransactionModalProps) {
+  const isEditMode = mode === "edit";
+  const firstTransaction = initialTransactions[0];
+  function getDefaultValue<K extends keyof RecurringTransaction>(
+    field: K
+  ): RecurringTransaction[K] | undefined {
+    if (!firstTransaction) return undefined;
+
+    const allSame = initialTransactions.every(
+      (t) => t[field] === firstTransaction[field]
+    );
+
+    if (allSame) return firstTransaction[field];
+
+    // Only string fields can show "Multiple Values"
+    const fieldValue = firstTransaction[field];
+    if (typeof fieldValue === "string") {
+      return "Multiple Values" as RecurringTransaction[K];
+    }
+
+    // For number, enum, or array types, fallback to undefined
+    return undefined;
+  }
+
+  function getDefaultAccountValue() {
+    if (!firstTransaction) return undefined;
+    const allSame = initialTransactions.every(
+      (t) => t.account?._id === firstTransaction.account?._id
+    );
+    return allSame ? firstTransaction.account?._id : undefined;
+  }
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     clearErrors,
-
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<RawRecurringTransaction>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
+    mode: "onSubmit",
     defaultValues: {
-      name: initialTransaction?.name,
-      description: initialTransaction?.description,
-      vendor: initialTransaction?.vendor,
-      amount: initialTransaction?.amount,
-      type: initialTransaction?.type,
-      date: initialTransaction?.date,
-      account: initialTransaction?.account?._id,
-      category: initialTransaction?.category,
-      tags: initialTransaction?.tags || [],
-      interval: initialTransaction?.interval,
+      vendor: getDefaultValue("vendor"),
+      amount: getDefaultValue("amount"),
+      type: getDefaultValue("type"),
+      date: getDefaultValue("date"),
+      account: getDefaultAccountValue(),
+      category: getDefaultValue("category"),
+      interval: getDefaultValue("interval"),
+      tags: getDefaultValue("tags") || [],
+      description: getDefaultValue("description"),
+      name: getDefaultValue("name"),
     },
   });
 
   const currentValues = watch();
 
-  const handleTagsChange = (tags: string[]) => {
-    setValue("tags", tags);
-  };
+  const handleTagsChange = (tags: string[]) => setValue("tags", tags);
+  const handleCategoryChange = (category: TransactionCategory) =>
+    setValue("category", category, { shouldValidate: true, shouldDirty: true });
+  const handleAccountChange = (accountId: string) =>
+    setValue("account", accountId, { shouldValidate: true, shouldDirty: true });
 
-  const handleCategoryChange = (category: TransactionCategory) => {
-    setValue("category", category, { shouldValidate: true });
-  };
-
-  const handleAccountChange = (accountId: string) => {
-    setValue("account", accountId, { shouldValidate: true });
-  };
-
-  const onSubmitForm = async (data: RawRecurringTransaction) => {
-    onSubmit(data);
+  const onSubmitForm = (data: RawRecurringTransaction) => {
+    if (isEditMode) {
+      const updates: Partial<RawRecurringTransaction> = Object.keys(
+        dirtyFields
+      ).reduce((acc, key) => {
+        const k = key as keyof RawRecurringTransaction;
+        acc[k] = data[k];
+        return acc;
+      }, {} as Partial<RawRecurringTransaction>);
+      onSubmit(updates);
+    } else {
+      onSubmit(data);
+    }
     onClose();
   };
 
@@ -90,13 +131,13 @@ export function BaseRecurringTransactionModal({
     <>
       <Title>{title}</Title>
       <form onSubmit={handleSubmit(onSubmitForm)}>
-        <SubTitle> Required Fields </SubTitle>
+        <SubTitle>Required Fields</SubTitle>
         <Row>
           <InputContainer>
             <InputLabel>Vendor</InputLabel>
             <BaseInput
               {...register("vendor", {
-                required: false,
+                required: isEditMode ? false : "Vendor is required",
                 pattern: {
                   value: /^[a-zA-Z0-9 ]*$/,
                   message: "Alphanumeric values only",
@@ -109,11 +150,12 @@ export function BaseRecurringTransactionModal({
               <ErrorMessage>{errors.vendor.message}</ErrorMessage>
             )}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Amount</InputLabel>
             <BaseInput
               {...register("amount", {
-                required: false,
+                required: isEditMode ? false : "Amount is required",
                 validate: (value) => !isNaN(value || 0) || "Invalid number",
                 onChange: () => clearErrors("amount"),
               })}
@@ -123,16 +165,18 @@ export function BaseRecurringTransactionModal({
               <ErrorMessage>{errors.amount.message}</ErrorMessage>
             )}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Type</InputLabel>
-            <BaseSelect {...register("type")}>
-              <option value={TransactionType.EXPENSE}>
-                {TransactionType.EXPENSE}
-              </option>
-              <option value={TransactionType.INCOME}>
-                {TransactionType.INCOME}
-              </option>
+            <BaseSelect
+              {...register("type", {
+                required: isEditMode ? false : "Type is required",
+              })}
+            >
+              <option value={TransactionType.EXPENSE}>Expense</option>
+              <option value={TransactionType.INCOME}>Income</option>
             </BaseSelect>
+            {errors.type && <ErrorMessage>{errors.type.message}</ErrorMessage>}
           </InputContainer>
         </Row>
 
@@ -141,13 +185,13 @@ export function BaseRecurringTransactionModal({
             <InputLabel>Initial Date</InputLabel>
             <BaseInput
               {...register("date", {
-                required: false,
-                onChange: () => clearErrors("date"),
+                required: isEditMode ? false : "Date is required",
               })}
               type="date"
             />
             {errors.date && <ErrorMessage>{errors.date.message}</ErrorMessage>}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Account</InputLabel>
             <AccountDropdown
@@ -158,6 +202,7 @@ export function BaseRecurringTransactionModal({
               <ErrorMessage>{errors.account.message}</ErrorMessage>
             )}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Category</InputLabel>
             <CategoryDropdown
@@ -169,13 +214,13 @@ export function BaseRecurringTransactionModal({
             )}
           </InputContainer>
         </Row>
+
         <Row>
           <InputContainer>
             <InputLabel>Frequency</InputLabel>
             <BaseSelect
               {...register("interval", {
-                required: "Interval is required",
-                onChange: () => clearErrors("interval"),
+                required: isEditMode ? false : "Interval is required",
               })}
             >
               {Object.values(RecurringTransactionInterval).map((value) => (
@@ -184,11 +229,14 @@ export function BaseRecurringTransactionModal({
                 </option>
               ))}
             </BaseSelect>
+            {errors.interval && (
+              <ErrorMessage>{errors.interval.message}</ErrorMessage>
+            )}
           </InputContainer>
         </Row>
 
         <Divider />
-        <SubTitle> Additional Fields </SubTitle>
+        <SubTitle>Additional Fields</SubTitle>
 
         <Row>
           <TagInputContainer>
@@ -199,28 +247,22 @@ export function BaseRecurringTransactionModal({
             />
           </TagInputContainer>
         </Row>
+
         <Row>
           <InputContainer>
             <InputLabel>Description</InputLabel>
             <BaseInput
-              {...register("description", {
-                pattern: {
-                  value: /^[a-zA-Z0-9 .,!?;:'"()-]*$/,
-                  message: "No special characters are allowed",
-                },
-                onChange: () => clearErrors("description"),
-              })}
+              {...register("description")}
               placeholder="Enter description"
             />
-            {errors.description && (
-              <ErrorMessage>{errors.description.message}</ErrorMessage>
-            )}
           </InputContainer>
         </Row>
 
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>
-          <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          <SecondaryButton type="button" onClick={onClose}>
+            Cancel
+          </SecondaryButton>
         </ButtonContainer>
       </form>
     </>

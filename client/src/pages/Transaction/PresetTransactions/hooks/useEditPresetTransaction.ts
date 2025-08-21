@@ -4,9 +4,9 @@ import { BASE_API_URL } from "appConstants";
 import axios from "axios";
 import { RawPresetTransaction } from "types/Transaction";
 
-type EditPresetTransactionProps = {
-  presetTransactionId: string;
-  updatedPresetTransaction: RawPresetTransaction;
+type EditPresetTransactionsProps = {
+  presetTransactionIds: string[];
+  updatedFields: Partial<RawPresetTransaction>;
 };
 
 export const useEditPresetTransaction = () => {
@@ -15,17 +15,20 @@ export const useEditPresetTransaction = () => {
   return useMutationWithSuccessAndError({
     options: {
       mutationFn: ({
-        presetTransactionId,
-        updatedPresetTransaction,
-      }: EditPresetTransactionProps) =>
-        axios.put(
-          `${BASE_API_URL}/preset-transactions/${presetTransactionId}`,
-          updatedPresetTransaction
-        ),
+        presetTransactionIds,
+        updatedFields,
+      }: EditPresetTransactionsProps) =>
+        axios
+          .put(`${BASE_API_URL}/preset-transactions`, {
+            presetTransactionIds,
+            updatedFields,
+          })
+          .then((res) => res.data), // Return updated transactions
       onSuccess: () => {
+        // Only invalidate preset transactions list
         queryClient.invalidateQueries({ queryKey: ["presetTransactions"] });
       },
     },
-    customSuccess: "Preset transaction updated successfully",
+    customSuccess: "Preset transactions updated successfully",
   });
 };

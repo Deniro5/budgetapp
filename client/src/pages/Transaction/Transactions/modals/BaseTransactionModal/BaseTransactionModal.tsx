@@ -31,29 +31,39 @@ import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
 import useAccount from "pages/Accounts/hooks/useAccount";
 
-type BaseTransactionModalProps = {
-  title: string;
-  confirmText?: string;
-  onClose: () => void;
-  onSubmit: (
-    transaction: RawTransaction | BatchEditTransaction,
-    callback?: () => void
-  ) => void;
-  isPresetModal?: boolean;
-  initialTransactions?: Transaction[];
-  ignoreInitialAmount?: boolean;
-  isEditModal?: boolean;
-};
+type BaseTransactionModalProps =
+  | {
+      mode: "create";
+      title: string;
+      confirmText?: string;
+      onClose: () => void;
+      onSubmit: (transaction: RawTransaction) => void;
+      isPresetModal?: boolean;
+      initialTransactions?: Transaction[];
+      ignoreInitialAmount?: boolean;
+    }
+  | {
+      mode: "edit";
+      title: string;
+      confirmText?: string;
+      onClose: () => void;
+      onSubmit: (transaction: BatchEditTransaction) => void;
+      isPresetModal?: boolean;
+      initialTransactions?: Transaction[];
+      ignoreInitialAmount?: boolean;
+    };
 
 export function BaseTransactionModal({
+  mode,
   title,
   onClose,
   onSubmit,
   confirmText = "Add Transaction",
   initialTransactions = [],
   ignoreInitialAmount,
-  isEditModal,
 }: BaseTransactionModalProps) {
+  const isEditModal = mode === "edit";
+
   const [presetSearch, setPresetSearch] = useState("");
 
   const { presetTransactions } = usePresetTransactionSearch({
@@ -129,23 +139,25 @@ export function BaseTransactionModal({
 
   useEffect(() => {
     register("category", {
-      required: "Category is required",
+      required:
+        isEditModal && !dirtyFields.category ? false : "Category is required",
     });
     register("account", {
-      required: "Account is required",
+      required:
+        isEditModal && !dirtyFields.account ? false : "Account is required",
     });
-  }, [register]);
+  }, [register, dirtyFields.category, dirtyFields.account, isEditModal]);
 
   const handleTagsChange = (tags: string[]) => {
     setValue("tags", tags);
   };
 
   const handleCategoryChange = (category: TransactionCategory) => {
-    setValue("category", category, { shouldValidate: true });
+    setValue("category", category, { shouldValidate: true, shouldDirty: true });
   };
 
   const handleAccountChange = (accountId: string) => {
-    setValue("account", accountId, { shouldValidate: true });
+    setValue("account", accountId, { shouldValidate: true, shouldDirty: true });
   };
 
   const handlePresetSelect = (preset: PresetTransaction) => {
@@ -167,11 +179,9 @@ export function BaseTransactionModal({
         },
         {} as BatchEditTransaction
       );
-      console.log(updates);
-      // onSubmit(updates);
+      onSubmit(updates);
     } else {
-      console.log(data);
-      // onSubmit(data);
+      onSubmit(data);
     }
     onClose();
   };
@@ -206,7 +216,10 @@ export function BaseTransactionModal({
             <InputLabel>Vendor</InputLabel>
             <BaseInput
               {...register("vendor", {
-                required: "Vendor is required",
+                required:
+                  isEditModal && !dirtyFields.vendor
+                    ? false
+                    : "Vendor is required",
                 pattern: {
                   value: /^[a-zA-Z0-9 ]*$/,
                   message: "Alphanumeric values only",
@@ -223,7 +236,10 @@ export function BaseTransactionModal({
             <InputLabel>Amount</InputLabel>
             <BaseInput
               {...register("amount", {
-                required: "Amount is required",
+                required:
+                  isEditModal && !dirtyFields.amount
+                    ? false
+                    : "Amount is required",
                 validate: (value) => !isNaN(value) || "Invalid number",
                 onChange: () => clearErrors("amount"),
               })}
@@ -251,7 +267,8 @@ export function BaseTransactionModal({
             <InputLabel>Date</InputLabel>
             <BaseInput
               {...register("date", {
-                required: "Date is required",
+                required:
+                  isEditModal && !dirtyFields.date ? false : "Date is required",
                 onChange: () => clearErrors("date"),
               })}
               type="date"
@@ -324,7 +341,9 @@ export function BaseTransactionModal({
 
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>
-          <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          <SecondaryButton type="button" onClick={onClose}>
+            Cancel
+          </SecondaryButton>
         </ButtonContainer>
       </form>
     </>

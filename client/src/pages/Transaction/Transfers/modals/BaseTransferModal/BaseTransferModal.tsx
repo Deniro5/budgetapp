@@ -84,21 +84,10 @@ export function BaseTransferModal({
 
   const parsedAmount = Number(amount);
 
-  const currentReceivingBalance = receivingAccount?.balance;
-  const afterReceivingBalance =
-    currentReceivingBalance && amount
-      ? currentReceivingBalance +
-        ((initialTransfer?.amount ?? 0) + parsedAmount)
-      : undefined;
-
   const currentSendingBalance = sendingAccount?.balance;
   currentSendingBalance && amount
     ? currentSendingBalance + ((initialTransfer?.amount ?? 0) - parsedAmount)
     : undefined;
-  const afterSendingBalance =
-    currentSendingBalance && amount
-      ? currentSendingBalance + ((initialTransfer?.amount ?? 0) - parsedAmount)
-      : undefined;
 
   return (
     <form onSubmit={handleSubmit(onSubmitForm)}>
@@ -185,7 +174,9 @@ export function BaseTransferModal({
       />
       <ButtonContainer>
         <BaseButton type="submit">{confirmText}</BaseButton>
-        <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+        <SecondaryButton type="button" onClick={onClose}>
+          Cancel
+        </SecondaryButton>
       </ButtonContainer>
     </form>
   );

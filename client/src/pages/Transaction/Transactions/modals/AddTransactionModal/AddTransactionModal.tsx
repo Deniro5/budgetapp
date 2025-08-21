@@ -19,6 +19,7 @@ export function AddTransactionModal({ onClose }: AddTransactionModalProps) {
         title="Add Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
+        mode="create"
       />
     </Modal>
   );

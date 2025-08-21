@@ -119,36 +119,56 @@ export const getRecurringTransactions = async (
   return { transactions, count };
 };
 
-export const updateRecurringTransaction = async (
-  id: string,
+export const updateRecurringTransactions = async (
+  transactionIds: string[],
   userId: string,
   updateData: Partial<RecurringTransactionInput>
 ) => {
-  // Check ownership
-  const transaction = await RecurringTransactionModel.findOne({
-    _id: id,
+  console.log(updateData);
+  // Find all matching transactions that belong to the user
+  const transactions = await RecurringTransactionModel.find({
+    _id: { $in: transactionIds },
     userId,
   });
-  if (!transaction) return null;
 
-  return RecurringTransactionModel.findByIdAndUpdate(id, updateData, {
-    new: true,
-  }).populate({ path: "account", select: "name _id" });
+  if (transactions.length !== transactionIds.length) {
+    throw new Error(
+      "Unauthorized to update one or more recurring transactions"
+    );
+  }
+
+  console.log("fgeagea");
+
+  // Perform bulk update
+  await RecurringTransactionModel.updateMany(
+    { _id: { $in: transactionIds }, userId },
+    { $set: updateData }
+  );
+
+  return;
 };
 
-export const deleteRecurringTransaction = async (
-  id: string,
+export const deleteRecurringTransactions = async (
+  transactionIds: string[],
   userId: string
 ) => {
-  // Check ownership
-  const transaction = await RecurringTransactionModel.findOne({
-    _id: id,
+  // Find all matching transactions that belong to the user
+  const transactions = await RecurringTransactionModel.find({
+    _id: { $in: transactionIds },
     userId,
   });
-  if (!transaction) return false;
 
-  await RecurringTransactionModel.findByIdAndDelete(id);
-  return true;
+  if (transactions.length !== transactionIds.length) {
+    throw new Error("Unauthorized to delete one or more transactions");
+  }
+
+  // Delete all transactions
+  await RecurringTransactionModel.deleteMany({
+    _id: { $in: transactionIds },
+    userId,
+  });
+
+  return;
 };
 
 const getNextRunDate = (interval: string, date: string) => {
@@ -190,7 +210,7 @@ export const processRecurringTransactions = async () => {
       shouldUpdate = true;
     }
     if (shouldUpdate) {
-      await updateRecurringTransaction(transaction._id, transaction.userId, {
+      await updateRecurringTransactions([transaction._id], transaction.userId, {
         date: nextDate,
       });
     }

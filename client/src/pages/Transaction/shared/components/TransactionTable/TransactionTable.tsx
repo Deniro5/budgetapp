@@ -109,6 +109,7 @@ export function TransactionTable({
     transaction: Transaction | PresetTransaction | null
   ) => {
     if (!transaction) return;
+    
     if (!isTransactionSelected(transaction._id)) {
       setSelectedTransactions([transaction]);
     }

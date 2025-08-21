@@ -2,8 +2,8 @@ import express from "express";
 import {
   getTransactionById,
   getTransactions,
-  updateTransaction,
-  deleteTransaction,
+  updateTransactions,
+  deleteTransactions,
   createTransaction,
   getTransactionCategoriesByAmount,
   getTotalIncomeAndExpense,
@@ -27,7 +27,7 @@ router.get(
 
 router.get("/:id", verifyToken, getTransactionById);
 router.get("/", verifyToken, getTransactions);
-router.put("/:id", verifyToken, updateTransaction);
-router.delete("/", verifyToken, deleteTransaction);
+router.put("", verifyToken, updateTransactions);
+router.delete("/", verifyToken, deleteTransactions);
 
 export default router;

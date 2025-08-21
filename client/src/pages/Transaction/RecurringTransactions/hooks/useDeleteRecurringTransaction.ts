@@ -8,12 +8,16 @@ export const useDeleteRecurringTransaction = () => {
 
   return useMutationWithSuccessAndError({
     options: {
-      mutationFn: (transactionId: string) =>
-        axios.delete(`${BASE_API_URL}/recurring-transactions/${transactionId}`),
+      mutationFn: (transactionIds: string[]) =>
+        axios
+          .delete(`${BASE_API_URL}/recurring-transactions`, {
+            data: transactionIds,
+          })
+          .then((res) => res.data),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["recurringTransactions"] });
       },
     },
-    customSuccess: "Recurring transaction deleted successfully",
+    customSuccess: "Recurring transactions deleted successfully",
   });
 };

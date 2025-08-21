@@ -8,12 +8,16 @@ export const useDeletePresetTransaction = () => {
 
   return useMutationWithSuccessAndError({
     options: {
-      mutationFn: (transactionId: string) =>
-        axios.delete(`${BASE_API_URL}/preset-transactions/${transactionId}`),
+      mutationFn: (transactionIds: string[]) =>
+        axios
+          .delete(`${BASE_API_URL}/preset-transactions`, {
+            data: transactionIds,
+          })
+          .then((res) => res.data),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["presetTransactions"] });
       },
     },
-    customSuccess: "Preset transaction deleted successfully",
+    customSuccess: "Preset transactions deleted successfully",
   });
 };

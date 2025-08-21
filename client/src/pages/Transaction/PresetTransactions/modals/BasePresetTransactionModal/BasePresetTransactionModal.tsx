@@ -1,4 +1,3 @@
-import styled from "styled-components";
 import {
   BaseButton,
   BaseInput,
@@ -17,66 +16,109 @@ import {
   PresetTransaction,
   RawPresetTransaction,
 } from "types/Transaction";
-import { SPACING, FONTSIZE, COLORS } from "theme";
 import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import CategoryDropdown from "components/CategoryDropdown/CategoryDropdown";
+import { COLORS, FONTSIZE, SPACING } from "theme";
+import styled from "styled-components";
+import { getUserPreferences } from "store/user/userSelectors";
 
-type BasePresetTransactionModalProps = {
-  title: string;
-  confirmText?: string;
-  onClose: () => void;
-  onSubmit: (transaction: RawPresetTransaction, callback?: () => void) => void;
-  initialTransaction?: PresetTransaction;
-};
+type BasePresetTransactionModalProps =
+  | {
+      mode: "create";
+      title: string;
+      confirmText?: string;
+      onClose: () => void;
+      onSubmit: (transaction: RawPresetTransaction) => void;
+      initialTransactions?: never;
+    }
+  | {
+      mode: "edit";
+      title: string;
+      confirmText?: string;
+      onClose: () => void;
+      onSubmit: (transaction: Partial<RawPresetTransaction>) => void;
+      initialTransactions: PresetTransaction[];
+    };
 
 export function BasePresetTransactionModal({
+  mode,
   title,
   onClose,
   onSubmit,
-  confirmText = "Add Preset Transaction",
-
-  initialTransaction,
+  confirmText = mode === "edit" ? "Save Changes" : "Add Preset Transaction",
+  initialTransactions = [],
 }: BasePresetTransactionModalProps) {
+  const isEditMode = mode === "edit";
+  const firstTransaction = initialTransactions[0];
+
+  const userPreferences = getUserPreferences();
+
+  // Helper for default values
+  function getDefaultValue<K extends keyof PresetTransaction>(field: K): any {
+    if (!firstTransaction) return undefined;
+
+    return initialTransactions.every(
+      (t) => t[field] === firstTransaction[field]
+    )
+      ? firstTransaction[field]
+      : typeof firstTransaction[field] === "string"
+      ? "Multiple Values"
+      : undefined;
+  }
+
+  function getDefaultAccountValue() {
+    if (!firstTransaction) return userPreferences?.defaultAccount?._id;
+    return initialTransactions.every(
+      (account) => account?.account?._id === firstTransaction?.account?._id
+    )
+      ? firstTransaction?.account?._id
+      : undefined;
+  }
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     clearErrors,
-
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<RawPresetTransaction>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: {
-      name: initialTransaction?.name,
-      description: initialTransaction?.description,
-      vendor: initialTransaction?.vendor,
-      amount: initialTransaction?.amount,
-      type: initialTransaction?.type,
-      date: initialTransaction?.date,
-      account: initialTransaction?.account?._id,
-      category: initialTransaction?.category,
-      tags: initialTransaction?.tags || [],
+      name: getDefaultValue("name"),
+      description: getDefaultValue("description"),
+      vendor: getDefaultValue("vendor"),
+      amount: getDefaultValue("amount"),
+      type: getDefaultValue("type"),
+      date: getDefaultValue("date"),
+      account: getDefaultAccountValue(),
+      category: getDefaultValue("category"),
+      tags: getDefaultValue("tags") || [],
     },
   });
 
   const currentValues = watch();
 
-  const handleTagsChange = (tags: string[]) => {
-    setValue("tags", tags);
-  };
+  const handleTagsChange = (tags: string[]) => setValue("tags", tags);
+  const handleCategoryChange = (category: TransactionCategory) =>
+    setValue("category", category, { shouldValidate: true, shouldDirty: true });
+  const handleAccountChange = (accountId: string) =>
+    setValue("account", accountId, { shouldValidate: true, shouldDirty: true });
 
-  const handleCategoryChange = (category: TransactionCategory) => {
-    setValue("category", category, { shouldValidate: true });
-  };
-
-  const handleAccountChange = (accountId: string) => {
-    setValue("account", accountId, { shouldValidate: true });
-  };
-
-  const onSubmitForm = async (data: RawPresetTransaction) => {
-    onSubmit(data);
+  const onSubmitForm = (data: RawPresetTransaction) => {
+    if (isEditMode) {
+      const updates: Partial<RawPresetTransaction> = Object.keys(
+        dirtyFields
+      ).reduce((acc, key) => {
+        const k = key as keyof RawPresetTransaction;
+        acc[k] = data[k];
+        return acc;
+      }, {} as Partial<RawPresetTransaction>);
+      onSubmit(updates);
+    } else {
+      onSubmit(data);
+    }
     onClose();
   };
 
@@ -84,26 +126,22 @@ export function BasePresetTransactionModal({
     <>
       <Title>{title}</Title>
       <form onSubmit={handleSubmit(onSubmitForm)}>
-        <>
-          <Row>
-            <InputContainer>
-              <InputLabel>Preset Transaction Name</InputLabel>
-              <BaseInput
-                {...register("name", {
-                  required: "Name is required",
-                  onChange: () => clearErrors("name"),
-                })}
-                placeholder="Enter Name"
-              />
-              {errors.name && (
-                <ErrorMessage>{errors.name.message}</ErrorMessage>
-              )}
-            </InputContainer>
-          </Row>
-          <Divider />
-        </>
+        <Row>
+          <InputContainer>
+            <InputLabel>Preset Transaction Name</InputLabel>
+            <BaseInput
+              {...register("name", {
+                required: isEditMode ? false : "Name is required",
+                onChange: () => clearErrors("name"),
+              })}
+              placeholder="Enter Name"
+            />
+            {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+          </InputContainer>
+        </Row>
 
-        <SubTitle> Required Fields </SubTitle>
+        <Divider />
+        <SubTitle>Required Fields</SubTitle>
         <Row>
           <InputContainer>
             <InputLabel>Vendor</InputLabel>
@@ -122,6 +160,7 @@ export function BasePresetTransactionModal({
               <ErrorMessage>{errors.vendor.message}</ErrorMessage>
             )}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Amount</InputLabel>
             <BaseInput
@@ -136,6 +175,7 @@ export function BasePresetTransactionModal({
               <ErrorMessage>{errors.amount.message}</ErrorMessage>
             )}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Type</InputLabel>
             <BaseSelect {...register("type")}>
@@ -152,15 +192,10 @@ export function BasePresetTransactionModal({
         <Row>
           <InputContainer>
             <InputLabel>Date</InputLabel>
-            <BaseInput
-              {...register("date", {
-                required: false,
-                onChange: () => clearErrors("date"),
-              })}
-              type="date"
-            />
+            <BaseInput type="date" {...register("date", { required: false })} />
             {errors.date && <ErrorMessage>{errors.date.message}</ErrorMessage>}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Account</InputLabel>
             <AccountDropdown
@@ -171,6 +206,7 @@ export function BasePresetTransactionModal({
               <ErrorMessage>{errors.account.message}</ErrorMessage>
             )}
           </InputContainer>
+
           <InputContainer>
             <InputLabel>Category</InputLabel>
             <CategoryDropdown
@@ -184,8 +220,7 @@ export function BasePresetTransactionModal({
         </Row>
 
         <Divider />
-        <SubTitle> Additional Fields </SubTitle>
-
+        <SubTitle>Additional Fields</SubTitle>
         <Row>
           <TagInputContainer>
             <InputLabel>Tags</InputLabel>
@@ -195,11 +230,13 @@ export function BasePresetTransactionModal({
             />
           </TagInputContainer>
         </Row>
+
         <Row>
           <InputContainer>
             <InputLabel>Description</InputLabel>
             <BaseInput
               {...register("description", {
+                required: false,
                 pattern: {
                   value: /^[a-zA-Z0-9 .,!?;:'"()-]*$/,
                   message: "No special characters are allowed",
@@ -216,7 +253,9 @@ export function BasePresetTransactionModal({
 
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>
-          <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          <SecondaryButton type="button" onClick={onClose}>
+            Cancel
+          </SecondaryButton>
         </ButtonContainer>
       </form>
     </>

@@ -29,7 +29,7 @@ export const createTransaction = async (
   }
 };
 
-export const updateTransaction = async (
+export const updateTransactions = async (
   req: CustomRequest,
   res: Response
 ): Promise<void> => {
@@ -41,21 +41,26 @@ export const updateTransaction = async (
       return;
     }
 
-    const updatedTransaction = await transactionService.updateTransaction(
+    const { transactionIds, updatedFields } = req.body;
+
+    console.log(transactionIds, updatedFields);
+
+    await transactionService.updateTransactions(
       userId,
-      id,
-      req.body
+      transactionIds,
+      updatedFields
     );
 
-    res.json(updatedTransaction);
+    res.status(201).json({ messsage: "Transactions updated successfully" });
   } catch (err: any) {
+    console.log(err);
     res
       .status(500)
       .json({ error: err.message || "Failed to update transaction" });
   }
 };
 
-export const deleteTransaction = async (
+export const deleteTransactions = async (
   req: CustomRequest,
   res: Response
 ): Promise<void> => {

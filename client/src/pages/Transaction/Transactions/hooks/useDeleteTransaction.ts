@@ -11,9 +11,9 @@ export const useDeleteTransaction = () => {
       mutationFn: (transactionIds: string[]) =>
         axios
           .delete(`${BASE_API_URL}/transactions`, {
-            data: transactionIds, // sends array in the body
+            data: transactionIds,
           })
-          .then((res) => res.data), // returning deleted transaction data
+          .then((res) => res.data),
       onSuccess: (deletedTransaction) => {
         queryClient.invalidateQueries({ queryKey: ["transactions"] });
         queryClient.invalidateQueries({

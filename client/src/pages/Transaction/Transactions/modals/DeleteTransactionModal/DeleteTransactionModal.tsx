@@ -1,5 +1,4 @@
 import Modal from "components/Global/Modal";
-import { Transaction } from "types/Transaction";
 import ConfirmModal from "components/Global/ConfirmModal";
 import { useDeleteTransaction } from "../../hooks/useDeleteTransaction";
 import useTransactionStore from "store/transaction/transactionStore";

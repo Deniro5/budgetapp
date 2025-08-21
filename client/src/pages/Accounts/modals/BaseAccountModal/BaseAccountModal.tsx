@@ -137,7 +137,9 @@ export function BaseAccountModal({
 
         <ButtonContainer>
           <BaseButton type="submit">{confirmText}</BaseButton>
-          <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          <SecondaryButton type="button" onClick={onClose}>
+            Cancel
+          </SecondaryButton>
         </ButtonContainer>
       </form>
     </>

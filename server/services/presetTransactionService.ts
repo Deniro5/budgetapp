@@ -104,25 +104,49 @@ export const getPresetTransactions = async (query: PresetTransactionQuery) => {
   return { transactions, count };
 };
 
-export const updatePresetTransaction = async (
-  id: string,
+export const updatePresetTransactions = async (
+  transactionIds: string[],
   userId: string,
   updateData: Partial<PresetTransactionInput>
 ) => {
-  // Check ownership
-  const transaction = await PresetTransactionModel.findOne({ _id: id, userId });
-  if (!transaction) return null;
+  const transactions = await PresetTransactionModel.find({
+    _id: { $in: transactionIds },
+    userId,
+  });
 
-  return PresetTransactionModel.findByIdAndUpdate(id, updateData, {
-    new: true,
-  }).populate({ path: "account", select: "name _id" });
+  if (transactions.length !== transactionIds.length) {
+    throw new Error("Unauthorized to update one or more transactions");
+  }
+
+  // Perform bulk update
+  await PresetTransactionModel.updateMany(
+    { _id: { $in: transactionIds }, userId },
+    { $set: updateData }
+  );
+
+  return;
 };
 
-export const deletePresetTransaction = async (id: string, userId: string) => {
-  // Check ownership
-  const transaction = await PresetTransactionModel.findOne({ _id: id, userId });
-  if (!transaction) return false;
+export const deletePresetTransactions = async (
+  ids: string[],
+  userId: string
+) => {
+  // Find all matching transactions that belong to the user
+  const transactions = await PresetTransactionModel.find({
+    _id: { $in: ids },
+    userId,
+  });
 
-  await PresetTransactionModel.findByIdAndDelete(id);
+  // If not all requested IDs belong to the user, block the operation
+  if (transactions.length !== ids.length) {
+    throw new Error("Unauthorized to delete one or more transactions");
+  }
+
+  // Delete all transactions
+  await PresetTransactionModel.deleteMany({
+    _id: { $in: ids },
+    userId,
+  });
+
   return true;
 };

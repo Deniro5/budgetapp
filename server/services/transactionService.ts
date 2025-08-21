@@ -142,46 +142,70 @@ export const getTransactions = async (
   return { transactions, transactionCount };
 };
 
-export const updateTransaction = async (
+export const updateTransactions = async (
   userId: string,
-  id: string,
-  updateData: any
+  transactionIds: string[],
+  updateFields: any
 ): Promise<any> => {
-  const transaction = await TransactionModel.findOne({ _id: id, userId });
-  if (!transaction) throw new Error("Unauthorized to update this transaction");
+  const transactions = await TransactionModel.find({
+    _id: { $in: transactionIds },
+    userId,
+  });
 
-  const updatedTransaction = await TransactionModel.findByIdAndUpdate(
-    id,
-    updateData,
-    { new: true }
-  ).populate({ path: "account", select: "name _id" });
-
-  if (transaction.account === updatedTransaction.account) {
-    const change = updatedTransaction.amount - transaction.amount;
-    await updateAccountBalance({
-      accountId: transaction.account,
-      change: transaction.type === "Expense" ? -change : change,
-    });
-  } else {
-    //if the account has changed we need to add or subtract the original amount from the original accounts
-    await updateAccountBalance({
-      accountId: transaction.account,
-      change:
-        transaction.type === "Expense"
-          ? transaction.amount
-          : -transaction.amount,
-    });
-    //then we add or subtract the new amount from the new account
-    await updateAccountBalance({
-      accountId: updatedTransaction.account,
-      change:
-        transaction.type === "Expense"
-          ? -updatedTransaction.amount
-          : updatedTransaction.amount,
-    });
+  if (transactions.length !== transactionIds.length) {
+    throw new Error("Unauthorized to update one or more transactions");
   }
 
-  return updatedTransaction;
+  await TransactionModel.updateMany(
+    { _id: { $in: transactionIds }, userId },
+    { $set: updateFields },
+    { new: true }
+  );
+
+  if (
+    !updateFields["type"] &&
+    !updateFields["account"] &&
+    !updateFields["amount"]
+  )
+    return;
+
+  const accountChangesByAccount = transactions.reduce((acc, transaction) => {
+    const newType = updateFields["type"] ?? transaction.type;
+    const newAccount = updateFields["account"] ?? transaction.account;
+    const newAmount = updateFields["amount"] ?? transaction.amount;
+    const change =
+      (transaction.type === "Expense"
+        ? transaction.amount
+        : -transaction.amount) -
+      (newType === "Expense" ? newAmount : -newAmount);
+
+    if (transaction.account === newAccount) {
+      acc[transaction.account] = change + (acc[transaction.account] || 0);
+    } else {
+      //if the account has changed we need to add or subtract the original amount from the original accounts
+      acc[transaction.account] =
+        Number(
+          transaction.type === "Expense"
+            ? transaction.amount
+            : -transaction.amount
+        ) + (acc[transaction.account] || 0);
+
+      //then we add or subtract the new amount from the new account
+      acc[newAccount] =
+        Number(newType === "Expense" ? -newAmount : newAmount) +
+        (acc[newAccount] || 0);
+    }
+    return acc;
+  }, {});
+
+  Object.keys(accountChangesByAccount).forEach(async (accountId) => {
+    await updateAccountBalance({
+      accountId,
+      change: accountChangesByAccount[accountId],
+    });
+  });
+
+  return;
 };
 
 export const deleteTransactions = async (
