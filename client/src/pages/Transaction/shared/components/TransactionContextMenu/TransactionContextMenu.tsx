@@ -71,24 +71,37 @@ export function TransactionContextMenu({
     }
   };
 
-  const menuItems = [
-    {
-      label: editLabel,
-      function: handleEditClick,
-    },
-    ...(!multipleTransactionsSelected
-      ? [
-          {
-            label: copyLabel,
-            function: handleCopyClick,
-          },
-        ]
-      : []),
-    {
-      label: deleteLabel,
-      function: handleDeleteClick,
-    },
-  ];
+  const multipleSelectedWithTransfer =
+    multipleTransactionsSelected &&
+    selectedTransactions.some(
+      (t) => t.category === TransactionCategory.Transfer
+    );
+
+  const menuItems = multipleSelectedWithTransfer
+    ? [
+        {
+          label: "Batch operations with Transfer not supported",
+          function: () => {},
+        },
+      ]
+    : [
+        {
+          label: editLabel,
+          function: handleEditClick,
+        },
+        ...(!multipleTransactionsSelected
+          ? [
+              {
+                label: copyLabel,
+                function: handleCopyClick,
+              },
+            ]
+          : []),
+        {
+          label: deleteLabel,
+          function: handleDeleteClick,
+        },
+      ];
 
   const getWidth = () => {
     if (view === "Recurring" || view === "Preset") return 240;
@@ -110,6 +123,7 @@ export function TransactionContextMenu({
           top: `${contextMenuPosition.top}px`,
           left: `${contextMenuPosition.left}px`,
           position: "absolute",
+          pointerEvents: multipleSelectedWithTransfer ? "none" : "auto",
         }}
         content={<PopoverContent menuItems={menuItems} width={getWidth()} />}
       >

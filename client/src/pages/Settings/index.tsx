@@ -76,6 +76,7 @@ export default function Settings() {
             >
               <BaseCheckbox
                 checked={!newPreferences?.disabledCategories.includes(item)}
+                onChange={() => {}}
                 type="checkbox"
               />
               {item}

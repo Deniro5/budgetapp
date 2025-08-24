@@ -89,7 +89,6 @@ export const getTransactions = async (
     q,
     limit = 50,
     offset = 0,
-    sort = "-date",
     startDate,
     endDate,
     category,
@@ -134,7 +133,7 @@ export const getTransactions = async (
   const transactionCount = await TransactionModel.countDocuments(query);
 
   const transactions = await TransactionModel.find(query)
-    .sort(sort)
+    .sort({ date: -1, _id: -1 })
     .skip(offset)
     .limit(limit)
     .populate({ path: "account", select: "name _id" });

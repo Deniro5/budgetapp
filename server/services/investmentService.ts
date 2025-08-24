@@ -1,10 +1,11 @@
 import InvestmentModel from "../models/investment.model";
 import { SampleStocks } from "../data/sample-stocks";
 import mongoose from "mongoose";
-import AssetPriceHistoryModel from "../models/assetpricehistory.model";
+import AssetPriceHistoryModel from "../models/asset.model";
 import axios from "axios";
 import { addOneDay } from "../utils/dateutils";
 import { updateAccountBalance } from "./accountService";
+import { assetService } from "./assetService";
 
 const API_URL = "https://www.alphavantage.co/query";
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -36,7 +37,7 @@ interface TimeSeriesEntry {
 
 export const createInvestment = async (data: {
   userId: string;
-  asset: any;
+  asset: string;
   account: string;
   date: Date;
   quantity: number;
@@ -52,6 +53,9 @@ export const createInvestment = async (data: {
     accountId: account,
     change: -amount,
   });
+
+  const now = new Date();
+  await assetService.update(data.asset, { lastUsed: now });
 
   return savedInvestment;
 };
@@ -76,21 +80,27 @@ export const deleteInvestment = async (
 };
 
 export const getAllInvestments = async (userId: string) => {
-  console.log(userId);
-  return await InvestmentModel.find({ userId })
+  const investments = await InvestmentModel.find({ userId })
     .sort({ date: -1, _id: -1 })
-    .populate({ path: "account", select: "name _id" });
+    .populate({ path: "account", select: "name _id" })
+    .populate({ path: "asset", select: "symbol name exchange history" });
+
+  const now = new Date();
+  assetService.updateBatch(
+    investments.map((i) => i.asset._id),
+    { lastUsed: now }
+  );
+
+  return investments;
 };
 
-export const getAggregatedInvestments = async (
-  userId: string,
-  appendHistory?: boolean
-) => {
+export const getAggregatedInvestments = async (userId: string) => {
   const investments = await InvestmentModel.aggregate([
     { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: {
+          assetId: "$asset", // <-- get actual ObjectId here
           symbol: "$asset.symbol",
           userId: "$userId",
         },
@@ -106,6 +116,7 @@ export const getAggregatedInvestments = async (
       $project: {
         _id: 0,
         asset: {
+          _id: "$_id.assetId", // <-- include _id so we can update lastUsed
           symbol: "$_id.symbol",
           name: "$name",
           exchange: "$exchange",
@@ -126,7 +137,13 @@ export const getAggregatedInvestments = async (
       $sort: { "asset.symbol": 1 },
     },
   ]);
-  return appendHistory ? updateAssetPriceHistory(investments) : investments;
+
+  // --------------- update lastUsed ---------------
+  const now = new Date();
+  const assetIds = investments.map((i) => i.asset._id);
+  await assetService.updateBatch(assetIds, { lastUsed: now });
+
+  return investments;
 };
 
 export const getAggregatedInvestmentsByAccount = async (
@@ -341,93 +358,4 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
   });
 
   return investmentTotalsByDate;
-};
-
-export const updateAssetPriceHistory = async (investments: Investment[]) => {
-  const now = Date.now();
-  const investmentsWithHistory = [];
-
-  for (const investment of investments) {
-    const symbol = investment.asset.symbol;
-    let history: any = await AssetPriceHistoryModel.findOne({ symbol });
-    const needsUpdate =
-      !history || now - new Date(history.lastUpdated).getTime() > ONE_DAY;
-
-    if (needsUpdate) {
-      const params = {
-        function: "TIME_SERIES_DAILY",
-        symbol,
-        apikey: process.env.AV_KEY as string,
-        outputsize: "compact",
-      };
-
-      const { data } = await axios.get<{
-        "Time Series (Daily)": TimeSeriesEntry;
-      }>(API_URL, {
-        params,
-      });
-
-      const timeSeries = data["Time Series (Daily)"];
-      if (!timeSeries) {
-        console.warn(`Alpha Vantage response for ${symbol} was invalid`, data);
-        continue;
-      }
-
-      history = Object.entries(timeSeries).map(([date, daily]) => ({
-        date,
-        price: parseFloat(daily["4. close"]),
-      }));
-
-      // Sort ascending
-      history.sort(
-        (a: any, b: any) =>
-          new Date(a.date).getTime() - new Date(b.date).getTime()
-      );
-
-      const res = [];
-      let index = 0;
-      let curr = history[0].date;
-      let end = history[history.length - 1].date;
-      let lastPrice = 0;
-
-      while (curr < end) {
-        const currentItem = history[index];
-        while (currentItem.date !== curr) {
-          res.push({
-            date: curr,
-            price: lastPrice,
-          });
-          curr = addOneDay(curr);
-        }
-        res.push({
-          date: curr,
-          price: currentItem.price,
-        });
-        lastPrice = currentItem.price;
-        curr = addOneDay(curr);
-        index++;
-      }
-
-      history = res;
-
-      await AssetPriceHistoryModel.findOneAndUpdate(
-        { symbol },
-        {
-          symbol,
-          history,
-          lastUpdated: new Date(),
-        },
-        { upsert: true, new: true }
-      );
-    } else {
-      //if we get history from mongo , we need to just take the history part not the symbol
-      history = history.history;
-    }
-
-    investmentsWithHistory.push({
-      ...investment,
-      asset: { ...investment.asset, history },
-    });
-  }
-  return investmentsWithHistory;
 };

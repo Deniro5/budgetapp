@@ -180,7 +180,7 @@ export default function TransactionsPage() {
       <TransactionHeader />
 
       <PageColumnFlexContainer
-        gap={hasFilters ? SPACING.spacing4x : SPACING.spacing9x}
+        $gap={hasFilters ? SPACING.spacing4x : SPACING.spacing9x}
       >
         <FiltersContainer>
           <TransactionSearchBar />
@@ -198,7 +198,7 @@ export default function TransactionsPage() {
 
         {hasFilters && <TransactionFilterRow />}
         <ContentContainer>
-          <TableFlexContainer hasFilters={hasFilters} ref={tableRef}>
+          <TableFlexContainer $hasFilters={hasFilters} ref={tableRef}>
             <TransactionTable
               transactions={currentTransactions}
               loading={currentLoading}
@@ -318,10 +318,10 @@ export default function TransactionsPage() {
   );
 }
 
-const PageColumnFlexContainer = styled.div<{ gap: string }>`
+const PageColumnFlexContainer = styled.div<{ $gap: string }>`
   display: flex;
   flex-direction: column;
-  gap: ${({ gap }) => gap};
+  gap: ${({ $gap }) => $gap};
   margin-top: ${SPACING.spacing9x};
 `;
 
@@ -329,12 +329,12 @@ const ContentContainer = styled(Flex)`
   align-items: flex-start;
 `;
 
-const TableFlexContainer = styled(Flex)<{ hasFilters: boolean }>`
+const TableFlexContainer = styled(Flex)<{ $hasFilters: boolean }>`
   display: flex;
   flex-direction: column;
   flex: 1;
-  max-height: ${({ hasFilters }) =>
-    hasFilters ? "calc(100vh - 268px)" : "calc(100vh - 225px)"};
+  max-height: ${({ $hasFilters }) =>
+    $hasFilters ? "calc(100vh - 268px)" : "calc(100vh - 225px)"};
 `;
 
 const FiltersContainer = styled.div`

@@ -109,7 +109,7 @@ export function TransactionTable({
     transaction: Transaction | PresetTransaction | null
   ) => {
     if (!transaction) return;
-    
+
     if (!isTransactionSelected(transaction._id)) {
       setSelectedTransactions([transaction]);
     }
@@ -135,6 +135,7 @@ export function TransactionTable({
   if (loading) {
     return <SkeletonLoader height={40} rows={15} columns={1} />;
   }
+
   return (
     <TableWrapper>
       <ScrollableTable>
@@ -157,8 +158,14 @@ export function TransactionTable({
               index={index}
             />
           ))}
+          {!!loadMore && (
+            <tr>
+              <td colSpan={getTableColumns().length}>
+                <Waypoint onEnter={loadMore} />
+              </td>
+            </tr>
+          )}
         </ScrollBody>
-        {!!loadMore && <Waypoint onEnter={() => loadMore()} />}
       </ScrollableTable>
       {transactions.length === 0 && (
         <NoResult>

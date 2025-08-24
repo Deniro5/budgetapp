@@ -117,7 +117,7 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
           </InfoSection>
           <InfoSection>
             <Label>Budget Remaining:</Label>
-            <ChangeLabel isIncrease={isWithinBudget}>
+            <ChangeLabel $isIncrease={isWithinBudget}>
               {formatToCurrency(availableBudget)}
             </ChangeLabel>
           </InfoSection>
@@ -144,9 +144,9 @@ const Header = styled(Flex)`
   border-bottom: 1px solid lightgrey;
 `;
 
-const ChangeLabel = styled(Flex)<{ isIncrease: boolean }>`
+const ChangeLabel = styled(Flex)<{ $isIncrease: boolean }>`
   gap: ${SPACING.spacingBase};
-  color: ${({ isIncrease }) => (isIncrease ? "green" : COLORS.deleteRed)};
+  color: ${({ $isIncrease }) => ($isIncrease ? "green" : COLORS.deleteRed)};
   font-weight: bold;
   font-size: ${FONTSIZE.lg};
 `;

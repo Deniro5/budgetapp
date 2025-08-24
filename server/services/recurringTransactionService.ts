@@ -69,7 +69,6 @@ export const getRecurringTransactions = async (
     q,
     limit = 100,
     offset = 0,
-    sort = "-createdAt",
     category,
     tags,
     type,
@@ -111,7 +110,7 @@ export const getRecurringTransactions = async (
   const count = await RecurringTransactionModel.countDocuments(dbQuery);
 
   const transactions = await RecurringTransactionModel.find(dbQuery)
-    .sort(sort)
+    .sort({ date: -1, _id: -1 })
     .skip(offset)
     .limit(limit)
     .populate({ path: "account", select: "name _id" });
@@ -124,7 +123,6 @@ export const updateRecurringTransactions = async (
   userId: string,
   updateData: Partial<RecurringTransactionInput>
 ) => {
-  console.log(updateData);
   // Find all matching transactions that belong to the user
   const transactions = await RecurringTransactionModel.find({
     _id: { $in: transactionIds },
@@ -136,8 +134,6 @@ export const updateRecurringTransactions = async (
       "Unauthorized to update one or more recurring transactions"
     );
   }
-
-  console.log("fgeagea");
 
   // Perform bulk update
   await RecurringTransactionModel.updateMany(

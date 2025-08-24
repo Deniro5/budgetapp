@@ -35,6 +35,7 @@ export function TransactionFilterRow() {
           <TransactionFilterTag
             name={getFilterLabel(key)}
             onClick={() => removeFilter(key)}
+            key={key}
           />
         ) : null;
       })}

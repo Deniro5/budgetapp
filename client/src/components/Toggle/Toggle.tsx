@@ -17,7 +17,7 @@ export function Toggle({ checked, onChange, label }: ToggleProps) {
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <StyledSwitch checked={checked} />
+        <StyledSwitch $checked={checked} />
       </SwitchLabel>
       {label && <LabelText>{label}</LabelText>}
     </ToggleWrapper>
@@ -43,20 +43,20 @@ const HiddenCheckbox = styled.input`
   height: 0;
 `;
 
-const StyledSwitch = styled.span<{ checked: boolean }>`
+const StyledSwitch = styled.span<{ $checked: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ checked }) => (checked ? COLORS.primary : "#ccc")};
+  background-color: ${({ $checked }) => ($checked ? COLORS.primary : "#ccc")};
   border-radius: 22px;
   transition: background-color 0.2s;
 
   &::before {
     content: "";
     position: absolute;
-    left: ${({ checked }) => (checked ? "18px" : "2px")};
+    left: ${({ $checked }) => ($checked ? "18px" : "2px")};
     top: 2px;
     width: 18px;
     height: 18px;

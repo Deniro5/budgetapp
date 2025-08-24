@@ -40,7 +40,7 @@ function MainLayout() {
       <ToastProvider>
         <Sidebar isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
 
-        <ContentContainer isExpanded={isExpanded}>
+        <ContentContainer $isExpanded={isExpanded}>
           <Suspense fallback={<p>Loading...</p>}>
             <Routes>
               <Route path="/" element={<DashboardPage />} />
@@ -64,12 +64,12 @@ const AppContainer = styled.div`
   display: flex;
 `;
 
-const ContentContainer = styled.div<{ isExpanded: boolean }>`
+const ContentContainer = styled.div<{ $isExpanded: boolean }>`
   flex: 1;
   padding: ${SPACING.spacing8x};
-  margin-left: ${({ isExpanded }) => (isExpanded ? "200px" : "40px")};
-  width: ${({ isExpanded }) =>
-    isExpanded ? "calc(100vw - 200px)" : "calc(100vw - 40px)"};
+  margin-left: ${({ $isExpanded }) => ($isExpanded ? "200px" : "40px")};
+  width: ${({ $isExpanded }) =>
+    $isExpanded ? "calc(100vw - 200px)" : "calc(100vw - 40px)"};
   height: 100vh;
   background: ${COLORS.background};
 `;

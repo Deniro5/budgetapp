@@ -66,7 +66,7 @@ export function TransactionTableRow({
   return (
     <Container
       onContextMenu={handleContextMenu}
-      isSelected={isSelected}
+      $isSelected={isSelected}
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
     >
@@ -75,7 +75,7 @@ export function TransactionTableRow({
       )}
       <td> {getTransactionVendorName()} </td>
       <td> {transaction.date ? transaction.date : emptyString} </td>
-      <AmountTd transactionType={transaction.type}>
+      <AmountTd $transactionType={transaction.type}>
         {transaction.amount
           ? `${
               transaction.type === TransactionType.INCOME ? "+" : ""
@@ -104,13 +104,13 @@ export function TransactionTableRow({
   );
 }
 
-const Container = styled.tr<{ isSelected: boolean }>`
+const Container = styled.tr<{ $isSelected: boolean }>`
   color: ${COLORS.font};
   font-weight: 500;
   border-bottom: 1px solid ${COLORS.mediumGrey};
   cursor: pointer;
-  background: ${({ isSelected }) =>
-    isSelected ? COLORS.lightPrimary : COLORS.pureWhite};
+  background: ${({ $isSelected }) =>
+    $isSelected ? COLORS.lightPrimary : COLORS.pureWhite};
   user-select: none; /* Prevent text highlighting */
   &:hover {
     background: ${COLORS.lightPrimary};
@@ -123,9 +123,9 @@ const Container = styled.tr<{ isSelected: boolean }>`
   }
 `;
 
-const AmountTd = styled.td<{ transactionType?: TransactionType }>`
-  color: ${({ transactionType }) =>
-    transactionType === TransactionType.INCOME && COLORS.green};
+const AmountTd = styled.td<{ $transactionType?: TransactionType }>`
+  color: ${({ $transactionType }) =>
+    $transactionType === TransactionType.INCOME && COLORS.green};
 `;
 
 const CategoryTd = styled.td`

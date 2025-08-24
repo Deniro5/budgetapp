@@ -46,6 +46,7 @@ export default function InvestmentsPage() {
       <InvestmentCardContainer>
         {results.map((investment) => (
           <InvestmentCard
+            key={investment.asset.symbol}
             setActiveOverlay={setActiveOverlay}
             setPresetValues={setPresetValues}
             investment={investment}

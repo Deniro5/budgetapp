@@ -67,7 +67,7 @@ export function TransactionHeader() {
         <TabContainer>
           {tabs.map((tab) => (
             <Tab
-              isActive={tab.value === view}
+              $isActive={tab.value === view}
               key={tab.value}
               onClick={() => setView(tab.value)}
             >
@@ -97,14 +97,15 @@ const TabContainer = styled(Flex)`
   gap: 2px;
 `;
 
-const Tab = styled.button<{ isActive?: boolean }>`
-  background: ${({ isActive }) =>
-    isActive ? COLORS.primary : COLORS.pureWhite};
+const Tab = styled.button<{ $isActive?: boolean }>`
+  background: ${({ $isActive }) =>
+    $isActive ? COLORS.primary : COLORS.pureWhite};
   border-radius: 4px;
-  color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.font)};
+  color: ${({ $isActive }) => ($isActive ? COLORS.pureWhite : COLORS.font)};
   border: 1px solid
-    ${({ isActive }) => (isActive ? COLORS.primary : COLORS.darkGrey)};
-  border: ${({ isActive }) => (isActive ? "" : `1px solid ${COLORS.darkGrey}`)};
+    ${({ $isActive }) => ($isActive ? COLORS.primary : COLORS.darkGrey)};
+  border: ${({ $isActive }) =>
+    $isActive ? "" : `1px solid ${COLORS.darkGrey}`};
   padding: ${SPACING.spacing2x} ${SPACING.spacing4x};
   display: flex;
   align-items: center;

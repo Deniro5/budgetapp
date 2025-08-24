@@ -234,11 +234,6 @@ export const SampleStocks = [
     name: "Vanguard S&P 500 Index ETF (CAD-Hedged)",
     exchange: "TSX",
   },
-  {
-    symbol: "FBTC",
-    name: "Fidelity Advantage Bitcoin ETF",
-    exchange: "TSX",
-  },
   { symbol: "BMO", name: "Bank of Montreal", exchange: "TSX" },
   {
     symbol: "CIBC",
@@ -248,7 +243,6 @@ export const SampleStocks = [
   { symbol: "GIL", name: "Gildan Activewear Inc.", exchange: "TSX" },
   { symbol: "CVE", name: "Cenovus Energy Inc.", exchange: "TSX" },
   { symbol: "MG", name: "Magna International Inc.", exchange: "TSX" },
-  { symbol: "SU.TO", name: "Suncor Energy Inc.", exchange: "TSX" },
   {
     symbol: "BAM.A",
     name: "Brookfield Asset Management Class A",
@@ -260,7 +254,6 @@ export const SampleStocks = [
     exchange: "TSX",
   },
   { symbol: "PPL.TO", name: "Pembina Pipeline Corporation", exchange: "TSX" },
-  { symbol: "MG.TO", name: "Magna International Inc.", exchange: "TSX" },
 
   { symbol: "BA", name: "Boeing Co", exchange: "NYSE" },
   { symbol: "CSCO", name: "Cisco Systems, Inc.", exchange: "NYSE" },
@@ -273,10 +266,8 @@ export const SampleStocks = [
     exchange: "NYSE",
   },
   { symbol: "GE", name: "General Electric Company", exchange: "NYSE" },
-  { symbol: "BA", name: "Boeing Company", exchange: "NYSE" },
   { symbol: "MMM", name: "3M Company", exchange: "NYSE" },
   { symbol: "UPS", name: "United Parcel Service, Inc.", exchange: "NYSE" },
-
   { symbol: "WFC", name: "Wells Fargo & Company", exchange: "NYSE" },
   { symbol: "C", name: "Citigroup Inc.", exchange: "NYSE" },
   { symbol: "F", name: "Ford Motor Company", exchange: "NYSE" },
@@ -319,7 +310,6 @@ export const SampleStocks = [
     exchange: "NYSE",
   },
 
-  { symbol: "SU", name: "Suncor Energy Inc.", exchange: "TSX" },
   { symbol: "TD.TO", name: "Toronto-Dominion Bank", exchange: "TSX" },
   { symbol: "BCE.TO", name: "BCE Inc.", exchange: "TSX" },
   {
@@ -327,7 +317,6 @@ export const SampleStocks = [
     name: "Canadian National Railway Company",
     exchange: "TSX",
   },
-  { symbol: "ENB.TO", name: "Enbridge Inc.", exchange: "TSX" },
   { symbol: "ENB.TO", name: "Enbridge Inc.", exchange: "TSX" },
   { symbol: "PPL.TO", name: "Pembina Pipeline Corp.", exchange: "TSX" },
   { symbol: "BNS.TO", name: "Bank of Nova Scotia", exchange: "TSX" },

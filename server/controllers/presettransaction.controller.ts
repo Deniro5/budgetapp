@@ -127,9 +127,7 @@ export const updatePresetTransactions = async (
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
-    console.log(req.body);
     const { presetTransactionIds, updatedFields } = req.body;
-    console.log(presetTransactionIds, updatedFields);
 
     await presetTransactionService.updatePresetTransactions(
       presetTransactionIds,

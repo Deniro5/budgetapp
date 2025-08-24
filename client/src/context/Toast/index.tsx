@@ -59,8 +59,8 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
     <ToastContext.Provider value={{ toast, setToast }}>
       <>
         <ToastContainer
-          show={!!toast?.toast}
-          color={toastColorMap[toast?.type || "success"]}
+          $show={!!toast?.toast}
+          $color={toastColorMap[toast?.type || "success"]}
         >
           {toast?.toast}
         </ToastContainer>
@@ -70,17 +70,17 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-const ToastContainer = styled.div<{ show: boolean; color: string }>`
+const ToastContainer = styled.div<{ $show: boolean; $color: string }>`
   border-radius: 4px;
   position: absolute;
   right: 8px;
   top: 16px;
-  background: ${({ color }) => color};
+  background: ${({ $color }) => $color};
   width: 400px;
   padding: ${SPACING.spacing4x};
   color: ${COLORS.pureWhite};
-  transform: translateY(${({ show }) => (show ? "8px" : "-80px")});
-  opacity: ${({ show }) => (show ? 1 : 0)};
+  transform: translateY(${({ $show }) => ($show ? "8px" : "-80px")});
+  opacity: ${({ $show }) => ($show ? 1 : 0)};
   transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
   text-align: center;
   z-index: 1000;

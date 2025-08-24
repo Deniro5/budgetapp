@@ -27,27 +27,27 @@ export default function DashboardPage() {
       </Flex>
       <ScrollablePageContainer>
         <DashboardContainer>
-          <Column gridArea={"account"}>
+          <Column $gridArea={"account"}>
             <DashboardCard>
               <AccountWidget startDate={startDate} endDate={endDate} />
             </DashboardCard>
           </Column>
-          <Column gridArea={"income"}>
+          <Column $gridArea={"income"}>
             <DashboardCard>
               <IncomeExpenseWidget startDate={startDate} endDate={endDate} />
             </DashboardCard>
           </Column>
-          <Column gridArea={"budget"}>
+          <Column $gridArea={"budget"}>
             <DashboardCard>
               <BudgetWidget startDate={startDate} endDate={endDate} />
             </DashboardCard>
           </Column>
-          <Column gridArea="categoryline">
+          <Column $gridArea="categoryline">
             <DashboardCard>
               <CategoryLineWidget startDate={startDate} endDate={endDate} />
             </DashboardCard>
           </Column>
-          <Column gridArea={"recent"}>
+          <Column $gridArea={"recent"}>
             <DashboardCard>
               <RecentTransactionsWidget />
             </DashboardCard>
@@ -75,6 +75,6 @@ const DashboardContainer = styled.div`
   gap: ${SPACING.spacing6x};
 `;
 
-const Column = styled.div<{ gridArea: string }>`
-  grid-area: ${({ gridArea }) => gridArea};
+const Column = styled.div<{ $gridArea: string }>`
+  grid-area: ${({ $gridArea }) => $gridArea};
 `;

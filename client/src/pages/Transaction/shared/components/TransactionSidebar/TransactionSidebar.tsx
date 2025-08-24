@@ -143,7 +143,7 @@ export const TransactionSidebar = () => {
   };
 
   return (
-    <SidebarContainer isExpanded={isExpanded}>
+    <SidebarContainer $isExpanded={isExpanded}>
       {!isExpanded ? (
         <IconContainer onClick={toggleExpanded}>
           <FontAwesomeIcon
@@ -160,11 +160,11 @@ export const TransactionSidebar = () => {
   );
 };
 
-const SidebarContainer = styled.div<{ isExpanded: boolean }>`
+const SidebarContainer = styled.div<{ $isExpanded: boolean }>`
   background: ${COLORS.pureWhite};
   border: 1px solid ${COLORS.mediumGrey};
   padding: ${SPACING.spacing6x} ${SPACING.spacing8x};
-  width: ${({ isExpanded }) => (isExpanded ? "280px" : "fit-content")};
+  width: ${({ $isExpanded }) => ($isExpanded ? "280px" : "fit-content")};
   border-radius: 4px;
 `;
 

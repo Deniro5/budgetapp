@@ -77,10 +77,10 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
   const navigate = useNavigate();
 
   return (
-    <SidebarContainer data-testid={"sidebar"} isExpanded={isExpanded}>
+    <SidebarContainer data-testid={"sidebar"} $isExpanded={isExpanded}>
       {sidebarItems.map((sidebarItem) => (
         <MenuItem
-          isActive={sidebarItem.isActive}
+          $isActive={sidebarItem.isActive}
           onClick={() => navigate(sidebarItem.href)}
           key={sidebarItem.href}
         >
@@ -103,11 +103,12 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
   );
 };
 
-const MenuItem = styled.div<{ isActive?: boolean }>`
+const MenuItem = styled.div<{ $isActive?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
-  color: ${({ isActive }) => (isActive ? COLORS.pureWhite : COLORS.lightGrey)};
+  color: ${({ $isActive }) =>
+    $isActive ? COLORS.pureWhite : COLORS.lightGrey};
   padding: ${SPACING.spacing2x};
   border-radius: 4px;
   margin: 0;
@@ -122,8 +123,8 @@ const MenuItem = styled.div<{ isActive?: boolean }>`
       color: ${COLORS.pureWhite};
     }
   }
-  ${({ isActive }) =>
-    isActive &&
+  ${({ $isActive }) =>
+    $isActive &&
     `
     background: ${COLORS.primary};
     path {
@@ -137,26 +138,26 @@ const MenuItem = styled.div<{ isActive?: boolean }>`
 
 const IconContainer = styled.div``;
 
-const SidebarContainer = styled.div<{ isExpanded: boolean }>`
+const SidebarContainer = styled.div<{ $isExpanded: boolean }>`
   display: flex;
-  align-items: ${({ isExpanded }) => (isExpanded ? "flex-start" : "center")};
+  align-items: ${({ $isExpanded }) => ($isExpanded ? "flex-start" : "center")};
   flex-direction: column;
   position: fixed;
   gap: ${SPACING.spacing4x};
   height: calc(100vh);
-  width: ${({ isExpanded }) => (isExpanded ? "200px" : "40px")};
+  width: ${({ $isExpanded }) => ($isExpanded ? "200px" : "40px")};
   background: ${COLORS.primary};
-  padding: ${({ isExpanded }) =>
-    isExpanded
+  padding: ${({ $isExpanded }) =>
+    $isExpanded
       ? `${SPACING.spacing6x} ${SPACING.spacing3x}`
       : `${SPACING.spacing6x} 0`};
 
   ${MenuItem} {
-    width: ${({ isExpanded }) => isExpanded && "150px"};
+    width: ${({ $isExpanded }) => $isExpanded && "150px"};
   }
 
   ${IconContainer} {
-    width: ${({ isExpanded }) => isExpanded && "16px"};
+    width: ${({ $isExpanded }) => $isExpanded && "16px"};
   }
 `;
 

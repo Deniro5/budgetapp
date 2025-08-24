@@ -26,8 +26,8 @@ function Modal({ isOpen, onClose, children, width }: ModalProps) {
 
   return (
     <>
-      <StyledOverlay isOpen={isOpen} onClick={handleClickOutside} />
-      <StyledDialog isOpen={isOpen} ref={dialogRef} width={width}>
+      <StyledOverlay $isOpen={isOpen} onClick={handleClickOutside} />
+      <StyledDialog $isOpen={isOpen} ref={dialogRef} $width={width}>
         <CloseButton onClick={onClose}>
           <FontAwesomeIcon icon={faClose} height={20} width={20} />
         </CloseButton>
@@ -37,26 +37,21 @@ function Modal({ isOpen, onClose, children, width }: ModalProps) {
   );
 }
 
-// Overlay
-const StyledOverlay = styled(({ isOpen, ...rest }: { isOpen: boolean }) => (
-  <div {...rest} />
-))<{ isOpen: boolean }>`
+const StyledOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
+  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
   z-index: 999;
 `;
 
-// Dialog
-const StyledDialog = styled(
-  ({ isOpen, width, ...rest }: { isOpen: boolean; width?: number }) => (
-    <dialog {...rest} />
-  )
-)<{ isOpen: boolean; width?: number }>`
+const StyledDialog = styled.dialog<{
+  $isOpen: boolean;
+  $width: number | undefined;
+}>`
   position: absolute;
   top: 40%;
   transform: translateY(-40%);
@@ -65,9 +60,9 @@ const StyledDialog = styled(
   box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   z-index: 1000;
-  display: ${({ isOpen }) => (isOpen ? "block" : "none")};
+  display: ${({ $isOpen }) => ($isOpen ? "block" : "none")};
   color: black;
-  width: ${({ width }) => width}px;
+  width: ${({ $width }) => $width}px;
 `;
 
 const CloseButton = styled(IconButton)`

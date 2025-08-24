@@ -73,7 +73,6 @@ export const getAllInvestments = async (
     }
 
     const investments = await investmentService.getAllInvestments(userId);
-    console.log(investments);
     res.json(investments);
   } catch (err) {
     console.error("Error fetching investments:", err);

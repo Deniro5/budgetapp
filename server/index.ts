@@ -14,6 +14,8 @@ import transferRoutes from "./routes/transfer.routes";
 import investmentRoutes from "./routes/investment.routes";
 import TransactionModel from "./models/transaction.model";
 import { processRecurringTransactions } from "./services/recurringTransactionService";
+import { SampleStocks } from "./data/sample-stocks";
+import AssetModel from "./models/asset.model";
 
 const app = express();
 
@@ -53,8 +55,4 @@ const onStartServer = () => {
 app.listen(PORT, () => {
   console.log("server is running on port " + PORT);
   onStartServer();
-});
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to the MeRN server!");
 });

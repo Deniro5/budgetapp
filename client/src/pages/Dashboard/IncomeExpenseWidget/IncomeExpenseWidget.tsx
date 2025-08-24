@@ -85,7 +85,7 @@ export const IncomeExpenseWidget = ({
     <>
       <Header>
         <Name> Income / Expenses </Name>
-        <ChangeLabel isIncrease={isIncrease}>
+        <ChangeLabel $isIncrease={isIncrease}>
           {isIncrease ? "+" : "-"} {formatToCurrency(netIncome)}
         </ChangeLabel>
       </Header>
@@ -106,9 +106,9 @@ const Header = styled(Flex)`
   padding-bottom: ${SPACING.spacing3x};
 `;
 
-const ChangeLabel = styled(Flex)<{ isIncrease: boolean }>`
+const ChangeLabel = styled(Flex)<{ $isIncrease: boolean }>`
   gap: ${SPACING.spacingBase};
-  color: ${({ isIncrease }) => (isIncrease ? "green" : COLORS.deleteRed)};
+  color: ${({ $isIncrease }) => ($isIncrease ? "green" : COLORS.deleteRed)};
   font-weight: bold;
   font-size: ${FONTSIZE.lg};
 `;
