@@ -50,6 +50,7 @@ export function BaseInvestmentModal({
 }: BaseInvestmentModalProps) {
   const userPreferences = getUserPreferences();
   const { activeAccountIds } = useAccounts();
+  const { assetResult } =  
 
   const {
     register,

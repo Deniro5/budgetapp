@@ -92,40 +92,12 @@ export const getCurrentAggregatedInvestments = async (
       return;
     }
 
-    const aggregated = await investmentService.getAggregatedInvestments(
-      userId,
-      true
-    );
+    const aggregated = await investmentService.getAggregatedInvestments(userId);
 
     res.json(aggregated);
     return;
   } catch (err) {
     console.error("Error aggregating investments:", err);
     res.status(500).json({ error: "Failed to aggregate investments" });
-  }
-};
-
-export const searchStocks = async (
-  req: CustomRequest,
-  res: Response
-): Promise<void> => {
-  try {
-    const { userId } = req;
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    const { q } = req.query;
-    if (!q || typeof q !== "string") {
-      res.status(400).json({ error: "Please provide a search query" });
-      return;
-    }
-
-    const results = investmentService.searchStocks(q);
-    res.status(201).json(results);
-  } catch (err) {
-    console.error("Error searching stocks:", err);
-    res.status(500).json({ error: "Failed to fetch search results" });
   }
 };

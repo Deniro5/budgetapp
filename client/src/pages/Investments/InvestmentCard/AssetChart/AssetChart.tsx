@@ -16,28 +16,33 @@ type AssetChartProps = {
 };
 
 export const AssetChart = ({ asset }: AssetChartProps) => {
-  const data = asset.history.reverse();
+  const data = [...asset.history].reverse();
+
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <LineChart
-        data={data}
-        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis
-          domain={["auto", "auto"]}
-          tickFormatter={(value) => formatCurrencyShort(value)}
-        />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="price"
-          stroke={COLORS.darkGreen}
-          strokeWidth={2}
-          dot={false}
-        />
-      </LineChart>
+      {data.length ? (
+        <LineChart
+          data={data}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis
+            domain={["auto", "auto"]}
+            tickFormatter={(value) => formatCurrencyShort(value)}
+          />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="price"
+            stroke={COLORS.darkGreen}
+            strokeWidth={2}
+            dot={false}
+          />
+        </LineChart>
+      ) : (
+        <div>No data available to show for this asset</div>
+      )}
     </ResponsiveContainer>
   );
 };

@@ -12,10 +12,9 @@ import recurringTransactionRoutes from "./routes/recurringtransaction.routes";
 import budgetRoutes from "./routes/budget.routes";
 import transferRoutes from "./routes/transfer.routes";
 import investmentRoutes from "./routes/investment.routes";
-import TransactionModel from "./models/transaction.model";
 import { processRecurringTransactions } from "./services/recurringTransactionService";
-import { SampleStocks } from "./data/sample-stocks";
-import AssetModel from "./models/asset.model";
+import { updateLastUsedAssetsPrices } from "./services/assetService";
+import assetRoutes from "./routes/asset.routes";
 
 const app = express();
 
@@ -41,6 +40,7 @@ app.use("/recurring-transactions", recurringTransactionRoutes);
 app.use("/accounts", accountRoutes);
 app.use("/budget", budgetRoutes);
 app.use("/investments", investmentRoutes);
+app.use("/assets", assetRoutes);
 
 mongoose.connect(
   `mongodb+srv://deantowheed5:${process.env.DB_PASS}@cluster0.ewv8l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
@@ -48,11 +48,12 @@ mongoose.connect(
 
 const PORT = process.env.PORT || 8000;
 
-const onStartServer = () => {
-  processRecurringTransactions();
+const onStartServer = async () => {
+  await processRecurringTransactions();
+  await updateLastUsedAssetsPrices();
 };
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log("server is running on port " + PORT);
-  onStartServer();
+  await onStartServer();
 });

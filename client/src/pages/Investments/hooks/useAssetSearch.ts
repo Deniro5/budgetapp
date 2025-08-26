@@ -19,10 +19,9 @@ export const useAssetSearch = () => {
   const { data, isLoading, error } = useQueryWithError<Asset[], Error>(
     ["assetSearch", debouncedInput],
     async () => {
-      const res = await axios.get<Asset[]>(
-        `${BASE_API_URL}/investments/search`,
-        { params: { q: debouncedInput } }
-      );
+      const res = await axios.get<Asset[]>(`${BASE_API_URL}/assets/search`, {
+        params: { q: debouncedInput },
+      });
       return res.data;
     },
     {

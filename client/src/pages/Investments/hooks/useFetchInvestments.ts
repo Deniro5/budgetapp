@@ -14,6 +14,8 @@ export const useFetchInvestments = () => {
     "Failed to fetch investments"
   );
 
+  console.log(data);
+
   const getCurrentInvestmentsQuantityMap = () =>
     data
       ? data.reduce((result, investment) => {
@@ -32,16 +34,18 @@ export const useFetchInvestments = () => {
               result[entry.account] = {};
             }
             //
-            if (result[entry.account][entry.asset.symbol]) {
-              result[entry.account][entry.asset.symbol] += entry.quantity;
+            if (result[entry.account][entry.asset]) {
+              result[entry.account][entry.asset] += entry.quantity;
             } else {
-              result[entry.account][entry.asset.symbol] = entry.quantity;
+              result[entry.account][entry.asset] = entry.quantity;
             }
           }
           return result;
         }, {} as Record<string, Record<string, number>>)
       : {};
   };
+
+  console.log(getInvestmentsByAccount());
 
   return {
     results: data ?? [],

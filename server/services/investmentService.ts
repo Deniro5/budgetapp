@@ -1,11 +1,8 @@
 import InvestmentModel from "../models/investment.model";
-import { SampleStocks } from "../data/sample-stocks";
 import mongoose from "mongoose";
-import AssetPriceHistoryModel from "../models/asset.model";
-import axios from "axios";
 import { addOneDay } from "../utils/dateutils";
 import { updateAccountBalance } from "./accountService";
-import { assetService } from "./assetService";
+import { updateBatchAssetsByIds, updateAssetById } from "./assetService";
 
 const API_URL = "https://www.alphavantage.co/query";
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -55,7 +52,7 @@ export const createInvestment = async (data: {
   });
 
   const now = new Date();
-  await assetService.update(data.asset, { lastUsed: now });
+  await updateAssetById(data.asset, { lastUsed: now });
 
   return savedInvestment;
 };
@@ -86,7 +83,7 @@ export const getAllInvestments = async (userId: string) => {
     .populate({ path: "asset", select: "symbol name exchange history" });
 
   const now = new Date();
-  assetService.updateBatch(
+  updateBatchAssetsByIds(
     investments.map((i) => i.asset._id),
     { lastUsed: now }
   );
@@ -96,30 +93,45 @@ export const getAllInvestments = async (userId: string) => {
 
 export const getAggregatedInvestments = async (userId: string) => {
   const investments = await InvestmentModel.aggregate([
-    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+    {
+      $match: { userId: new mongoose.Types.ObjectId(userId) },
+    },
+    {
+      $lookup: {
+        from: "assets",
+        localField: "asset",
+        foreignField: "_id",
+        as: "assetDetails",
+      },
+    },
+    { $unwind: "$assetDetails" },
     {
       $group: {
         _id: {
-          assetId: "$asset", // <-- get actual ObjectId here
-          symbol: "$asset.symbol",
+          assetId: "$assetDetails._id",
           userId: "$userId",
         },
-        name: { $first: "$asset.name" },
-        exchange: { $first: "$asset.exchange" },
+        symbol: { $first: "$assetDetails.symbol" },
+        name: { $first: "$assetDetails.name" },
+        exchange: { $first: "$assetDetails.exchange" },
+        history: { $first: "$assetDetails.history" },
         totalQuantity: { $sum: "$quantity" },
         totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
         entries: { $push: "$$ROOT" },
       },
     },
-    { $match: { totalQuantity: { $gt: 0 } } },
+    {
+      $match: { totalQuantity: { $gt: 0 } },
+    },
     {
       $project: {
         _id: 0,
         asset: {
-          _id: "$_id.assetId", // <-- include _id so we can update lastUsed
-          symbol: "$_id.symbol",
+          _id: "$_id.assetId",
+          symbol: "$symbol",
           name: "$name",
           exchange: "$exchange",
+          history: "$history",
         },
         userId: "$_id.userId",
         quantity: "$totalQuantity",
@@ -138,10 +150,9 @@ export const getAggregatedInvestments = async (userId: string) => {
     },
   ]);
 
-  // --------------- update lastUsed ---------------
   const now = new Date();
   const assetIds = investments.map((i) => i.asset._id);
-  await assetService.updateBatch(assetIds, { lastUsed: now });
+  await updateBatchAssetsByIds(assetIds, { lastUsed: now });
 
   return investments;
 };
@@ -150,9 +161,6 @@ export const getAggregatedInvestmentsByAccount = async (
   userId: string,
   accountId: string
 ) => {
-  //get investments with a positive quantity by account id.
-  //attach history to them
-  //get the last price and return it with the investment
   const investments = await InvestmentModel.aggregate([
     {
       $match: {
@@ -160,60 +168,60 @@ export const getAggregatedInvestmentsByAccount = async (
         account: new mongoose.Types.ObjectId(accountId),
       },
     },
+
+    {
+      $lookup: {
+        from: "assets",
+        localField: "asset",
+        foreignField: "_id",
+        as: "assetDoc",
+      },
+    },
+    { $unwind: "$assetDoc" },
+
     {
       $group: {
         _id: {
-          symbol: "$asset.symbol",
+          assetId: "$assetDoc._id",
           userId: "$userId",
         },
-        name: { $first: "$asset.name" },
+        asset: { $first: "$assetDoc" },
         totalQuantity: { $sum: "$quantity" },
         totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
       },
     },
+
     { $match: { totalQuantity: { $gt: 0 } } },
+
+    {
+      $addFields: {
+        price: {
+          $let: {
+            vars: {
+              lastHistory: { $arrayElemAt: ["$asset.history", -1] },
+            },
+            in: "$$lastHistory.price",
+          },
+        },
+      },
+    },
     {
       $project: {
         _id: 0,
         asset: {
-          symbol: "$_id.symbol",
-          name: "$name",
+          _id: "$asset._id",
+          symbol: "$asset.symbol",
+          name: "$asset.name",
+          exchange: "$asset.exchange",
         },
         quantity: "$totalQuantity",
-      },
-    },
-    {
-      $lookup: {
-        from: "assetpricehistories",
-        localField: "asset.symbol",
-        foreignField: "symbol",
-        as: "historyDoc",
-      },
-    },
-    {
-      $unwind: {
-        path: "$historyDoc",
-        preserveNullAndEmptyArrays: true,
-      },
-    },
-    {
-      $addFields: {
-        price: {
-          $arrayElemAt: ["$historyDoc.history.price", -1],
-        },
-      },
-    },
-
-    {
-      $project: {
-        asset: 1,
-        quantity: 1,
         price: 1,
       },
     },
-
     { $sort: { "asset.symbol": 1 } },
   ]);
+
+  console.log(investments);
 
   return investments;
 };
@@ -260,15 +268,6 @@ export const getInvestmentTransactionHistoryByAccount = async ({
   return investmentTransactionTotalsByDate;
 };
 
-export const searchStocks = (query: string) => {
-  const lower = query.toLowerCase();
-  return SampleStocks.filter(
-    (stock) =>
-      stock.symbol.toLowerCase().includes(lower) ||
-      stock.name.toLowerCase().includes(lower)
-  ).slice(0, 20);
-};
-
 export const getAggregatedInvestmentTimelineByAccount = async ({
   userId,
   accountId,
@@ -280,7 +279,6 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
   startDate: string;
   endDate: string;
 }) => {
-  //Final structure: {date: string, value: number}[] where value is the total value of all investments on that day
   const investments = await InvestmentModel.aggregate([
     {
       $match: {
@@ -293,29 +291,40 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     {
       $group: {
         _id: {
-          symbol: "$asset.symbol",
+          assetId: "$asset",
           userId: "$userId",
         },
-        symbol: { $first: "$asset.symbol" },
+        assetId: { $first: "$asset" },
         entries: { $push: "$$ROOT" },
       },
     },
     {
+      $lookup: {
+        from: "assets",
+        localField: "assetId",
+        foreignField: "_id",
+        as: "asset",
+      },
+    },
+    { $unwind: "$asset" },
+    {
       $project: {
         _id: 0,
         asset: {
-          symbol: "$_id.symbol",
+          _id: "$asset._id",
+          symbol: "$asset.symbol",
+          exchange: "$asset.exchange",
+          name: "$asset.name",
+          history: "$asset.history",
         },
         entries: 1,
       },
     },
   ]);
-  const investmentsWithHistory = await updateAssetPriceHistory(investments);
 
   const investmentTotalsByDate: Record<string, number> = {};
 
-  //we need to sort the entries
-  investmentsWithHistory.forEach((inv) => {
+  investments.forEach((inv) => {
     const { history } = inv.asset;
     const { entries } = inv;
     const entriesKeyedByDate = entries.reduce(
