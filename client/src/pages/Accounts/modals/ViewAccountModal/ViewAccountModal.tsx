@@ -40,7 +40,7 @@ const Container = styled.div`
   flex-direction: column;
   gap: ${SPACING.spacing2x};
   border-bottom: 1px solid ${COLORS.mediumGrey};
-  padding: ${SPACING.spacing4x} 0;
+  padding: ${SPACING.spacing5x} 0;
 `;
 
 const NameContainer = styled.div``;
@@ -95,7 +95,8 @@ export function ViewAccountModal({ account, onClose }: ViewAccountModalProps) {
       </Row>
       <Row>
         <InputContainer>
-          <InputLabel>Investment Total</InputLabel>${assetTotal}
+          <InputLabel>Investment Total</InputLabel>
+          {formatToCurrency(assetTotal)}
         </InputContainer>
         <InputContainer>
           <InputLabel>Total Balance</InputLabel>

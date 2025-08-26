@@ -20,9 +20,7 @@ export enum InvestmentsOverlayType {
 
 export default function InvestmentsPage() {
   const { mutate } = useCreateInvestment();
-  const { results, getInvestmentsByAccount, isLoading, error } =
-    useFetchInvestments();
-  const investmentsByAccount = getInvestmentsByAccount();
+  const { results, isLoading, error } = useFetchInvestments();
 
   const [activeOverlay, setActiveOverlay] =
     useState<InvestmentsOverlayType | null>(null);
@@ -46,7 +44,7 @@ export default function InvestmentsPage() {
       <InvestmentCardContainer>
         {results.map((investment) => (
           <InvestmentCard
-            key={investment.asset.symbol}
+            key={investment.asset._id}
             setActiveOverlay={setActiveOverlay}
             setPresetValues={setPresetValues}
             investment={investment}
@@ -65,7 +63,6 @@ export default function InvestmentsPage() {
           onClose={handleCloseOverlay}
           onSubmit={handleInvestmentSubmit}
           presetValues={presetValues}
-          investmentsByAccount={investmentsByAccount}
         />
       )}
 
@@ -75,7 +72,6 @@ export default function InvestmentsPage() {
           onSubmit={handleInvestmentSubmit}
           presetValues={presetValues}
           assetsList={results.map((investment) => investment.asset)}
-          investmentsByAccount={investmentsByAccount}
         />
       )}
 
@@ -87,9 +83,9 @@ export default function InvestmentsPage() {
 }
 
 const InvestmentCardContainer = styled(Flex)`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: ${SPACING.spacing6x};
-  justify-content: center;
+
   align-items: stretch;
 `;

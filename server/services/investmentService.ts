@@ -4,34 +4,6 @@ import { addOneDay } from "../utils/dateutils";
 import { updateAccountBalance } from "./accountService";
 import { updateBatchAssetsByIds, updateAssetById } from "./assetService";
 
-const API_URL = "https://www.alphavantage.co/query";
-const ONE_DAY = 24 * 60 * 60 * 1000;
-
-interface Investment {
-  asset: {
-    symbol: string;
-  };
-  entries: any[];
-  quantity: number;
-  price: number;
-  date: string;
-  account: string;
-  userId: string;
-}
-
-interface TimeSeriesEntry {
-  [date: string]: {
-    "1. open": string;
-    "2. high": string;
-    "3. low": string;
-    "4. close": string;
-    "5. adjusted close": string;
-    "6. volume": string;
-    "7. dividend amount"?: string;
-    "8. split coefficient"?: string;
-  };
-}
-
 export const createInvestment = async (data: {
   userId: string;
   asset: string;
@@ -91,6 +63,7 @@ export const getAllInvestments = async (userId: string) => {
   return investments;
 };
 
+//used for getAllInvestments
 export const getAggregatedInvestments = async (userId: string) => {
   const investments = await InvestmentModel.aggregate([
     {
@@ -117,7 +90,6 @@ export const getAggregatedInvestments = async (userId: string) => {
         history: { $first: "$assetDetails.history" },
         totalQuantity: { $sum: "$quantity" },
         totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
-        entries: { $push: "$$ROOT" },
       },
     },
     {
@@ -142,7 +114,6 @@ export const getAggregatedInvestments = async (userId: string) => {
             { $divide: ["$totalValue", "$totalQuantity"] },
           ],
         },
-        entries: 1,
       },
     },
     {
@@ -157,10 +128,12 @@ export const getAggregatedInvestments = async (userId: string) => {
   return investments;
 };
 
+//used for getAccountInvestmentSummary
 export const getAggregatedInvestmentsByAccount = async (
   userId: string,
   accountId: string
 ) => {
+  //gets total quantity and price for each asset
   const investments = await InvestmentModel.aggregate([
     {
       $match: {
@@ -187,7 +160,6 @@ export const getAggregatedInvestmentsByAccount = async (
         },
         asset: { $first: "$assetDoc" },
         totalQuantity: { $sum: "$quantity" },
-        totalValue: { $sum: { $multiply: ["$quantity", "$price"] } },
       },
     },
 
@@ -195,14 +167,7 @@ export const getAggregatedInvestmentsByAccount = async (
 
     {
       $addFields: {
-        price: {
-          $let: {
-            vars: {
-              lastHistory: { $arrayElemAt: ["$asset.history", -1] },
-            },
-            in: "$$lastHistory.price",
-          },
-        },
+        price: { $ifNull: [{ $arrayElemAt: ["$asset.history.price", -1] }, 0] },
       },
     },
     {
@@ -221,7 +186,9 @@ export const getAggregatedInvestmentsByAccount = async (
     { $sort: { "asset.symbol": 1 } },
   ]);
 
-  console.log(investments);
+  const now = new Date();
+  const assetIds = investments.map((i) => i.asset._id);
+  await updateBatchAssetsByIds(assetIds, { lastUsed: now });
 
   return investments;
 };
@@ -290,10 +257,7 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     },
     {
       $group: {
-        _id: {
-          assetId: "$asset",
-          userId: "$userId",
-        },
+        _id: "$asset_id",
         assetId: { $first: "$asset" },
         entries: { $push: "$$ROOT" },
       },
@@ -311,10 +275,6 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
       $project: {
         _id: 0,
         asset: {
-          _id: "$asset._id",
-          symbol: "$asset.symbol",
-          exchange: "$asset.exchange",
-          name: "$asset.name",
           history: "$asset.history",
         },
         entries: 1,

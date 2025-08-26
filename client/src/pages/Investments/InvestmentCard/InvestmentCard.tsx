@@ -89,7 +89,7 @@ export const InvestmentCard = ({
 };
 const Container = styled(Card)`
   padding: ${SPACING.spacing6x};
-  max-width: 750px;
+  max-width: 580px;
 `;
 
 const StyledDivider = styled(Divider)`
@@ -99,7 +99,6 @@ const StyledDivider = styled(Divider)`
 const InvestmentInfo = styled(Flex)`
   flex-wrap: wrap;
   align-items: flex-start;
-
   margin-top: ${SPACING.spacing6x};
   gap: ${SPACING.spacing4x} ${SPACING.spacing10x};
   margin-left: ${SPACING.spacingBase};
@@ -112,7 +111,6 @@ const InvestmentInfo = styled(Flex)`
 const Label = styled.h3`
   font-size: ${FONTSIZE.lg};
   font-weight: 600;
-
   margin: 0;
 `;
 

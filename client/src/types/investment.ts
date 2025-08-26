@@ -10,7 +10,7 @@ type Entry = {
 };
 
 export type Investment = {
-  asset: string;
+  asset: Asset;
   quantity: number;
   price: number;
   date: string;
@@ -35,4 +35,5 @@ export type Asset = {
   name: string;
   exchange: string;
   history: { date: string; price: number }[];
+  _id: string;
 };

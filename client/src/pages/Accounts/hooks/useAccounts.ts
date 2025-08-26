@@ -1,7 +1,7 @@
 import { useQueryWithError } from "hooks/useQueryWithError";
 import axios from "axios";
 import { BASE_API_URL } from "appConstants";
-import { Account } from "types/account";
+import { Account, AccountInvestmentSummaryItem } from "types/account";
 import { useMemo } from "react";
 
 export default function useAccounts() {
@@ -25,6 +25,12 @@ export default function useAccounts() {
       return acc;
     }, {}) || {};
 
+  const accountInvestmentSummaryByIdMap =
+    data?.reduce((acc: Record<string, AccountInvestmentSummaryItem[]>, cur) => {
+      acc[cur._id] = cur.investmentSummary;
+      return acc;
+    }, {}) || {};
+
   //we are using useMemo here because these are used as dependencies in BaseInvestmentModal
   const activeAccounts = useMemo(
     () => data?.filter((account) => !account.isArchived) ?? [],
@@ -41,6 +47,7 @@ export default function useAccounts() {
     activeAccounts,
     activeAccountIds,
     accountNameByIdMap,
+    accountInvestmentSummaryByIdMap,
     isLoading,
     error,
   };

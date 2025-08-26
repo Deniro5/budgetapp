@@ -80,7 +80,7 @@ export async function searchAsset(
       return;
     }
 
-    const results = assetService.searchAsset(q);
+    const results = await assetService.searchAsset(q);
     res.status(201).json(results);
   } catch (err) {
     console.error("Error searching stocks:", err);

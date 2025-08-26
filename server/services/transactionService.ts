@@ -273,6 +273,7 @@ export const getTransactionCategoriesByAmount = async (
     };
   }
 
+  //sum all transactions by category and then sort by descending total
   const categoryTotals = await TransactionModel.aggregate([
     { $match: matchConditions },
     {

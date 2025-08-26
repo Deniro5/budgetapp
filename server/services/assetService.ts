@@ -32,8 +32,6 @@ export async function getAssetById(id: string) {
 }
 
 export async function updateAssetById(id: string, data: Partial<Asset>) {
-  console.log(data);
-  console.log(id);
   return await AssetModel.findByIdAndUpdate(id, data, { new: true });
 }
 
@@ -125,12 +123,12 @@ export async function updateLastUsedAssetsPrices() {
   console.log("update assets completed");
   return assetsToUpdate;
 }
+export const searchAsset = async (query: string) => {
+  const regex = new RegExp(query, "i"); // case-insensitive regex
 
-export const searchAsset = (query: string) => {
-  const lower = query.toLowerCase();
-  return SampleStocks.filter(
-    (stock) =>
-      stock.symbol.toLowerCase().includes(lower) ||
-      stock.name.toLowerCase().includes(lower)
-  ).slice(0, 20);
+  return await AssetModel.find({
+    $or: [{ symbol: regex }, { name: regex }],
+  })
+    .limit(20)
+    .lean();
 };

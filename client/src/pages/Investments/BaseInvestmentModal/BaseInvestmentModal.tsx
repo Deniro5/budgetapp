@@ -29,7 +29,6 @@ type BaseInvestmentModalProps = {
   input: string;
   setInput: React.Dispatch<React.SetStateAction<string>>;
   assetsList: Asset[];
-  investmentsByAccount: Record<string, Record<string, number>>;
   isSellModal?: boolean;
 };
 
@@ -45,12 +44,10 @@ export function BaseInvestmentModal({
   assetsList,
   input,
   setInput,
-  investmentsByAccount,
   isSellModal,
 }: BaseInvestmentModalProps) {
   const userPreferences = getUserPreferences();
-  const { activeAccountIds } = useAccounts();
-  const { assetResult } =  
+  const { activeAccountIds, accountInvestmentSummaryByIdMap } = useAccounts();
 
   const {
     register,
@@ -85,6 +82,7 @@ export function BaseInvestmentModal({
 
   const handleAssetChange = (asset: Asset) => {
     setValue("asset", asset, { shouldValidate: true });
+    setValue("price", asset.history[0]?.price || 0, { shouldValidate: true });
   };
   const handleAccountChange = (accountId: string) => {
     setValue("account", accountId, { shouldValidate: true });
@@ -95,31 +93,39 @@ export function BaseInvestmentModal({
     onClose();
   };
 
-  const checkAccountHasAsset = (accountId: string) =>
-    currentValues.asset &&
-    investmentsByAccount[accountId] &&
-    investmentsByAccount[accountId][currentValues.asset?.symbol];
+  const getAccountInvestments = (accountId: string) =>
+    accountInvestmentSummaryByIdMap[accountId] ?? [];
 
-  const assetQuantityOwned =
-    account && checkAccountHasAsset(account._id)
-      ? investmentsByAccount[account._id][currentValues.asset?.symbol]
-      : 0;
+  const findAssetInAccount = (accountId: string, assetId: string) =>
+    assetId
+      ? getAccountInvestments(accountId).find((i) => i.asset._id === assetId)
+      : undefined;
 
-  // if it's the sell modal only show the accounts that have the asset
+  const accountHasAsset = (accountId: string, assetId: string) =>
+    !!findAssetInAccount(accountId, assetId);
+
+  const getAssetQuantity = (accountId: string, assetId: string) =>
+    findAssetInAccount(accountId, assetId)?.quantity ?? 0;
+
+  const assetId = currentValues.asset?._id;
+
+  const assetQuantityOwned = account
+    ? getAssetQuantity(account._id, assetId)
+    : 0;
+
   const filteredAccountIds = isSellModal
-    ? activeAccountIds.filter((accountId) => checkAccountHasAsset(accountId))
+    ? activeAccountIds.filter((id) => accountHasAsset(id, assetId))
     : activeAccountIds;
 
   // set the modal default account to the first account that has the asset if we are selling and if the default account is not in the list
   useEffect(() => {
-    if (isSellModal && !checkAccountHasAsset(currentValues.account)) {
-      const defaultAccount = activeAccountIds.find((accountId) =>
-        checkAccountHasAsset(accountId)
+    if (isSellModal && !accountHasAsset(currentValues.account, assetId)) {
+      const defaultAccount = activeAccountIds.find((id) =>
+        accountHasAsset(id, assetId)
       );
-      handleAccountChange(defaultAccount || "");
+      handleAccountChange(defaultAccount ?? "");
     }
-  }, [activeAccountIds]);
-
+  }, [isSellModal, activeAccountIds, assetId, currentValues.account]);
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
       <Title>{title}</Title>
@@ -150,7 +156,9 @@ export function BaseInvestmentModal({
         <Row>
           <InputContainer>
             <InputLabel>
-              Amount Currently in {account?.name}: {assetQuantityOwned}
+              Amount{" "}
+              {currentValues.asset &&
+                `currently in ${account?.name}: ${assetQuantityOwned}`}
             </InputLabel>
             <BaseInput
               {...register("quantity", {

@@ -8,6 +8,7 @@ import {
 } from "../services/investmentService";
 import { addOneDay } from "../utils/dateutils";
 import InvestmentModel from "../models/investment.model";
+import e from "express";
 
 interface AccountInput {
   userId: string;
@@ -93,10 +94,11 @@ export const updateAccount = async (
 
   if (updateData.baselineDate !== account.baselineDate) {
     const transactionTotal =
-      (await getAccountTransactionTotalAfterBaseline({
+      (await getAccountTransactionTotalBetweenDates({
         userId,
         accountId,
-        baselineDate: updateData.baselineDate,
+        startDate: updateData.baselineDate,
+        endDate: new Date().toISOString().split("T")[0],
       })) + updateData.baselineAmount;
     updateData.balance = transactionTotal;
   }
@@ -110,34 +112,6 @@ export const deleteAccount = async (userId: string, accountId: string) => {
 
   await AccountModel.findByIdAndDelete(accountId);
   return true;
-};
-
-export const getAccountBalanceAtDate = async ({
-  userId,
-  accountId,
-  baselineAmount,
-  baselineDate,
-  startDate,
-}: {
-  userId: string;
-  accountId: string;
-  baselineAmount: number;
-  baselineDate: string;
-  startDate: string;
-}): Promise<number> => {
-  if (startDate <= baselineDate) return 0;
-
-  const transactions = await TransactionModel.find({
-    userId,
-    account: accountId,
-    date: { $gte: baselineDate, $lt: startDate },
-  });
-
-  const delta = transactions.reduce((acc, cur) => {
-    return acc + (cur.type === "Income" ? cur.amount : -cur.amount);
-  }, 0);
-
-  return baselineAmount + delta;
 };
 
 export const getAccountTransactionsFromStartToEnd = async ({
@@ -172,6 +146,45 @@ export const getAccountTransactionsFromStartToEnd = async ({
   return transactions;
 };
 
+export const getAccountTransactionTotalBetweenDates = async ({
+  userId,
+  accountId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  accountId: string;
+  startDate: string;
+  endDate: string;
+}) => {
+  const transactionHistory = await TransactionModel.find({
+    userId,
+    account: accountId,
+    date: { $gte: startDate, $lte: endDate },
+  });
+  const transactionTotal = transactionHistory.reduce((total, transaction) => {
+    return (
+      total +
+      (transaction.type === "Income" ? transaction.amount : -transaction.amount)
+    );
+  }, 0);
+  const investmentTransactionHistory: Record<string, number> =
+    await getInvestmentTransactionHistoryByAccount({
+      userId,
+      accountId: accountId,
+      startDate,
+      endDate,
+    });
+
+  const investmentTransactionTotal: number = Object.values(
+    investmentTransactionHistory
+  ).reduce((acc: number, cur: number) => {
+    return acc - cur;
+  }, 0);
+
+  return transactionTotal + investmentTransactionTotal;
+};
+
 export const getAccountBalancesById = async ({
   userId,
   id,
@@ -199,15 +212,15 @@ export const getAccountBalancesById = async ({
 
   for (const account of accounts) {
     const { _id, baselineAmount, baselineDate } = account;
-    const accountBalanceAtStartDate = await getAccountBalanceAtDate({
-      userId,
-      accountId: _id,
-      baselineAmount,
-      baselineDate,
-      startDate,
-    });
+    const accountBalanceAtStartDate =
+      await getAccountTransactionTotalBetweenDates({
+        userId,
+        accountId: _id,
+        startDate: baselineDate,
+        endDate: startDate,
+      });
 
-    transactionTotal += accountBalanceAtStartDate;
+    transactionTotal += accountBalanceAtStartDate + baselineAmount;
     const laterStartDate = startDate < baselineDate ? baselineDate : startDate;
 
     if (!earliestDate || laterStartDate < earliestDate)
@@ -273,43 +286,6 @@ export const getAccountBalancesById = async ({
     currentDate = addOneDay(currentDate);
   }
   return result;
-};
-
-export const getAccountTransactionTotalAfterBaseline = async ({
-  userId,
-  accountId,
-  baselineDate,
-}: {
-  userId: string;
-  accountId: string;
-  baselineDate: string;
-}) => {
-  const transactionHistory = await TransactionModel.find({
-    userId,
-    account: accountId,
-    date: { $gte: baselineDate, $lte: new Date().toISOString().split("T")[0] },
-  });
-  const transactionTotal = transactionHistory.reduce((total, transaction) => {
-    return (
-      total +
-      (transaction.type === "Income" ? transaction.amount : -transaction.amount)
-    );
-  }, 0);
-  const investmentTransactionHistory: Record<string, number> =
-    await getInvestmentTransactionHistoryByAccount({
-      userId,
-      accountId: accountId,
-      startDate: baselineDate,
-      endDate: new Date().toISOString().split("T")[0],
-    });
-
-  const investmentTransactionTotal: number = Object.values(
-    investmentTransactionHistory
-  ).reduce((acc: number, cur: number) => {
-    return acc - cur;
-  }, 0);
-
-  return transactionTotal + investmentTransactionTotal;
 };
 
 interface UpdateAccountBalanceArgs {

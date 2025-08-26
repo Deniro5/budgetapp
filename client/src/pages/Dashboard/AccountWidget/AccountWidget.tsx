@@ -132,6 +132,7 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
 
 const Name = styled.h3`
   margin: 0;
+  min-width: 132px;
   font-size: ${FONTSIZE.lg};
 `;
 

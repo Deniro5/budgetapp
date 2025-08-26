@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Asset } from "types/investment";
+import { formatToCurrency } from "utils/index";
 
 type AssetMenuItemProps = {
   asset: Asset;
@@ -12,14 +13,21 @@ export default function AssetMenuItem({ asset }: AssetMenuItemProps) {
     { label: "Exchange", value: asset.exchange },
   ].filter(({ value }) => !!value);
 
+  const price = asset.history[0]?.price
+    ? formatToCurrency(asset.history[0].price)
+    : "";
+
   return (
     <Container>
-      <Name> {asset.symbol} </Name>
+      <Name>
+        {" "}
+        {asset.symbol} - {price}
+      </Name>
       <FieldsContainer>
         {fields.map(({ label, value }) => (
           <FieldContainer key={label}>
             <FieldLabel>{label}:</FieldLabel>
-            <FieldValue title={String(value)}>{String(value)}</FieldValue>
+            <FieldValue>{String(value)}</FieldValue>
           </FieldContainer>
         ))}
       </FieldsContainer>
@@ -53,7 +61,7 @@ const FieldsContainer = styled.div`
 const FieldContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  flex: 1 1 25%;
+  flex: 1 1 30%;
   min-width: 0;
   font-size: ${FONTSIZE.sm};
 `;

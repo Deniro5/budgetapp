@@ -1,17 +1,17 @@
 import styled from "styled-components";
-import { COLORS, SPACING } from "theme";
+import { COLORS, FONTSIZE, SPACING } from "theme";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBorderAll,
   faGear,
-  faFileInvoiceDollar,
   IconDefinition,
   faChevronRight,
   faChevronLeft,
-  faSackDollar,
-  faHandHoldingDollar,
+  faExchange,
   faChartLine,
+  faChartPie,
+  faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { getFirstPath } from "utils";
@@ -39,33 +39,28 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
     },
     {
       href: "/transactions",
-      icon: faChartLine,
+      icon: faExchange,
       label: "Transactions",
       isActive: firstPath === "transactions",
     },
     {
-      href: "/accounts",
-      icon: faFileInvoiceDollar,
-      label: "Accounts",
-      isActive: firstPath === "accounts",
-    },
-    {
       href: "/budget",
-      icon: faFileInvoiceDollar,
+      icon: faChartPie,
       label: "Budget",
       isActive: firstPath === "budget",
     },
-    {
-      href: "/savings",
-      icon: faSackDollar,
-      label: "Savings",
-      isActive: firstPath === "savings",
-    },
+
     {
       href: "/investments",
-      icon: faHandHoldingDollar,
+      icon: faChartLine,
       label: "Investments",
       isActive: firstPath === "investments",
+    },
+    {
+      href: "/accounts",
+      icon: faWallet,
+      label: "Accounts",
+      isActive: firstPath === "accounts",
     },
     {
       href: "/settings",
@@ -108,31 +103,40 @@ const MenuItem = styled.div<{ $isActive?: boolean }>`
   align-items: center;
   cursor: pointer;
   color: ${({ $isActive }) =>
-    $isActive ? COLORS.pureWhite : COLORS.lightGrey};
-  padding: ${SPACING.spacing2x};
+    $isActive ? COLORS.pureWhite : COLORS.darkPrimary};
+  padding: ${SPACING.spacing3x};
   border-radius: 4px;
   margin: 0;
   height: 32px;
+  font-weight: 500;
+  font-size: ${FONTSIZE.md};
 
   path {
-    color: ${COLORS.lightGrey};
+    color: ${COLORS.primary};
   }
   &:hover {
-    color: ${COLORS.pureWhite};
+    color: ${COLORS.darkPrimary};
     path {
-      color: ${COLORS.pureWhite};
+      color: ${COLORS.darkPrimary};
     }
   }
   ${({ $isActive }) =>
     $isActive &&
     `
-    background: ${COLORS.primary};
+    background: ${COLORS.darkPrimary};
     path {
         color: ${COLORS.pureWhite};
     }
-    text-decoration:underline;
+
     font-weight: 600;
-    text-underline-offset: 2px;
+
+
+      &:hover {
+    color: ${COLORS.pureWhite};
+    path {
+      color: ${COLORS.pureWhite};
+    }
+  }
   `}
 `;
 
@@ -141,12 +145,13 @@ const IconContainer = styled.div``;
 const SidebarContainer = styled.div<{ $isExpanded: boolean }>`
   display: flex;
   align-items: ${({ $isExpanded }) => ($isExpanded ? "flex-start" : "center")};
+  border-right: 1px solid ${COLORS.lightFont};
   flex-direction: column;
   position: fixed;
   gap: ${SPACING.spacing4x};
   height: calc(100vh);
   width: ${({ $isExpanded }) => ($isExpanded ? "200px" : "40px")};
-  background: ${COLORS.primary};
+  background: ${COLORS.lightPrimary};
   padding: ${({ $isExpanded }) =>
     $isExpanded
       ? `${SPACING.spacing6x} ${SPACING.spacing3x}`

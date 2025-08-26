@@ -1,4 +1,5 @@
 import DropdownList from "components/DropdownList/DropdownList";
+import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import useAccounts from "pages/Accounts/hooks/useAccounts";
 
 interface AccountDropdownProps {
@@ -14,7 +15,10 @@ export default function AccountDropdown({
   accountsList,
   placeholder,
 }: AccountDropdownProps) {
-  const { activeAccountIds, accountNameByIdMap } = useAccounts();
+  const { activeAccountIds, accountNameByIdMap, isLoading } = useAccounts();
+
+  if (isLoading)
+    return <SkeletonLoader rows={1} columns={1} height={44}></SkeletonLoader>;
 
   return (
     <DropdownList

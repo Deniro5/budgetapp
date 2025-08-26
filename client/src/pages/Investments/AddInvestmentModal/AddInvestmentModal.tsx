@@ -7,14 +7,12 @@ type AddInvestmentModalProps = {
   onClose: () => void;
   onSubmit: (investment: RawInvestment) => void;
   presetValues: Partial<RawInvestment>;
-  investmentsByAccount: Record<string, Record<string, number>>;
 };
 
 export default function AddInvestmentModal({
   onClose,
   onSubmit,
   presetValues,
-  investmentsByAccount,
 }: AddInvestmentModalProps) {
   const { results, input, setInput } = useAssetSearch();
 
@@ -32,7 +30,6 @@ export default function AddInvestmentModal({
       assetsList={results}
       input={input}
       setInput={setInput}
-      investmentsByAccount={investmentsByAccount}
     />
   );
 }
