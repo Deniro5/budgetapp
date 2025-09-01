@@ -167,7 +167,7 @@ export const getAggregatedInvestmentsByAccount = async (
 
     {
       $addFields: {
-        price: { $ifNull: [{ $arrayElemAt: ["$asset.history.price", -1] }, 0] },
+        price: { $ifNull: [{ $arrayElemAt: ["$asset.history.price", 0] }, 0] },
       },
     },
     {
@@ -257,7 +257,7 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
     },
     {
       $group: {
-        _id: "$asset_id",
+        _id: "$asset",
         assetId: { $first: "$asset" },
         entries: { $push: "$$ROOT" },
       },
@@ -322,6 +322,7 @@ export const getAggregatedInvestmentTimelineByAccount = async ({
       lastPrice = historyKeyedByDate[currDate]?.price || lastPrice;
       investmentTotalsByDate[currDate] =
         (investmentTotalsByDate[currDate] || 0) + cumulativeQty * lastPrice;
+
       currDate = addOneDay(currDate);
     }
   });

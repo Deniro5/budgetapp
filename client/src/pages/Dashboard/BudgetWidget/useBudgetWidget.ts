@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { TransactionCategory } from "types/Transaction";
 import axios from "axios";
 import { BASE_API_URL } from "appConstants";
@@ -45,12 +44,22 @@ const fetchTransactionCategoriesByAmount = async (
   return response.data;
 };
 
+const fetchIncomeExpenseData = async (
+  startDate: string,
+  endDate: string
+): Promise<IncomeExpenseData> => {
+  const queryString = `startDate=${startDate}&endDate=${endDate}`;
+  const response = await axios.get<IncomeExpenseData>(
+    `${BASE_API_URL}/transactions/income-expense-by-date?${queryString}`
+  );
+  return response.data;
+};
+
 export const useBudgetWidget = ({
   startDate,
   endDate,
 }: useBudgetWidgetProps) => {
   const { budget } = useBudget();
-  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQueryWithError<
     BudgetCategoryData,
@@ -64,12 +73,14 @@ export const useBudgetWidget = ({
     "Failed to load budget categories"
   );
 
-  const totalIncomeAndExpenseByDate =
-    queryClient.getQueryData<IncomeExpenseData>([
-      "incomeExpense",
-      startDate,
-      endDate,
-    ]);
+  const { data: incomeExpenseData } = useQueryWithError<
+    IncomeExpenseData,
+    Error
+  >(
+    ["incomeExpense", startDate, endDate],
+    () => fetchIncomeExpenseData(startDate, endDate),
+    { enabled: !!startDate && !!endDate }
+  );
 
   const budgetCategories = budget?.budgetCategories;
   const categoryTotals = data?.categoryTotals;
@@ -123,17 +134,17 @@ export const useBudgetWidget = ({
 
   const getAvailableBudget = () => {
     const totalBudget = getAggregatedTotalBudget();
-    if (!totalIncomeAndExpenseByDate) return totalBudget;
+    if (!incomeExpenseData) return totalBudget;
 
-    const lastDate =
-      totalIncomeAndExpenseByDate[totalIncomeAndExpenseByDate.length - 1];
+    const lastDate = incomeExpenseData[incomeExpenseData.length - 1];
+
     return totalBudget - (lastDate?.expense ?? 0);
   };
 
   return {
     categoriesWithBudget: getAggregatedCategoriesWithBudget(),
     totalBudget: getAggregatedTotalBudget(),
-    availableBudget: getAvailableBudget(),
+    getAvailableBudget,
     isLoading,
     error,
   };

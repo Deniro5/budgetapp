@@ -98,7 +98,7 @@ const Sidebar = ({ isExpanded, toggleExpanded }: SidebarProps) => {
   );
 };
 
-const MenuItem = styled.div<{ $isActive?: boolean }>`
+const MenuItem = styled.button<{ $isActive?: boolean }>`
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -110,6 +110,8 @@ const MenuItem = styled.div<{ $isActive?: boolean }>`
   height: 32px;
   font-weight: 500;
   font-size: ${FONTSIZE.md};
+  border: none;
+  background: none;
 
   path {
     color: ${COLORS.primary};

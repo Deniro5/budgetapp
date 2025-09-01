@@ -73,7 +73,6 @@ export const getAllAccountsWithInvestmentSummary = async (userId: string) => {
       };
     })
   );
-
   return accountsWithInvestments;
 };
 
@@ -118,14 +117,12 @@ export const getAccountTransactionsFromStartToEnd = async ({
   userId,
   accountId,
   startDate,
-  baselineDate,
   baselineAmount,
   endDate,
 }: {
   userId: string;
   accountId: string;
   startDate: string;
-  baselineDate: string;
   baselineAmount: number;
   endDate: string;
 }): Promise<any[]> => {
@@ -135,13 +132,11 @@ export const getAccountTransactionsFromStartToEnd = async ({
     date: { $gte: startDate, $lte: endDate },
   });
 
-  if (startDate === baselineDate) {
-    transactions.unshift({
-      date: startDate,
-      amount: baselineAmount,
-      type: "Income",
-    });
-  }
+  transactions.unshift({
+    date: startDate,
+    amount: baselineAmount,
+    type: "Income",
+  });
 
   return transactions;
 };
@@ -208,7 +203,6 @@ export const getAccountBalancesById = async ({
 
   let transactionTotal = 0;
   let allTransactionsAfterStartDate: any[] = [];
-  let earliestDate: string | null = null;
 
   for (const account of accounts) {
     const { _id, baselineAmount, baselineDate } = account;
@@ -219,19 +213,16 @@ export const getAccountBalancesById = async ({
         startDate: baselineDate,
         endDate: startDate,
       });
-
-    transactionTotal += accountBalanceAtStartDate + baselineAmount;
-    const laterStartDate = startDate < baselineDate ? baselineDate : startDate;
-
-    if (!earliestDate || laterStartDate < earliestDate)
-      earliestDate = laterStartDate;
+    transactionTotal += accountBalanceAtStartDate;
+    //we need to start from the next day since we have already included transactions up to the start date
+    const laterStartDate =
+      startDate < baselineDate ? baselineDate : addOneDay(startDate);
 
     const transactionsFromStartToEnd =
       await getAccountTransactionsFromStartToEnd({
         userId,
         accountId: _id,
         startDate: laterStartDate,
-        baselineDate,
         baselineAmount,
         endDate,
       });
@@ -250,10 +241,12 @@ export const getAccountBalancesById = async ({
     {}
   );
 
+  let currentDate = addOneDay(startDate);
+
   const investmentBalancesMap = await getAggregatedInvestmentTimelineByAccount({
     userId,
     accountId: id === "All" ? undefined : id,
-    startDate,
+    startDate: currentDate,
     endDate,
   });
 
@@ -261,11 +254,10 @@ export const getAccountBalancesById = async ({
     await getInvestmentTransactionHistoryByAccount({
       userId,
       accountId: id === "All" ? undefined : id,
-      startDate,
+      startDate: currentDate,
       endDate,
     });
 
-  let currentDate = startDate;
   const result: {
     date: string;
     balance: number;

@@ -27,10 +27,11 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
   const {
     categoriesWithBudget,
     totalBudget,
-    availableBudget,
+    getAvailableBudget,
     isLoading,
     error,
   } = useBudgetWidget({ startDate, endDate });
+  const availableBudget = getAvailableBudget();
   const isWithinBudget = availableBudget > 0;
 
   const chartElement = (

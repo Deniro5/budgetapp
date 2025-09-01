@@ -102,7 +102,6 @@ const DropdownList = <T,>({
       >
         <SelectedItem onClick={handleButtonClick}>
           <SelectedItemText>
-            {" "}
             {selected ? itemToString(selected) : placeholder}
           </SelectedItemText>
         </SelectedItem>
@@ -123,7 +122,6 @@ const SelectedItem = styled.button`
   &::placeholder {
     color: ${COLORS.lightFont};
   }
-
   box-sizing: border-box;
 
   appearance: none; /* Remove native arrow */
@@ -136,8 +134,7 @@ const SelectedItemText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 90px;
-  padding-right: ${SPACING.spacing2x};
+  padding-right: ${SPACING.spacing4x};
   text-align: left;
 `;
 
@@ -157,8 +154,7 @@ const Item = styled.div`
 `;
 
 const NoItems = styled.div`
-  padding: 10px;
-  color: #888;
+  padding: ${SPACING.spacing3x};
 `;
 
 const ScrollableContainer = styled.div`
