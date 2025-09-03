@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import { COLORS, SPACING } from "theme";
-import React from "react";
+import { COLORS, FONTSIZE, SPACING } from "theme";
+import React, { forwardRef } from "react";
+import { useMenuFocus } from "hooks/useMenuFocus";
 
 type MenuItem = {
   label: string;
@@ -11,23 +12,27 @@ type PopoverContentProps = {
   menuItems?: MenuItem[];
   children?: React.ReactNode;
   width?: number;
+  onClose: () => void;
 };
 
-function PopoverContent({
+const PopoverContent = ({
   menuItems,
-  children,
   width = 180,
-}: PopoverContentProps) {
+  onClose,
+}: PopoverContentProps) => {
+  const menuRef = useMenuFocus();
+
   const handleClick = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     callback: () => void
   ) => {
     callback();
     e.stopPropagation();
+    onClose();
   };
 
   const getPopoverContent = () => {
-    if (menuItems) {
+    if (menuItems && menuItems.length) {
       return menuItems.map((menuItem) => (
         <PopoverMenuItem
           key={menuItem.label}
@@ -37,16 +42,18 @@ function PopoverContent({
         </PopoverMenuItem>
       ));
     } else {
-      return children;
+      return <NoItems>No items found</NoItems>;
     }
   };
 
   return (
-    <PopoverContentContainer $width={width}>
+    <PopoverContentContainer $width={width} ref={menuRef}>
       {getPopoverContent()}
     </PopoverContentContainer>
   );
-}
+};
+
+PopoverContent.displayName = "PopoverContent";
 
 const PopoverContentContainer = styled.div<{ $width: number }>`
   background: ${COLORS.pureWhite};
@@ -57,18 +64,34 @@ const PopoverContentContainer = styled.div<{ $width: number }>`
   z-index: 1000;
   overflow-x: hidden;
   overflow-y: hidden;
+  max-height: 200px;
+  overflow: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  color: ${COLORS.font};
 `;
 
-const PopoverMenuItem = styled.div`
-  text-align: center;
+const PopoverMenuItem = styled.button`
+  background: transparent;
   &:hover {
     background: ${COLORS.lightGrey};
   }
   &:active {
     background: ${COLORS.mediumGrey};
   }
-  padding: ${SPACING.spacing3x};
   cursor: pointer;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: ${FONTSIZE.md};
+  padding: ${SPACING.spacing3x} ${SPACING.spacing2x};
+  color: ${COLORS.font};
+`;
+
+const NoItems = styled.div`
+  padding: ${SPACING.spacing3x};
 `;
 
 export default PopoverContent;

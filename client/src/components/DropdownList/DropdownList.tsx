@@ -3,13 +3,16 @@ import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Popover } from "react-tiny-popover";
 import PopoverContent from "../Global/PopoverContent";
-import DropdownListItem from "./DropdownListItem";
+import { useMenuFocus } from "hooks/useMenuFocus";
 
+interface MenuItem {
+  label: string;
+  function: () => void;
+}
 interface DropdownListProps<T> {
-  items: T[];
+  items: MenuItem[];
   selected: T | null;
   placeholder: string;
-  onSelect: (item: T) => void;
   searchable?: boolean;
   itemRenderer?: (item: T) => React.ReactNode;
   width?: number;
@@ -20,7 +23,6 @@ const DropdownList = <T,>({
   items,
   selected,
   placeholder,
-  onSelect,
   searchable,
   itemRenderer,
   width = 200,
@@ -34,27 +36,15 @@ const DropdownList = <T,>({
     if (searchable) {
       setFilteredItems(
         items.filter((item) => {
-          const stringItem = itemToString(item);
-          if (typeof stringItem === "string") {
-            return stringItem.toLowerCase().includes(searchTerm.toLowerCase());
-          }
-          return false;
+          if (!item?.label) return false;
+
+          return item.label.toLowerCase().includes(searchTerm.toLowerCase());
         })
       );
     }
   }, [searchTerm, items, searchable, itemRenderer]);
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
-
-  const handleSelect = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    item: T
-  ) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onSelect(item);
-    setIsOpen(false);
-  };
 
   const handleButtonClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -73,7 +63,7 @@ const DropdownList = <T,>({
         onClickOutside={toggleDropdown}
         containerStyle={{ zIndex: "1100" }}
         content={
-          <PopoverContent width={width}>
+          <>
             {searchable && (
               <SearchInput
                 type="text"
@@ -82,22 +72,12 @@ const DropdownList = <T,>({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             )}
-            <ScrollableContainer>
-              {filteredItems.length > 0 ? (
-                filteredItems.map((item, index) => (
-                  <Item key={index} onClick={(e) => handleSelect(e, item)}>
-                    {itemRenderer ? (
-                      itemRenderer(item)
-                    ) : (
-                      <DropdownListItem>{itemToString(item)}</DropdownListItem>
-                    )}
-                  </Item>
-                ))
-              ) : (
-                <NoItems>No items found</NoItems>
-              )}
-            </ScrollableContainer>
-          </PopoverContent>
+            <PopoverContent
+              width={width}
+              menuItems={filteredItems}
+              onClose={toggleDropdown}
+            />
+          </>
         }
       >
         <SelectedItem onClick={handleButtonClick}>
@@ -141,29 +121,8 @@ const SelectedItemText = styled.span`
 const SearchInput = styled.input`
   width: 100%;
   padding: 10px;
-  border: none;
-  border-bottom: 1px solid #ccc;
   outline: none;
-`;
-
-const Item = styled.div`
-  cursor: pointer;
-  &:hover {
-    background-color: #f9f9f9;
-  }
-`;
-
-const NoItems = styled.div`
-  padding: ${SPACING.spacing3x};
-`;
-
-const ScrollableContainer = styled.div`
-  max-height: 200px;
-  overflow: scroll;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  border: 1px solid grey;
 `;
 
 export default DropdownList;

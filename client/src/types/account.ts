@@ -35,3 +35,5 @@ export type Account = RawAccount & {
   investmentSummary: AccountInvestmentSummaryItem[];
   createdAt: string;
 };
+
+export const ALL_ACCOUNTS = "All";

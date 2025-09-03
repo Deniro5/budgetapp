@@ -117,6 +117,10 @@ export const BudgetWidget = ({ startDate, endDate }: BudgetWidgetProps) => {
             <p>{formatToCurrency(totalBudget)} </p>
           </InfoSection>
           <InfoSection>
+            <Label>Budget Used:</Label>
+            <p>{formatToCurrency(totalBudget - availableBudget)} </p>
+          </InfoSection>
+          <InfoSection>
             <Label>Budget Remaining:</Label>
             <ChangeLabel $isIncrease={isWithinBudget}>
               {formatToCurrency(availableBudget)}

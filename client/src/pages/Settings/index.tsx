@@ -70,13 +70,10 @@ export default function Settings() {
         <SettingName>Enabled Categories</SettingName>
         <CategoryContainer>
           {Object.values(transactionOnlyCategories).map((item) => (
-            <BaseCheckboxContainer
-              onClick={() => handleCategoryChange(item)}
-              key={item}
-            >
+            <BaseCheckboxContainer key={item}>
               <BaseCheckbox
                 checked={!newPreferences?.disabledCategories.includes(item)}
-                onChange={() => {}}
+                onChange={() => handleCategoryChange(item)}
                 type="checkbox"
               />
               {item}

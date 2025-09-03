@@ -157,7 +157,7 @@ export const BaseCheckbox = styled.input`
   cursor: pointer;
 `;
 
-export const BaseCheckboxContainer = styled.button`
+export const BaseCheckboxContainer = styled.label`
   display: flex;
   gap: ${SPACING.spacingBase};
   align-items: center;
@@ -176,7 +176,7 @@ export const ScrollablePageContainer = styled.div`
   overflow: scroll;
   scrollbar-width: none;
   padding-bottom: ${SPACING.spacingBase};
-  &::-webkit-scrollbar { 
+  &::-webkit-scrollbar {
     display: none;
   }
   height: calc(100vh - 136px);

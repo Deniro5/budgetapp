@@ -120,7 +120,7 @@ export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
           <b>{formatToCurrency(lastTotal)}</b>
         </span>
         <AccountDropdown
-          accountsList={["All", ...activeAccountIds]}
+          hasAllOption
           selectedAccountId={accountWidgetId}
           handleAccountChange={handleAccountChange}
         />
