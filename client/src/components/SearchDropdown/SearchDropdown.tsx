@@ -6,51 +6,54 @@ import PopoverContent from "../Global/PopoverContent";
 
 import { BaseInput } from "styles";
 
+interface MenuItem {
+  label: string;
+  function: () => void;
+}
 // Define props interface
-interface DropdownListProps<T> {
+interface SearchDropdownProps {
   value: string;
   setValue: (value: string) => void;
-  items: T[];
-  selected: T | null;
+  items: MenuItem[];
+  selected: MenuItem | null;
   placeholder: string;
-  onSelect: (item: T) => void;
-  itemRenderer?: (item: T) => React.ReactNode;
-  itemToString: (item: T) => string;
   width?: number;
+  onSelect: (item: MenuItem) => void;
 }
 
 // Dropdown component
-export const SearchDropdown = <T,>({
+export const SearchDropdown = ({
   value,
   setValue,
   items,
   selected,
   placeholder,
   onSelect,
-  itemRenderer,
-  itemToString,
   width = 200,
-}: DropdownListProps<T>) => {
+}: SearchDropdownProps) => {
   const [hasFocus, setHasFocus] = useState(false);
   const searchRef = useRef<HTMLInputElement | null>(null);
 
   const handleSelect = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    item: T
+    item: MenuItem
   ) => {
+    e.stopPropagation();
+    e.preventDefault();
     setValue("");
     setHasFocus(false);
     onSelect(item);
   };
 
-  const hasSearchResults = items && items.length > 0;
+  const removeFocus = () => setHasFocus(false);
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    setHasFocus(false);
+    removeFocus();
   };
 
+  const hasSearchResults = items && items.length > 0;
   return (
     <>
       <Popover
@@ -59,25 +62,17 @@ export const SearchDropdown = <T,>({
         padding={4}
         containerStyle={{ zIndex: "1100" }}
         content={
-          <PopoverContent width={width}>
-            <ScrollableContainer>
-              {hasSearchResults ? (
-                items.map((item, index) => (
-                  <Item key={index} onMouseDown={(e) => handleSelect(e, item)}>
-                    {itemRenderer && itemRenderer(item)}
-                  </Item>
-                ))
-              ) : (
-                <NoItems>No items found</NoItems>
-              )}
-            </ScrollableContainer>
-          </PopoverContent>
+          <PopoverContent
+            width={width}
+            menuItems={items}
+            onClose={removeFocus}
+          />
         }
       >
         <BaseInput
           type="text"
           placeholder={placeholder}
-          value={hasFocus ? value : (selected && itemToString(selected)) || ""}
+          value={hasFocus ? value : (selected && selected.label) || ""}
           onChange={(e) => setValue(e.target.value)}
           ref={searchRef}
           onFocus={() => setHasFocus(true)}
@@ -87,24 +82,3 @@ export const SearchDropdown = <T,>({
     </>
   );
 };
-
-const Item = styled.div`
-  cursor: pointer;
-  &:hover {
-    background-color: #f9f9f9;
-  }
-`;
-
-const NoItems = styled.div`
-  padding: 10px;
-  color: #888;
-`;
-
-const ScrollableContainer = styled.div`
-  max-height: 200px;
-  overflow: scroll;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;

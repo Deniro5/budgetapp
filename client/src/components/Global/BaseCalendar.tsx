@@ -133,13 +133,16 @@ const CalendarContainer = styled.div`
     border-color: ${COLORS.darkGrey};
 
     .react-calendar__tile--now {
-      color: ${COLORS.calendarBlue};
       background: none;
+
+      text-decoration: underline;
       font-weight: 700;
+      color: ${COLORS.calendarBlue};
     }
 
     .react-calendar__tile--active {
       background: ${COLORS.primary};
+      color: ${COLORS.pureWhite};
     }
 
     .react-calendar__navigation__label__labelText {
@@ -160,6 +163,10 @@ const CalendarContainer = styled.div`
 
     .react-calendar__tile--hasActive {
       background: unset;
+    }
+    .react-calendar__tile--rangeEnd {
+      background-color: ${COLORS.primary}; /* highlight end date */
+      color: ${COLORS.pureWhite};
     }
   }
 `;

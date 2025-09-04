@@ -9,25 +9,21 @@ interface MenuItem {
   label: string;
   function: () => void;
 }
-interface DropdownListProps<T> {
+interface DropdownListProps {
   items: MenuItem[];
-  selected: T | null;
+  selected: MenuItem | null;
   placeholder: string;
   searchable?: boolean;
-  itemRenderer?: (item: T) => React.ReactNode;
   width?: number;
-  itemToString: (item: T) => string;
 }
 
-const DropdownList = <T,>({
+const DropdownList = ({
   items,
   selected,
   placeholder,
   searchable,
-  itemRenderer,
   width = 200,
-  itemToString,
-}: DropdownListProps<T>) => {
+}: DropdownListProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredItems, setFilteredItems] = useState(items);
@@ -37,12 +33,11 @@ const DropdownList = <T,>({
       setFilteredItems(
         items.filter((item) => {
           if (!item?.label) return false;
-
           return item.label.toLowerCase().includes(searchTerm.toLowerCase());
         })
       );
     }
-  }, [searchTerm, items, searchable, itemRenderer]);
+  }, [searchTerm, items, searchable]);
 
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
@@ -82,7 +77,7 @@ const DropdownList = <T,>({
       >
         <SelectedItem onClick={handleButtonClick}>
           <SelectedItemText>
-            {selected ? itemToString(selected) : placeholder}
+            {selected ? selected.label : placeholder}
           </SelectedItemText>
         </SelectedItem>
       </Popover>

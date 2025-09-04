@@ -8,6 +8,7 @@ import RouteProtector from "./components/RouteProtector";
 import HomeRedirect from "./components/HomeRedirect";
 import Login from "./pages/Login";
 import SignUp from "./pages/Signup";
+import LoadingComponent from "components/LoadingComponent/LoadingComponent";
 
 const App = () => {
   const { checkAuth, isCheckingAuth } = useUserStore();
@@ -16,7 +17,7 @@ const App = () => {
   }, [checkAuth]);
 
   return isCheckingAuth ? (
-    <p> Checking Auth </p>
+    <LoadingComponent message="Checking authentication..." />
   ) : (
     <Router>
       <Routes>

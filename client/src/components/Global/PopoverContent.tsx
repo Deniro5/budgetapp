@@ -64,7 +64,7 @@ const PopoverContentContainer = styled.div<{ $width: number }>`
   z-index: 1000;
   overflow-x: hidden;
   overflow-y: hidden;
-  max-height: 200px;
+  max-height: 220px;
   overflow: scroll;
   scrollbar-width: none;
   &::-webkit-scrollbar {

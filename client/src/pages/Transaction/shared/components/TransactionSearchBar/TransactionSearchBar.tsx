@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { BaseButton, BaseInput } from "styles";
 import { ChangeEvent, useEffect, useState } from "react";
 import useTransactionStore from "store/transaction/transactionStore";
+import { COLORS, SPACING } from "theme";
 
 export function TransactionSearchBar() {
   const { search, setSearch } = useTransactionStore();
@@ -30,9 +31,9 @@ export function TransactionSearchBar() {
         value={inputValue}
         onChange={handleSearchChange}
       />
-      <SearchButton>
+      <SearchIconContainer>
         <FontAwesomeIcon icon={faSearch} />
-      </SearchButton>
+      </SearchIconContainer>
     </SearchBarContainer>
   );
 }
@@ -46,7 +47,13 @@ const SearchBar = styled(BaseInput)`
   flex: 1;
 `;
 
-const SearchButton = styled(BaseButton)`
+const SearchIconContainer = styled.div`
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
+  background-color: ${COLORS.primary};
+  color: ${COLORS.pureWhite};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${SPACING.spacing3x} ${SPACING.spacing4x};
 `;

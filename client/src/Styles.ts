@@ -83,8 +83,10 @@ export const IconButton = styled.button`
     background: none;
   }
   color: ${COLORS.font};
+
   &:focus {
-    outline: ${COLORS.lightPrimary};
+    outline: 2px solid ${COLORS.primary};
+    outline-offset: 2px; /* optional, pushes outline away for better visibility */
   }
   &:hover {
     color: ${COLORS.primary};

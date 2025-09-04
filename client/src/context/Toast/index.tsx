@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import styled from "styled-components";
-import { COLORS, SPACING } from "theme";
+import { COLORS, FONTSIZE, SPACING } from "theme";
 
 type ToastType = "success" | "error";
 
@@ -38,7 +38,10 @@ const toastColorMap: Record<ToastType, string> = {
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [toast, setToast] = useState<Toast | null>(null);
+  const [toast, setToast] = useState<Toast | null>({
+    toast: "Transaction successfully created",
+    type: "success",
+  });
   const lastType = useRef<ToastType>("success"); //we need this so that the color doesnt flash when going off screen
 
   useEffect(() => {
@@ -71,17 +74,29 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
 };
 
 const ToastContainer = styled.div<{ $show: boolean; $color: string }>`
-  border-radius: 4px;
-  position: absolute;
-  right: 8px;
+  position: fixed;
   top: 16px;
+  right: 16px;
+  width: 320px;
   background: ${({ $color }) => $color};
-  width: 400px;
-  padding: ${SPACING.spacing4x};
   color: ${COLORS.pureWhite};
-  transform: translateY(${({ $show }) => ($show ? "8px" : "-80px")});
-  opacity: ${({ $show }) => ($show ? 1 : 0)};
-  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+  padding: ${SPACING.spacing4x} ${SPACING.spacing4x};
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  font-size: ${FONTSIZE.md};
+  font-weight: 500;
   text-align: center;
   z-index: 1000;
+  pointer-events: auto;
+
+  /* Smooth slide + fade animation */
+  transform: translateY(${({ $show }) => ($show ? "0" : "-40px")});
+  opacity: ${({ $show }) => ($show ? 1 : 0)};
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Optional hover effect */
+  &:hover {
+    filter: brightness(1.05);
+  }
 `;

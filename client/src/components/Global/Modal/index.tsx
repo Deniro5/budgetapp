@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { SPACING } from "theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { IconButton } from "styles";
+import { FocusTrap } from "focus-trap-react";
 
 type ModalProps = {
   isOpen: boolean;
@@ -14,6 +15,13 @@ type ModalProps = {
 
 function Modal({ isOpen, onClose, children, width }: ModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen && dialogRef.current) {
+      // Move focus to modal when it opens
+      dialogRef.current.focus();
+    }
+  }, [isOpen]);
 
   const handleClickOutside = (event: React.MouseEvent<HTMLDivElement>) => {
     if (
@@ -27,12 +35,14 @@ function Modal({ isOpen, onClose, children, width }: ModalProps) {
   return (
     <>
       <StyledOverlay $isOpen={isOpen} onClick={handleClickOutside} />
-      <StyledDialog $isOpen={isOpen} ref={dialogRef} $width={width}>
-        <CloseButton onClick={onClose}>
-          <FontAwesomeIcon icon={faClose} height={20} width={20} />
-        </CloseButton>
-        {children}
-      </StyledDialog>
+      <FocusTrap>
+        <StyledDialog $isOpen={isOpen} ref={dialogRef} $width={width}>
+          <CloseButton onClick={onClose}>
+            <FontAwesomeIcon icon={faClose} height={20} width={20} />
+          </CloseButton>
+          {children}
+        </StyledDialog>
+      </FocusTrap>
     </>
   );
 }
