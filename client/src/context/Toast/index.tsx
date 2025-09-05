@@ -38,10 +38,7 @@ const toastColorMap: Record<ToastType, string> = {
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [toast, setToast] = useState<Toast | null>({
-    toast: "Transaction successfully created",
-    type: "success",
-  });
+  const [toast, setToast] = useState<Toast | null>(null);
   const lastType = useRef<ToastType>("success"); //we need this so that the color doesnt flash when going off screen
 
   useEffect(() => {

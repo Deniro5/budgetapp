@@ -19,17 +19,26 @@ export default function useAccounts() {
     "Failed to load accounts"
   );
 
-  const accountNameByIdMap =
-    data?.reduce((acc: Record<string, string>, cur) => {
-      acc[cur._id] = cur.name;
-      return acc;
-    }, {}) || {};
+  const accountNameByIdMap = useMemo(() => {
+    return (
+      data?.reduce((acc: Record<string, string>, cur) => {
+        acc[cur._id] = cur.name;
+        return acc;
+      }, {}) || {}
+    );
+  }, [data]);
 
-  const accountInvestmentSummaryByIdMap =
-    data?.reduce((acc: Record<string, AccountInvestmentSummaryItem[]>, cur) => {
-      acc[cur._id] = cur.investmentSummary;
-      return acc;
-    }, {}) || {};
+  const accountInvestmentSummaryByIdMap = useMemo(() => {
+    return (
+      data?.reduce(
+        (acc: Record<string, AccountInvestmentSummaryItem[]>, cur) => {
+          acc[cur._id] = cur.investmentSummary;
+          return acc;
+        },
+        {}
+      ) || {}
+    );
+  }, [data]);
 
   //we are using useMemo here because these are used as dependencies in BaseInvestmentModal
   const activeAccounts = useMemo(

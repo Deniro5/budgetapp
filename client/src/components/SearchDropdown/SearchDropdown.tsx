@@ -1,84 +1,68 @@
-// Import dependencies
 import React, { useState, useRef } from "react";
+import PopoverContent from "../Global/PopoverContent";
+import { BaseInput } from "styles";
 import styled from "styled-components";
 import { Popover } from "react-tiny-popover";
-import PopoverContent from "../Global/PopoverContent";
-
-import { BaseInput } from "styles";
 
 interface MenuItem {
   label: string;
   function: () => void;
 }
-// Define props interface
+
 interface SearchDropdownProps {
   value: string;
   setValue: (value: string) => void;
   items: MenuItem[];
-  selected: MenuItem | null;
+  selected: string | null;
   placeholder: string;
   width?: number;
-  onSelect: (item: MenuItem) => void;
 }
 
-// Dropdown component
 export const SearchDropdown = ({
   value,
   setValue,
   items,
   selected,
   placeholder,
-  onSelect,
-  width = 200,
+  width,
 }: SearchDropdownProps) => {
-  const [hasFocus, setHasFocus] = useState(false);
-  const searchRef = useRef<HTMLInputElement | null>(null);
-
-  const handleSelect = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    item: MenuItem
-  ) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setValue("");
-    setHasFocus(false);
-    onSelect(item);
-  };
-
-  const removeFocus = () => setHasFocus(false);
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    removeFocus();
-  };
+  const [isFocused, setIsFocused] = useState(false);
 
   const hasSearchResults = items && items.length > 0;
+
+  const handleFocus = () => setIsFocused(true);
+
   return (
-    <>
-      <Popover
-        isOpen={hasSearchResults && hasFocus}
-        positions={"bottom"}
-        padding={4}
-        containerStyle={{ zIndex: "1100" }}
-        content={
-          <PopoverContent
-            width={width}
-            menuItems={items}
-            onClose={removeFocus}
-          />
-        }
-      >
-        <BaseInput
-          type="text"
-          placeholder={placeholder}
-          value={hasFocus ? value : (selected && selected.label) || ""}
-          onChange={(e) => setValue(e.target.value)}
-          ref={searchRef}
-          onFocus={() => setHasFocus(true)}
-          onBlur={handleBlur}
+    <Popover
+      isOpen={isFocused && hasSearchResults}
+      positions={["bottom"]}
+      padding={4}
+      containerStyle={{ zIndex: "1100" }}
+      onClickOutside={() => setIsFocused(false)}
+      content={
+        <PopoverContent
+          width={width}
+          menuItems={items}
+          onClose={() => setIsFocused(false)}
         />
-      </Popover>
-    </>
+      }
+    >
+      <DropdownInput
+        type="text"
+        placeholder={placeholder}
+        value={isFocused ? value : selected || ""}
+        onChange={(e) => setValue(e.target.value)}
+        onFocus={handleFocus}
+      />
+    </Popover>
   );
 };
+
+const DropdownContainer = styled.div<{ $width?: number }>`
+  position: relative;
+  width: ${({ $width }) => ($width ? `${$width}px` : "100%")};
+`;
+
+const DropdownInput = styled(BaseInput)`
+  width: 100%;
+`;

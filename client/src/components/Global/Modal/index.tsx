@@ -35,14 +35,13 @@ function Modal({ isOpen, onClose, children, width }: ModalProps) {
   return (
     <>
       <StyledOverlay $isOpen={isOpen} onClick={handleClickOutside} />
-      <FocusTrap>
-        <StyledDialog $isOpen={isOpen} ref={dialogRef} $width={width}>
-          <CloseButton onClick={onClose}>
-            <FontAwesomeIcon icon={faClose} height={20} width={20} />
-          </CloseButton>
-          {children}
-        </StyledDialog>
-      </FocusTrap>
+
+      <StyledDialog $isOpen={isOpen} ref={dialogRef} $width={width}>
+        <CloseButton onClick={onClose}>
+          <FontAwesomeIcon icon={faClose} height={20} width={20} />
+        </CloseButton>
+        {children}
+      </StyledDialog>
     </>
   );
 }

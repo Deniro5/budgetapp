@@ -69,6 +69,7 @@ export function BaseTransactionModal({
   const { presetTransactions } = usePresetTransactionSearch({
     search: presetSearch,
   });
+
   const userPreferences = getUserPreferences();
 
   const [currentPreset, setCurrentPreset] = useState<PresetTransaction | null>(
@@ -165,9 +166,10 @@ export function BaseTransactionModal({
     reset({ ...currentValues, ...preset, account: preset.account?._id });
   };
 
-  const presetRenderer = (presetTransaction: PresetTransaction) => (
-    <PresetTransactionMenuItem presetTransaction={presetTransaction} />
-  );
+  const presetMenuItems = presetTransactions.map((presetTransaction) => ({
+    label: <PresetTransactionMenuItem presetTransaction={presetTransaction} />,
+    function: () => handlePresetSelect(presetTransaction),
+  }));
 
   const onSubmitForm = async (data: RawTransaction) => {
     if (isEditModal) {
@@ -197,14 +199,9 @@ export function BaseTransactionModal({
               width={620}
               value={presetSearch}
               setValue={setPresetSearch}
-              items={presetTransactions}
+              items={presetMenuItems}
               placeholder="Search for preset transaction"
-              selected={currentPreset}
-              onSelect={function (item: PresetTransaction): void {
-                handlePresetSelect(item);
-              }}
-              itemRenderer={presetRenderer}
-              itemToString={({ name }) => `${name}`}
+              selected={currentPreset?.name || null}
             />
           </InputContainer>
         </Row>

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
-import React, { forwardRef } from "react";
+import React from "react";
 import { useMenuFocus } from "hooks/useMenuFocus";
 
 type MenuItem = {
@@ -13,21 +13,24 @@ type PopoverContentProps = {
   children?: React.ReactNode;
   width?: number;
   onClose: () => void;
+  onSelect?: () => void;
 };
 
 const PopoverContent = ({
   menuItems,
   width = 180,
   onClose,
+  onSelect,
 }: PopoverContentProps) => {
-  const menuRef = useMenuFocus();
+  // const menuRef = useMenuFocus();
 
   const handleClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     callback: () => void
   ) => {
-    callback();
     e.stopPropagation();
+    callback();
+    if (onSelect) onSelect();
     onClose();
   };
 
@@ -47,7 +50,7 @@ const PopoverContent = ({
   };
 
   return (
-    <PopoverContentContainer $width={width} ref={menuRef}>
+    <PopoverContentContainer $width={width}>
       {getPopoverContent()}
     </PopoverContentContainer>
   );

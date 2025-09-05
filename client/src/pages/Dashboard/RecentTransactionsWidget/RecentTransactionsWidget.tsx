@@ -1,13 +1,9 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { useNavigate } from "react-router";
-import { Flex, SecondaryButton } from "styles";
-import { faAdd } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { Flex } from "styles";
 import { TransactionTable } from "pages/Transaction/shared/components";
 import { useRecentTransactionsWidget } from "./useRecentTransactionsWidget";
-import { AddTransactionModal } from "pages/Transaction/Transactions/modals";
 import renderChart from "../Hocs/renderChart";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 
@@ -24,12 +20,6 @@ export const RecentTransactionsWidget = () => {
           loading={isLoading}
           error={error?.message || null}
           transactions={recentTransactions}
-          sidebarTransactionId={null}
-          setSidebarTransactionId={() => {}}
-          setActiveTransaction={() => {}}
-          setActiveOverlay={() => {}}
-          setContextMenuPosition={() => {}}
-          view="Transactions"
         />
         <ViewMoreLink onClick={() => navigate("transactions")}>
           View All Transactions

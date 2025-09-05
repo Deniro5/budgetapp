@@ -32,16 +32,13 @@ type BaseInvestmentModalProps = {
   isSellModal?: boolean;
 };
 
-const investmentSearchResultRenderer = (asset: Asset) => (
-  <AssetMenuItem asset={asset} />
-);
-
 export function BaseInvestmentModal({
   title,
   onClose,
   onSubmit,
   presetValues,
   assetsList,
+
   input,
   setInput,
   isSellModal,
@@ -126,6 +123,14 @@ export function BaseInvestmentModal({
       handleAccountChange(defaultAccount ?? "");
     }
   }, [isSellModal, activeAccountIds, assetId, currentValues.account]);
+
+  const assetMenuItems = assetsList.map((asset) => {
+    return {
+      label: <AssetMenuItem asset={asset} />,
+      function: () => handleAssetChange(asset),
+    };
+  });
+
   return (
     <Modal isOpen={true} onClose={onClose} width={700}>
       <Title>{title}</Title>
@@ -138,14 +143,9 @@ export function BaseInvestmentModal({
               width={600}
               value={input}
               setValue={setInput}
-              items={assetsList}
+              items={assetMenuItems}
               placeholder="Select Asset"
-              selected={currentValues.asset}
-              onSelect={function (item: Asset): void {
-                handleAssetChange(item);
-              }}
-              itemRenderer={investmentSearchResultRenderer}
-              itemToString={({ symbol, name }) => `${name} - ${symbol}`}
+              selected={currentValues?.asset?.name ?? null}
             />
             {errors.asset && (
               <ErrorMessage>{errors.asset.message}</ErrorMessage>

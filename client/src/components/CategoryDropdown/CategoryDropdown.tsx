@@ -3,15 +3,15 @@ import { getUserTransactionCategories } from "store/user/userSelectors";
 import { TransactionCategory } from "types/Transaction";
 
 interface CategoryDropdownProps {
-  selectedCategory: TransactionCategory | null;
   handleCategoryChange: (category: TransactionCategory) => void;
   placeholder?: string;
+  selectedCategory: string;
 }
 
 export default function CategoryDropdown({
-  selectedCategory,
   handleCategoryChange,
   placeholder,
+  selectedCategory,
 }: CategoryDropdownProps) {
   const userTransactionCategories = getUserTransactionCategories();
 
@@ -27,7 +27,6 @@ export default function CategoryDropdown({
       items={items}
       selected={selectedCategory}
       placeholder={placeholder || "Select Category"}
-      itemToString={(item: TransactionCategory) => item}
       searchable
     />
   );

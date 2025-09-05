@@ -1,6 +1,7 @@
 import DropdownList from "components/DropdownList/DropdownList";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import useAccounts from "pages/Accounts/hooks/useAccounts";
+import { useMemo } from "react";
 import { ALL_ACCOUNTS } from "types/account";
 
 interface AccountDropdownProps {
@@ -38,12 +39,15 @@ export default function AccountDropdown({
   if (isLoading)
     return <SkeletonLoader rows={1} columns={1} height={44}></SkeletonLoader>;
 
+  const selectedLabel =
+    (selectedAccountId && accountNameByIdMap[selectedAccountId]) ??
+    selectedAccountId;
+
   return (
     <DropdownList
       items={items}
-      selected={selectedAccountId}
+      selected={selectedLabel}
       placeholder={placeholder || "Select Account"}
-      itemToString={(item: string) => accountNameByIdMap[item] || item}
       searchable
     />
   );

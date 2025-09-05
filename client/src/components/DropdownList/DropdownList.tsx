@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Popover } from "react-tiny-popover";
@@ -11,7 +11,7 @@ interface MenuItem {
 }
 interface DropdownListProps {
   items: MenuItem[];
-  selected: MenuItem | null;
+  selected: string | null;
   placeholder: string;
   searchable?: boolean;
   width?: number;
@@ -26,20 +26,13 @@ const DropdownList = ({
 }: DropdownListProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredItems, setFilteredItems] = useState(items);
 
-  useEffect(() => {
-    if (searchable) {
-      setFilteredItems(
-        items.filter((item) => {
-          if (!item?.label) return false;
-          return item.label.toLowerCase().includes(searchTerm.toLowerCase());
-        })
-      );
-    }
-  }, [searchTerm, items, searchable]);
-
-  const toggleDropdown = () => setIsOpen((prev) => !prev);
+  const filteredItems = useMemo(() => {
+    if (!searchable) return items;
+    return items.filter((item) =>
+      item?.label?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [items, searchTerm, searchable]);
 
   const handleButtonClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -49,13 +42,17 @@ const DropdownList = ({
     setIsOpen(true);
   };
 
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
   return (
     <>
       <Popover
         isOpen={isOpen}
         positions={"bottom"}
         padding={4}
-        onClickOutside={toggleDropdown}
+        onClickOutside={handleClose}
         containerStyle={{ zIndex: "1100" }}
         content={
           <>
@@ -65,20 +62,19 @@ const DropdownList = ({
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
               />
             )}
             <PopoverContent
               width={width}
               menuItems={filteredItems}
-              onClose={toggleDropdown}
+              onClose={handleClose}
             />
           </>
         }
       >
         <SelectedItem onClick={handleButtonClick}>
-          <SelectedItemText>
-            {selected ? selected.label : placeholder}
-          </SelectedItemText>
+          <SelectedItemText>{selected || placeholder}</SelectedItemText>
         </SelectedItem>
       </Popover>
     </>
