@@ -84,7 +84,7 @@ export const IconButton = styled.button`
   }
   color: ${COLORS.font};
 
-  &:focus {
+  &:active {
     outline: 2px solid ${COLORS.primary};
     outline-offset: 2px; /* optional, pushes outline away for better visibility */
   }
