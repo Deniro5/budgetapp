@@ -31,8 +31,8 @@ export default function BudgetForm({
 }: BudgetProps) {
   const { register, handleSubmit, clearErrors, watch, reset } =
     useForm<BudgetCategories>({
-      mode: "onSubmit", // Validation only on submit
-      reValidateMode: "onSubmit", // No revalidation on field changes
+      mode: "onSubmit",
+      reValidateMode: "onSubmit",
       defaultValues: {
         ...defaultValues,
         ...initialBudgetCategories,

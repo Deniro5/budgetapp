@@ -1,9 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import * as recurringTransactionService from "../services/recurringTransactionService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-}
+import { CustomRequest } from "../types";
 
 export const createRecurringTransaction = async (
   req: CustomRequest,
@@ -24,8 +21,11 @@ export const createRecurringTransaction = async (
         });
 
       res.status(201).json(newTransaction);
-    } catch (error: any) {
-      if (error.message.includes("Recurring Transaction limit reached")) {
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Recurring Transaction limit reached")
+      ) {
         res.status(400).json({ error: error.message });
         return;
       }
@@ -129,7 +129,6 @@ export const updateRecurringTransactions = async (
 
     const { recurringTransactionIds, updatedFields } = req.body;
 
-    // Call service to handle bulk update
     await recurringTransactionService.updateRecurringTransactions(
       recurringTransactionIds,
       userId,

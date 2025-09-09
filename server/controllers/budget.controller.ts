@@ -1,9 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import * as budgetService from "../services/budgetService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-}
+import { CustomRequest } from "../types";
 
 export const getBudget = async (
   req: CustomRequest,

@@ -2,7 +2,7 @@ import styled, { keyframes } from "styled-components";
 import { FONTSIZE, SPACING } from "theme";
 
 type LoadingComponentProps = {
-  message?: string; // customizable loading text
+  message?: string;
 };
 
 export default function LoadingComponent({
@@ -16,7 +16,6 @@ export default function LoadingComponent({
   );
 }
 
-// Spinner animation
 const spin = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

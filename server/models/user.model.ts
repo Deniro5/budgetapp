@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
   preferences: {
     currency: {
       type: String,
-      default: "CAD", // default currency
+      default: "CAD",
     },
     disabledCategories: { type: [String], required: false },
     defaultAccount: {

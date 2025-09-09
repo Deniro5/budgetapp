@@ -147,7 +147,7 @@ const IconContainer = styled.div``;
 const SidebarContainer = styled.div<{ $isExpanded: boolean }>`
   display: flex;
   align-items: ${({ $isExpanded }) => ($isExpanded ? "flex-start" : "center")};
-  border-right: 1px solid ${COLORS.lightFont};
+  border-right: 1px solid ${COLORS.mediumGrey};
   flex-direction: column;
   position: fixed;
   gap: ${SPACING.spacing4x};

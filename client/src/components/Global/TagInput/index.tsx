@@ -19,31 +19,26 @@ const TagInput: React.FC<TagInputProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
 
-  // Add a new tag when Enter or Space is pressed
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       addTag(inputValue);
     } else if (e.key === "Backspace" && !inputValue) {
-      // Remove the last tag if input is empty
       removeLastTag();
     }
   };
 
-  // Function to remove the last tag
   const removeLastTag = () => {
     if (value.length > 0) {
       setValue(value.slice(0, -1));
     }
   };
-  // Add a tag on blur
   const handleBlur = () => {
     if (inputValue.trim()) {
       addTag(inputValue);
     }
   };
 
-  // Function to add a tag to the parent value and clear the input
   const addTag = (tag: string) => {
     const trimmedTag = tag.trim();
     if (trimmedTag && !value.includes(trimmedTag) && validator(tag)) {
@@ -52,7 +47,6 @@ const TagInput: React.FC<TagInputProps> = ({
     setInputValue("");
   };
 
-  // Remove a tag from the list
   const removeTag = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     tag: string

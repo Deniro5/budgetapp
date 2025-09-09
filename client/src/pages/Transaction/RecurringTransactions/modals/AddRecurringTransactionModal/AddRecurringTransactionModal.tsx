@@ -22,6 +22,7 @@ export function AddRecurringTransactionModal({
         title="Add Recurring Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
+        mode="create"
       />
     </Modal>
   );

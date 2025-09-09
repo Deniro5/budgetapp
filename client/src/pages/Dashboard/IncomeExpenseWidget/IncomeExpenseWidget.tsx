@@ -32,7 +32,7 @@ export const IncomeExpenseWidget = ({
   const isIncrease = netIncome >= 0;
 
   if (!totalIncomeAndExpenseByDate || totalIncomeAndExpenseByDate.length === 0)
-    return null; // Handle empty data case
+    return null;
 
   const chartElement = (
     <ResponsiveContainer width="100%" height={350}>

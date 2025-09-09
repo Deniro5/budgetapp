@@ -1,11 +1,10 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-// Mongoose Schema definition
 const investmentSchema: Schema = new Schema(
   {
     asset: { type: Schema.Types.ObjectId, ref: "Asset", required: true },
-    account: { type: Schema.Types.ObjectId, ref: "Account", required: true }, // Reference to the Account
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the User
+    account: { type: Schema.Types.ObjectId, ref: "Account", required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     date: { type: String, required: true },
     quantity: { type: Number, required: true },
     price: { type: Number, required: true },
@@ -13,10 +12,6 @@ const investmentSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Create the Mongoose model
-const InvestmentModel: Model<any> = mongoose.model(
-  "Investment",
-  investmentSchema
-);
+const InvestmentModel = mongoose.model("Investment", investmentSchema);
 
 export default InvestmentModel;

@@ -11,7 +11,9 @@ const Providers = (props: { children: React.ReactNode }) => {
 };
 
 test("Sidebar collapses/expands on click", () => {
-  render(<Sidebar />, { wrapper: Providers });
+  render(<Sidebar isExpanded={false} toggleExpanded={() => {}} />, {
+    wrapper: Providers,
+  });
   expect(screen.getByTestId("sidebar")).toHaveStyle({ width: "40px" });
 
   const sidebarBtn = screen.getByTestId("sidebar-button");
@@ -23,8 +25,10 @@ test("Sidebar collapses/expands on click", () => {
   expect(screen.getByTestId("sidebar")).toHaveStyle({ width: "40px" });
 });
 
-test("Sidebar has no labels when collapsed/ has labels wehn expanded", () => {
-  render(<Sidebar />, { wrapper: Providers });
+test("Sidebar has no labels when collapsed/ has labels when expanded", () => {
+  render(<Sidebar isExpanded={false} toggleExpanded={() => {}} />, {
+    wrapper: Providers,
+  });
   expect(screen.getByTestId("sidebar")).toHaveStyle({ width: "40px" });
 
   //no labels when collapsed
@@ -49,7 +53,9 @@ test("Sidebar has no labels when collapsed/ has labels wehn expanded", () => {
 
 describe("Sidebar shows correct active styles", () => {
   it('should show "Dashboard" as active when URL path is "/"', () => {
-    render(<Sidebar />, { wrapper: Providers }); //
+    render(<Sidebar isExpanded={false} toggleExpanded={() => {}} />, {
+      wrapper: Providers,
+    }); //
 
     expect(screen.getByTestId("sidebar-Dashboard")).toHaveStyle({
       background: COLORS.primary,

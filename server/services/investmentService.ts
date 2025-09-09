@@ -216,7 +216,7 @@ export const getInvestmentTransactionHistoryByAccount = async ({
     },
     {
       $group: {
-        _id: "$date", // key directly by date
+        _id: "$date",
         totalValue: {
           $sum: {
             $multiply: ["$quantity", "$price"],

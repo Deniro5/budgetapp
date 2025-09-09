@@ -1,4 +1,3 @@
-// store.ts
 import { create } from "zustand";
 import { RawUser, User } from "types/user";
 import axios from "axios";

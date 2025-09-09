@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import * as transactionService from "../services/transactionService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-}
+import { CustomRequest } from "../types";
 
 export const createTransaction = async (
   req: CustomRequest,
@@ -12,7 +9,7 @@ export const createTransaction = async (
   try {
     const { userId } = req;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -22,10 +19,9 @@ export const createTransaction = async (
     });
 
     res.status(201).json(transaction);
-  } catch (err: any) {
-    res
-      .status(500)
-      .json({ error: err.message || "Failed to create transaction" });
+  } catch (err) {
+    console.error("Error creating transaction:", err);
+    res.status(500).json({ message: "Failed to create transaction" });
   }
 };
 
@@ -37,7 +33,7 @@ export const updateTransactions = async (
     const { userId } = req;
     const { id } = req.params;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -48,12 +44,10 @@ export const updateTransactions = async (
       updatedFields
     );
 
-    res.status(201).json({ messsage: "Transactions updated successfully" });
-  } catch (err: any) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ error: err.message || "Failed to update transaction" });
+    res.status(201).json({ message: "Transactions updated successfully" });
+  } catch (err) {
+    console.error("Error updating transactions:", err);
+    res.status(500).json({ message: "Failed to update transactions" });
   }
 };
 
@@ -64,23 +58,21 @@ export const deleteTransactions = async (
   try {
     const { userId } = req;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
-    const transactionids = req.body;
+    const transactionIds = req.body;
 
     const deletedTransactions = await transactionService.deleteTransactions(
       userId,
-      transactionids
+      transactionIds
     );
 
     res.json(deletedTransactions);
-  } catch (err: any) {
-    console.log(err);
-    res
-      .status(500)
-      .json({ error: err.message || "Failed to delete transaction" });
+  } catch (err) {
+    console.error("Error deleting transactions:", err);
+    res.status(500).json({ message: "Failed to delete transactions" });
   }
 };
 
@@ -92,17 +84,16 @@ export const getTransactionById = async (
     const { userId } = req;
     const { id } = req.params;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
     const transaction = await transactionService.getTransactionById(userId, id);
 
     res.json(transaction);
-  } catch (err: any) {
-    res
-      .status(500)
-      .json({ error: err.message || "Failed to fetch transaction" });
+  } catch (err) {
+    console.error("Error fetching transaction by ID:", err);
+    res.status(500).json({ message: "Failed to fetch transaction" });
   }
 };
 
@@ -113,19 +104,18 @@ export const getTransactions = async (
   try {
     const { userId } = req;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
-    const filters = req.query as any;
+    const filters = req.query;
 
     const result = await transactionService.getTransactions(userId, filters);
 
     res.json(result);
-  } catch (err: any) {
-    res
-      .status(500)
-      .json({ error: err.message || "Failed to fetch transactions" });
+  } catch (err) {
+    console.error("Error fetching transactions:", err);
+    res.status(500).json({ message: "Failed to fetch transactions" });
   }
 };
 
@@ -138,7 +128,7 @@ export const getTransactionCategoriesByAmount = async (
     const { limit, startDate, endDate } = req.query;
 
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -153,10 +143,9 @@ export const getTransactionCategoriesByAmount = async (
       );
 
     res.json({ categoryTotals: categories });
-  } catch (err: any) {
-    res
-      .status(500)
-      .json({ message: "Server error", error: err.message || err });
+  } catch (err) {
+    console.error("Error fetching transaction categories by amount:", err);
+    res.status(500).json({ message: "Failed to fetch transaction categories" });
   }
 };
 
@@ -169,7 +158,7 @@ export const getTotalIncomeAndExpense = async (
     const { startDate, endDate, category } = req.query;
 
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -181,9 +170,10 @@ export const getTotalIncomeAndExpense = async (
     );
 
     res.json(incomeExpense);
-  } catch (err: any) {
+  } catch (err) {
+    console.error("Error fetching total income and expense:", err);
     res
       .status(500)
-      .json({ message: "Server error", error: err.message || err });
+      .json({ message: "Failed to fetch total income and expense" });
   }
 };

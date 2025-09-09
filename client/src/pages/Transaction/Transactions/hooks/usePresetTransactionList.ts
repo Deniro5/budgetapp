@@ -2,7 +2,7 @@ import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
 import { PresetTransaction } from "types/Transaction";
 import { BASE_API_URL } from "appConstants";
-import { useInfiniteQueryWithError } from "hooks/useInfiniteQueryWithError"; // adjust the path
+import { useInfiniteQueryWithError } from "hooks/useInfiniteQueryWithError";
 
 type FetchPresetTransactionsArgs = {
   search: string;
@@ -13,7 +13,6 @@ type FetchPresetTransactionsResponse = {
   presetTransactionCount: number;
 };
 
-// Fetcher function
 const fetchPresetTransactions = async (
   context: QueryFunctionContext<[string, FetchPresetTransactionsArgs], number>
 ): Promise<FetchPresetTransactionsResponse> => {
@@ -34,7 +33,6 @@ const fetchPresetTransactions = async (
   return response.data;
 };
 
-// Hook using useInfiniteQueryWithError
 export default function usePresetTransactionSearch({
   search,
 }: FetchPresetTransactionsArgs) {
@@ -59,7 +57,7 @@ export default function usePresetTransactionSearch({
         return loaded < lastPage.presetTransactionCount ? loaded : undefined;
       },
       initialPageParam: 0,
-      enabled: search !== "", // optional safeguard
+      enabled: search !== "",
     },
     "Failed to fetch preset transactions"
   );

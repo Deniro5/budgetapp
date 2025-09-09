@@ -54,8 +54,8 @@ export function BaseInvestmentModal({
     clearErrors,
     formState: { errors, isSubmitted },
   } = useForm<RawInvestment>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: {
       asset: presetValues?.asset ?? undefined,
       quantity: presetValues?.quantity ?? 0,
@@ -211,7 +211,7 @@ export function BaseInvestmentModal({
             <AccountDropdown
               selectedAccountId={currentValues.account}
               handleAccountChange={handleAccountChange}
-              accountsList={filteredAccountIds}
+              filteredAccountIdList={filteredAccountIds}
             />
             {errors.account && isSubmitted && (
               <ErrorMessage>{errors.account.message}</ErrorMessage>

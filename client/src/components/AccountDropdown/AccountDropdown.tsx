@@ -8,6 +8,7 @@ interface AccountDropdownProps {
   handleAccountChange: (account: string) => void;
   placeholder?: string;
   hasAllOption?: boolean;
+  filteredAccountIdList?: string[];
 }
 
 export default function AccountDropdown({
@@ -15,25 +16,30 @@ export default function AccountDropdown({
   handleAccountChange,
   placeholder,
   hasAllOption,
+  filteredAccountIdList = [],
 }: AccountDropdownProps) {
   const { activeAccountIds, accountNameByIdMap, isLoading } = useAccounts();
 
+  //add the all option and then filter by filteredAccountIdList if there is one
   const items = [
     ...(hasAllOption
       ? [
           {
+            key: ALL_ACCOUNTS,
             label: ALL_ACCOUNTS,
             function: () => handleAccountChange(ALL_ACCOUNTS),
           },
         ]
       : []),
-    ...activeAccountIds.map((accountId) => {
-      return {
-        key: accountId,
-        label: accountNameByIdMap[accountId] || accountId,
-        function: () => handleAccountChange(accountId),
-      };
-    }),
+    ...activeAccountIds
+      .filter((accountId) => filteredAccountIdList.includes(accountId))
+      .map((accountId) => {
+        return {
+          key: accountId,
+          label: accountNameByIdMap[accountId] || accountId,
+          function: () => handleAccountChange(accountId),
+        };
+      }),
   ];
 
   if (isLoading)

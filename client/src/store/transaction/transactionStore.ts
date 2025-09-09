@@ -19,7 +19,7 @@ export interface TransactionStore {
   setEndDate: (newEndDate: string) => void;
   filter: TransactionFilter;
   setFilter: (newFilter: TransactionFilter) => void;
-  // new
+
   sidebarTransactionId: string | null;
   setSidebarTransactionId: (id: string | null) => void;
 
@@ -55,7 +55,7 @@ const useTransactionStore = create<TransactionStore>((set) => ({
   setFilter: (newFilter) => {
     set({ filter: newFilter });
   },
-  // new
+
   sidebarTransactionId: null,
   setSidebarTransactionId: (id) => set({ sidebarTransactionId: id }),
 

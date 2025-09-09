@@ -1,9 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import * as accountService from "../services/accountService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-}
+import { CustomRequest } from "../types";
 
 export const createAccount = async (
   req: CustomRequest,
@@ -22,11 +19,12 @@ export const createAccount = async (
     });
 
     res.status(201).json(newAccount);
-  } catch (err: any) {
-    if (err.message.includes("Account limit reached")) {
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.includes("Account limit reached")) {
       res.status(400).json({ error: err.message });
       return;
     }
+
     console.error("Error creating account:", err);
     res.status(500).json({ error: "Failed to create account" });
   }

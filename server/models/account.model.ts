@@ -1,6 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
 
-// Mongoose Schema definition
 const accountSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
@@ -15,7 +14,6 @@ const accountSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Create the Mongoose model
-const AccountModel: Model<any> = mongoose.model("Account", accountSchema);
+const AccountModel = mongoose.model("Account", accountSchema);
 
 export default AccountModel;

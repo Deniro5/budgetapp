@@ -1,10 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import * as presetTransactionService from "../services/presetTransactionService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-}
-
+import { CustomRequest } from "../types";
 export const createPresetTransaction = async (
   req: CustomRequest,
   res: Response
@@ -24,8 +20,11 @@ export const createPresetTransaction = async (
         });
 
       res.status(201).json(newTransaction);
-    } catch (error: any) {
-      if (error.message.includes("Preset Transaction limit reached")) {
+    } catch (error: unknown) {
+      if (
+        error instanceof Error &&
+        error.message.includes("Preset Transaction limit reached")
+      ) {
         res.status(400).json({ error: error.message });
         return;
       }
@@ -164,7 +163,7 @@ export const deletePresetTransactions = async (
     res
       .status(201)
       .json({ messsage: "Preset Transactions deleted successfully" });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error deleting preset transactions:", err);
     res.status(500).json({ error: "Failed to delete preset transactions" });
   }

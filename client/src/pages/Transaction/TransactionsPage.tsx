@@ -176,7 +176,6 @@ export default function TransactionsPage() {
   return (
     <PageContainer>
       <TransactionHeader />
-
       <PageColumnFlexContainer
         $gap={hasFilters ? SPACING.spacing4x : SPACING.spacing9x}
       >
@@ -225,10 +224,7 @@ export default function TransactionsPage() {
 
       {activeOverlay === TransactionOverlayType.EDIT &&
         isTransaction(activeTransaction) && (
-          <EditTransactionModal
-            transaction={activeTransaction}
-            onClose={handleCloseOverlay}
-          />
+          <EditTransactionModal onClose={handleCloseOverlay} />
         )}
       {activeOverlay === TransactionOverlayType.DELETE &&
         isTransaction(activeTransaction) && (
@@ -276,17 +272,11 @@ export default function TransactionsPage() {
         )}
       {activeOverlay === TransactionOverlayType.EDIT_PRESET &&
         isPresetTransaction(activeTransaction) && (
-          <EditPresetTransactionModal
-            initialTransaction={activeTransaction}
-            onClose={handleCloseOverlay}
-          />
+          <EditPresetTransactionModal onClose={handleCloseOverlay} />
         )}
       {activeOverlay === TransactionOverlayType.DELETE_PRESET &&
         isPresetTransaction(activeTransaction) && (
-          <DeletePresetTransactionModal
-            transaction={activeTransaction}
-            onClose={handleCloseOverlay}
-          />
+          <DeletePresetTransactionModal onClose={handleCloseOverlay} />
         )}
       {activeOverlay === TransactionOverlayType.ADD_RECURRING && (
         <AddRecurringTransactionModal onClose={handleCloseOverlay} />
@@ -300,17 +290,11 @@ export default function TransactionsPage() {
         )}
       {activeOverlay === TransactionOverlayType.EDIT_RECURRING &&
         isRecurringTransaction(activeTransaction) && (
-          <EditRecurringTransactionModal
-            initialTransaction={activeTransaction}
-            onClose={handleCloseOverlay}
-          />
+          <EditRecurringTransactionModal onClose={handleCloseOverlay} />
         )}
       {activeOverlay === TransactionOverlayType.DELETE_RECURRING &&
         isRecurringTransaction(activeTransaction) && (
-          <DeleteRecurringTransactionModal
-            transaction={activeTransaction}
-            onClose={handleCloseOverlay}
-          />
+          <DeleteRecurringTransactionModal onClose={handleCloseOverlay} />
         )}
     </PageContainer>
   );

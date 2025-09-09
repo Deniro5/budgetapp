@@ -29,7 +29,7 @@ type BasePresetTransactionModalProps =
       confirmText?: string;
       onClose: () => void;
       onSubmit: (transaction: RawPresetTransaction) => void;
-      initialTransactions?: never;
+      initialTransactions?: PresetTransaction[];
     }
   | {
       mode: "edit";
@@ -53,7 +53,6 @@ export function BasePresetTransactionModal({
 
   const userPreferences = getUserPreferences();
 
-  // Helper for default values
   function getDefaultValue<K extends keyof PresetTransaction>(field: K): any {
     if (!firstTransaction) return undefined;
 

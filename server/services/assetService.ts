@@ -87,7 +87,7 @@ export async function updateAssetPriceHistory(asset: any) {
 export async function updateLastUsedAssetsPrices() {
   const job = await JobRunModel.findOne({ name: UPDATE_ASSETS_JOB_NAME });
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // start of today
+  today.setHours(0, 0, 0, 0);
 
   if (job && job.lastRun >= today) {
     console.log("Already updated assets today");
@@ -106,7 +106,7 @@ export async function updateLastUsedAssetsPrices() {
     } catch (err) {
       console.error("Failed to update asset", asset.symbol, err);
     }
-    await new Promise((resolve) => setTimeout(resolve, 15000)); // stagger requests
+    await new Promise((resolve) => setTimeout(resolve, 15000)); // stagger requests to avoid rate limit
   }
 
   // Record the run
@@ -124,7 +124,7 @@ export async function updateLastUsedAssetsPrices() {
   return assetsToUpdate;
 }
 export const searchAsset = async (query: string) => {
-  const regex = new RegExp(query, "i"); // case-insensitive regex
+  const regex = new RegExp(query, "i");
 
   return await AssetModel.find({
     $or: [{ symbol: regex }, { name: regex }],

@@ -22,7 +22,6 @@ interface ToastContextType {
   setToast: Dispatch<React.SetStateAction<Toast | null>>;
 }
 
-// Initial context
 export const ToastContext = createContext<ToastContextType>({
   toast: null,
   setToast: () => {},

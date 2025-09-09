@@ -1,6 +1,5 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-// Mongoose Schema definition
 const transferSchema: Schema = new Schema(
   {
     amount: { type: Number, required: true },
@@ -24,11 +23,11 @@ const transferSchema: Schema = new Schema(
         message: "transactionIds must contain exactly 2 Account IDs",
       },
     },
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the User
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   { timestamps: true }
 );
 
-const TransferModel: Model<any> = mongoose.model("Transfer", transferSchema);
+const TransferModel = mongoose.model("Transfer", transferSchema);
 
 export default TransferModel;

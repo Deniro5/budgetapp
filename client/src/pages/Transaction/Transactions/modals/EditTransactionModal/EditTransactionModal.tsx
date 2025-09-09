@@ -1,6 +1,6 @@
 import Modal from "components/Global/Modal";
 import { BaseTransactionModal } from "../BaseTransactionModal/BaseTransactionModal";
-import { BatchEditTransaction } from "types/Transaction";
+import { RawTransaction, Transaction } from "types/Transaction";
 import { useUpdateTransaction } from "../../hooks/useUpdateTransaction";
 import useTransactionStore from "store/transaction/transactionStore";
 type EditTransactionModalProps = {
@@ -12,7 +12,7 @@ export function EditTransactionModal({ onClose }: EditTransactionModalProps) {
   const { selectedTransactions } = useTransactionStore();
   const areMultipleSelected = selectedTransactions.length > 1;
 
-  const handleModalSubmit = (updatedFields: BatchEditTransaction) => {
+  const handleModalSubmit = (updatedFields: Partial<RawTransaction>) => {
     mutate({
       transactionIds: selectedTransactions.map((t) => t._id),
       updatedFields,
@@ -25,7 +25,7 @@ export function EditTransactionModal({ onClose }: EditTransactionModalProps) {
         title={`Edit Transaction${areMultipleSelected ? "s" : ""}`}
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransactions={selectedTransactions}
+        initialTransactions={selectedTransactions as Transaction[]}
         confirmText="Update"
         mode="edit"
       />

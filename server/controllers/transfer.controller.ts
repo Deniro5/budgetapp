@@ -1,15 +1,12 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import * as transferService from "../services/transferService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-}
+import { CustomRequest } from "../types";
 
 export const createTransfer = async (req: CustomRequest, res: Response) => {
   try {
     const { userId } = req;
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -23,7 +20,6 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
       date,
     });
 
-    // Populate accounts (optional, can do in service if preferred)
     await result.transactions[0].populate({
       path: "account",
       select: "name _id",
@@ -39,7 +35,7 @@ export const createTransfer = async (req: CustomRequest, res: Response) => {
     });
   } catch (err) {
     console.error("Error creating transfer:", err);
-    res.status(500).json({ error: "Failed to create transfer" });
+    res.status(500).json({ message: "Failed to create transfer" });
   }
 };
 
@@ -53,7 +49,7 @@ export const updateTransferByTransactionId = async (
     const updateData = req.body;
 
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -64,9 +60,9 @@ export const updateTransferByTransactionId = async (
     );
 
     res.json(result);
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error updating transfer:", err);
-    res.status(500).json({ error: err.message || "Failed to update transfer" });
+    res.status(500).json({ message: "Failed to update transfer" });
   }
 };
 
@@ -79,7 +75,7 @@ export const deleteTransferByTransactionId = async (
     const { id } = req.params;
 
     if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
       return;
     }
 
@@ -87,8 +83,8 @@ export const deleteTransferByTransactionId = async (
       await transferService.deleteTransferByTransactionId(userId, id);
 
     res.json({ deletedTransactionIds });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Error deleting transfer:", err);
-    res.status(500).json({ error: err.message || "Failed to delete transfer" });
+    res.status(500).json({ message: "Failed to delete transfer" });
   }
 };

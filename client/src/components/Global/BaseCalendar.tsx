@@ -53,7 +53,6 @@ function BaseCalendar({
     if (date && isRangeCalendar && (!endDate || date <= endDate)) {
       setStartDate(date);
     } else {
-      //revert
       setStartInput(dateToFormattedString(startDate));
     }
   };
@@ -64,7 +63,6 @@ function BaseCalendar({
     if (date && isRangeCalendar && (!startDate || date >= startDate)) {
       setEndDate(date);
     } else {
-      //revert
       setEndInput(dateToFormattedString(endDate));
     }
   };

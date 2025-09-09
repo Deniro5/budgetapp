@@ -16,7 +16,6 @@ type FetchPresetTransactionsResponse = {
   presetTransactionCount: number;
 };
 
-// Fetcher function
 const fetchPresetTransactions = async (
   context: QueryFunctionContext<[string, FetchPresetTransactionsArgs], number>
 ): Promise<FetchPresetTransactionsResponse> => {
@@ -44,7 +43,6 @@ const fetchPresetTransactions = async (
   return response.data;
 };
 
-// Hook
 export default function usePresetTransactions({
   search,
   filter,

@@ -118,7 +118,6 @@ export const updatePresetTransactions = async (
     throw new Error("Unauthorized to update one or more transactions");
   }
 
-  // Perform bulk update
   await PresetTransactionModel.updateMany(
     { _id: { $in: transactionIds }, userId },
     { $set: updateData }
@@ -131,18 +130,15 @@ export const deletePresetTransactions = async (
   ids: string[],
   userId: string
 ) => {
-  // Find all matching transactions that belong to the user
   const transactions = await PresetTransactionModel.find({
     _id: { $in: ids },
     userId,
   });
 
-  // If not all requested IDs belong to the user, block the operation
   if (transactions.length !== ids.length) {
     throw new Error("Unauthorized to delete one or more transactions");
   }
 
-  // Delete all transactions
   await PresetTransactionModel.deleteMany({
     _id: { $in: ids },
     userId,

@@ -2,11 +2,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMutationWithSuccessAndError } from "hooks/useMutationWithSuccessAndError";
 import { BASE_API_URL } from "appConstants";
 import axios from "axios";
-import { BatchEditTransaction } from "types/Transaction";
+import { RawTransaction } from "types/Transaction";
 
 type UpdateTransactionProps = {
   transactionIds: string[];
-  updatedFields: BatchEditTransaction;
+  updatedFields: Partial<RawTransaction>;
 };
 
 export const useUpdateTransaction = () => {

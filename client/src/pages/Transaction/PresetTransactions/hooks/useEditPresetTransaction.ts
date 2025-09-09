@@ -23,9 +23,8 @@ export const useEditPresetTransaction = () => {
             presetTransactionIds,
             updatedFields,
           })
-          .then((res) => res.data), // Return updated transactions
+          .then((res) => res.data),
       onSuccess: () => {
-        // Only invalidate preset transactions list
         queryClient.invalidateQueries({ queryKey: ["presetTransactions"] });
       },
     },

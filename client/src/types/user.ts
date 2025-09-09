@@ -1,7 +1,7 @@
 import { TransactionCategory } from "./Transaction";
 
 type BasePreferences<T = string | null> = {
-  currency: string; // Consider replacing string with a Currency type
+  currency: string;
   disabledCategories: TransactionCategory[];
   defaultAccount: T;
 };

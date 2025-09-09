@@ -1,6 +1,9 @@
 import Modal from "components/Global/Modal";
 import { BaseRecurringTransactionModal } from "../BaseRecurringTransactionModal/BaseRecurringTransactionModal";
-import { RawRecurringTransaction } from "types/Transaction";
+import {
+  RawRecurringTransaction,
+  RecurringTransaction,
+} from "types/Transaction";
 import { useEditRecurringTransaction } from "../../hooks/useEditRecurringTransaction";
 import useTransactionStore from "store/transaction/transactionStore";
 
@@ -14,7 +17,9 @@ export function EditRecurringTransactionModal({
   const { mutate } = useEditRecurringTransaction();
   const { selectedTransactions } = useTransactionStore();
 
-  const handleModalSubmit = (updatedFields: RawRecurringTransaction) => {
+  const handleModalSubmit = (
+    updatedFields: Partial<RawRecurringTransaction>
+  ) => {
     mutate({
       recurringTransactionIds: selectedTransactions.map((t) => t._id),
       updatedFields,
@@ -27,7 +32,7 @@ export function EditRecurringTransactionModal({
         title="Edit Recurring Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransactions={selectedTransactions}
+        initialTransactions={selectedTransactions as RecurringTransaction[]}
         mode="edit"
       />
     </Modal>

@@ -1,9 +1,8 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-// Mongoose Schema definition for Budget with mapped keys
 const budgetSchema: Schema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // Reference to the User
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     budgetCategories: {
       type: Map,
       of: {
@@ -13,13 +12,11 @@ const budgetSchema: Schema = new Schema(
       default: {},
     },
   },
-  { timestamps: true } // Adds createdAt and updatedAt fields
+  { timestamps: true }
 );
 
-// Ensure a unique budget per user
 budgetSchema.index({ userId: 1 }, { unique: true });
 
-// Create the Mongoose model
-const BudgetModel: Model<any> = mongoose.model("Budget", budgetSchema);
+const BudgetModel = mongoose.model("Budget", budgetSchema);
 
 export default BudgetModel;

@@ -1,11 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { Response } from "express";
 import * as investmentService from "../services/investmentService";
-import AccountModel from "../models/account.model";
-
-interface CustomRequest extends Request {
-  userId?: string;
-  investments?: any;
-}
+import { CustomRequest } from "../types";
 
 export const createInvestment = async (
   req: CustomRequest,
@@ -54,10 +49,9 @@ export const deleteInvestment = async (
     );
 
     res.json(deletedTransaction);
-  } catch (err: any) {
-    res
-      .status(500)
-      .json({ error: err.message || "Failed to delete transaction" });
+  } catch (err) {
+    console.error("Error deleting investment:", err);
+    res.status(500).json({ error: "Failed to delete transaction" });
   }
 };
 
@@ -82,8 +76,7 @@ export const getAllInvestments = async (
 
 export const getCurrentAggregatedInvestments = async (
   req: CustomRequest,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<void> => {
   try {
     const { userId } = req;

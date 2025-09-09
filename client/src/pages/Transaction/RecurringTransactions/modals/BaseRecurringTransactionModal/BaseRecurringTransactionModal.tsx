@@ -30,7 +30,7 @@ type BaseRecurringTransactionModalProps =
       confirmText?: string;
       onClose: () => void;
       onSubmit: (transaction: RawRecurringTransaction) => void;
-      initialTransactions?: never;
+      initialTransactions?: RecurringTransaction[];
     }
   | {
       mode: "edit";
@@ -51,6 +51,7 @@ export function BaseRecurringTransactionModal({
 }: BaseRecurringTransactionModalProps) {
   const isEditMode = mode === "edit";
   const firstTransaction = initialTransactions[0];
+
   function getDefaultValue<K extends keyof RecurringTransaction>(
     field: K
   ): RecurringTransaction[K] | undefined {
@@ -62,13 +63,11 @@ export function BaseRecurringTransactionModal({
 
     if (allSame) return firstTransaction[field];
 
-    // Only string fields can show "Multiple Values"
     const fieldValue = firstTransaction[field];
     if (typeof fieldValue === "string") {
       return "Multiple Values" as RecurringTransaction[K];
     }
 
-    // For number, enum, or array types, fallback to undefined
     return undefined;
   }
 
@@ -116,8 +115,8 @@ export function BaseRecurringTransactionModal({
       const updates: Partial<RawRecurringTransaction> = Object.keys(
         dirtyFields
       ).reduce((acc, key) => {
-        const k = key as keyof RawRecurringTransaction;
-        acc[k] = data[k];
+        const k = key as keyof Partial<RawRecurringTransaction>;
+        acc[k] = data[k as keyof RawRecurringTransaction] as any;
         return acc;
       }, {} as Partial<RawRecurringTransaction>);
       onSubmit(updates);

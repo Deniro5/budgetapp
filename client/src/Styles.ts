@@ -52,9 +52,9 @@ export const BaseButton = styled.button`
   cursor: pointer;
 
   &:disabled {
-    background: ${COLORS.darkGrey}; /* or any other disabled color */
+    background: ${COLORS.darkGrey};
     cursor: not-allowed;
-    opacity: 0.6; /* adjust opacity to indicate disabled state */
+    opacity: 0.6;
   }
 `;
 

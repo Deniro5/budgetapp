@@ -20,8 +20,6 @@ const PopoverContent = ({
   width = 180,
   onClose,
 }: PopoverContentProps) => {
-  // const menuRef = useMenuFocus();
-
   const handleClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     callback: () => void

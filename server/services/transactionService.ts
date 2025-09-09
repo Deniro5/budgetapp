@@ -1,5 +1,5 @@
 import TransactionModel from "../models/transaction.model";
-import mongoose from "mongoose";
+import mongoose, { FilterQuery } from "mongoose";
 import { updateAccountBalance } from "./accountService";
 
 interface CreateTransactionArgs {
@@ -181,7 +181,6 @@ export const updateTransactions = async (
     if (transaction.account === newAccount) {
       acc[transaction.account] = change + (acc[transaction.account] || 0);
     } else {
-      //if the account has changed we need to add or subtract the original amount from the original accounts
       acc[transaction.account] =
         Number(
           transaction.type === "Expense"
@@ -189,7 +188,6 @@ export const updateTransactions = async (
             : -transaction.amount
         ) + (acc[transaction.account] || 0);
 
-      //then we add or subtract the new amount from the new account
       acc[newAccount] =
         Number(newType === "Expense" ? -newAmount : newAmount) +
         (acc[newAccount] || 0);
@@ -211,7 +209,6 @@ export const deleteTransactions = async (
   userId: string,
   transactionIds: string[]
 ) => {
-  // Optional: validate ownership first
   const transactions = await TransactionModel.find({
     _id: { $in: transactionIds },
     userId,
@@ -255,7 +252,7 @@ export const getTransactionCategoriesByAmount = async (
     totalAmount: number;
   }[]
 > => {
-  const matchConditions: Record<string, any> = {
+  const matchConditions: FilterQuery<typeof TransactionModel> = {
     userId: new mongoose.Types.ObjectId(userId),
     type: { $ne: "Income" },
     category: { $ne: "Transfer" },

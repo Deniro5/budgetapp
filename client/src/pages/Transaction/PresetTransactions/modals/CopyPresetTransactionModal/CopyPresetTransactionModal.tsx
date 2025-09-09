@@ -1,10 +1,6 @@
 import Modal from "components/Global/Modal";
 import { BasePresetTransactionModal } from "../BasePresetTransactionModal/BasePresetTransactionModal";
-import {
-  OnSubmit,
-  PresetTransaction,
-  RawPresetTransaction,
-} from "types/Transaction";
+import { PresetTransaction, RawPresetTransaction } from "types/Transaction";
 import { useAddPresetTransaction } from "../../hooks/useAddPresetTransaction";
 
 type CopyPresetTransactionModalProps = {
@@ -17,7 +13,7 @@ export function CopyPresetTransactionModal({
   initialTransaction,
 }: CopyPresetTransactionModalProps) {
   const { mutate } = useAddPresetTransaction();
-  const handleModalSubmit = (transaction: Partial<RawPresetTransaction>) => {
+  const handleModalSubmit = (transaction: RawPresetTransaction) => {
     mutate(transaction);
   };
 

@@ -44,8 +44,8 @@ export function BaseTransferModal({
     clearErrors,
     formState: { errors },
   } = useForm<RawTransfer>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: initialTransfer || {
       sendingAccountId: userPreferences?.defaultAccount?._id || undefined,
       receivingAccountId: undefined,

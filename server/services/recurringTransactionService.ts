@@ -123,7 +123,6 @@ export const updateRecurringTransactions = async (
   userId: string,
   updateData: Partial<RecurringTransactionInput>
 ) => {
-  // Find all matching transactions that belong to the user
   const transactions = await RecurringTransactionModel.find({
     _id: { $in: transactionIds },
     userId,
@@ -135,7 +134,6 @@ export const updateRecurringTransactions = async (
     );
   }
 
-  // Perform bulk update
   await RecurringTransactionModel.updateMany(
     { _id: { $in: transactionIds }, userId },
     { $set: updateData }
@@ -148,7 +146,6 @@ export const deleteRecurringTransactions = async (
   transactionIds: string[],
   userId: string
 ) => {
-  // Find all matching transactions that belong to the user
   const transactions = await RecurringTransactionModel.find({
     _id: { $in: transactionIds },
     userId,
@@ -158,7 +155,6 @@ export const deleteRecurringTransactions = async (
     throw new Error("Unauthorized to delete one or more transactions");
   }
 
-  // Delete all transactions
   await RecurringTransactionModel.deleteMany({
     _id: { $in: transactionIds },
     userId,

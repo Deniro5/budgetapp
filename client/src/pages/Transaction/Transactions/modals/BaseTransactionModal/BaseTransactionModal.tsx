@@ -18,8 +18,6 @@ import {
   TransactionCategory,
   TransactionType,
   PresetTransaction,
-  BatchEditTransaction,
-  RawPresetTransaction,
 } from "types/Transaction";
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
@@ -32,18 +30,13 @@ import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
 import useAccount from "pages/Accounts/hooks/useAccount";
 
-type OnSubmit = {
-  (transaction: RawTransaction): void;
-  (transaction: RawPresetTransaction): void;
-};
-
 type BaseTransactionModalProps =
   | {
       mode: "create";
       title: string;
       confirmText?: string;
       onClose: () => void;
-      onSubmit: OnSubmit;
+      onSubmit: (transaction: RawTransaction) => void;
       isPresetModal?: boolean;
       initialTransactions?: Transaction[];
       ignoreInitialAmount?: boolean;
@@ -53,7 +46,7 @@ type BaseTransactionModalProps =
       title: string;
       confirmText?: string;
       onClose: () => void;
-      onSubmit: (transaction: BatchEditTransaction) => void;
+      onSubmit: (transaction: Partial<RawTransaction>) => void;
       isPresetModal?: boolean;
       initialTransactions?: Transaction[];
       ignoreInitialAmount?: boolean;
@@ -84,17 +77,14 @@ export function BaseTransactionModal({
 
   const firstTransaction = initialTransactions[0];
 
-  // string-like fields can return "Multiple Values"
   function getDefaultValue<K extends "description" | "vendor" | "date">(
     field: K
   ): string | undefined;
 
-  // strict typed fields just return their actual type or undefined
   function getDefaultValue<
     K extends "amount" | "type" | "account" | "tags" | "category"
   >(field: K): Transaction[K] | undefined;
 
-  // implementation
   function getDefaultValue<K extends keyof Transaction>(
     field: K
   ): Transaction[K] | string | undefined {
@@ -127,8 +117,8 @@ export function BaseTransactionModal({
     reset,
     formState: { errors, dirtyFields },
   } = useForm<RawTransaction>({
-    mode: "onSubmit", // Validation only on submit
-    reValidateMode: "onSubmit", // No revalidation on field changes
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: {
       description: getDefaultValue("description"),
       vendor: getDefaultValue("vendor"),
@@ -180,13 +170,13 @@ export function BaseTransactionModal({
 
   const onSubmitForm = async (data: RawTransaction) => {
     if (isEditModal) {
-      const updates: BatchEditTransaction = Object.keys(dirtyFields).reduce(
+      const updates: Partial<RawTransaction> = Object.keys(dirtyFields).reduce(
         (acc, key) => {
-          const k = key as keyof BatchEditTransaction;
-          acc[k] = data[k as keyof RawTransaction] as any; // 'as any' only if TS complains about value types
+          const k = key as keyof Partial<RawTransaction>;
+          acc[k] = data[k as keyof RawTransaction] as any;
           return acc;
         },
-        {} as BatchEditTransaction
+        {} as Partial<RawTransaction>
       );
       onSubmit(updates);
     } else {

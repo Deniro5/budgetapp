@@ -1,10 +1,6 @@
 import { Request, Response } from "express";
 import * as assetService from "../services/assetService";
-
-interface CustomRequest extends Request {
-  userId?: string;
-  investments?: any;
-}
+import { CustomRequest } from "../types";
 
 export async function createAsset(req: Request, res: Response): Promise<void> {
   try {

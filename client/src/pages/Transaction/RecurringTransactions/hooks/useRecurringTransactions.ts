@@ -16,7 +16,6 @@ type FetchRecurringTransactionsResponse = {
   recurringTransactionCount: number;
 };
 
-// Fetcher function
 const fetchRecurringTransactions = async (
   context: QueryFunctionContext<
     [string, FetchRecurringTransactionsArgs],
@@ -47,7 +46,6 @@ const fetchRecurringTransactions = async (
   return response.data;
 };
 
-// Hook
 export default function useRecurringTransactions({
   search,
   filter,
