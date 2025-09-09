@@ -50,7 +50,7 @@ const PORT = process.env.PORT || 8000;
 
 const onStartServer = async () => {
   await processRecurringTransactions();
-  await updateLastUsedAssetsPrices();
+  //await updateLastUsedAssetsPrices();
 };
 
 app.listen(PORT, async () => {

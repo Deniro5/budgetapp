@@ -86,7 +86,7 @@ export const IncomeExpenseWidget = ({
       <Header>
         <Name> Income / Expenses </Name>
         <ChangeLabel $isIncrease={isIncrease}>
-          {isIncrease ? "+" : "-"} {formatToCurrency(netIncome)}
+          {isIncrease ? "+" : ""} {formatToCurrency(netIncome)}
         </ChangeLabel>
       </Header>
       {chartContent}

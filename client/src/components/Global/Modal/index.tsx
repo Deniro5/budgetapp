@@ -4,7 +4,6 @@ import { SPACING } from "theme";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { IconButton } from "styles";
-import { FocusTrap } from "focus-trap-react";
 
 type ModalProps = {
   isOpen: boolean;

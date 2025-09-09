@@ -1,7 +1,6 @@
 import DropdownList from "components/DropdownList/DropdownList";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import useAccounts from "pages/Accounts/hooks/useAccounts";
-import { useMemo } from "react";
 import { ALL_ACCOUNTS } from "types/account";
 
 interface AccountDropdownProps {
@@ -30,6 +29,7 @@ export default function AccountDropdown({
       : []),
     ...activeAccountIds.map((accountId) => {
       return {
+        key: accountId,
         label: accountNameByIdMap[accountId] || accountId,
         function: () => handleAccountChange(accountId),
       };

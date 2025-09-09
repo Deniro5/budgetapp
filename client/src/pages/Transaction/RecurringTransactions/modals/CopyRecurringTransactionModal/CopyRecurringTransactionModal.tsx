@@ -1,21 +1,19 @@
 import Modal from "components/Global/Modal";
 import { BaseRecurringTransactionModal } from "../BaseRecurringTransactionModal/BaseRecurringTransactionModal";
-import {
-  RecurringTransaction,
-  RawRecurringTransaction,
-} from "types/Transaction";
+import { RawRecurringTransaction } from "types/Transaction";
 import { useAddRecurringTransaction } from "../../hooks/useAddRecurringTransaction";
+import useTransactionStore from "store/transaction/transactionStore";
 
 type CopyRecurringTransactionModalProps = {
   onClose: () => void;
-  initialTransaction: RecurringTransaction;
 };
 
 export function CopyRecurringTransactionModal({
   onClose,
-  initialTransaction,
 }: CopyRecurringTransactionModalProps) {
   const { mutate } = useAddRecurringTransaction();
+  const { selectedTransactions } = useTransactionStore();
+
   const handleModalSubmit = (transaction: RawRecurringTransaction) => {
     mutate(transaction);
   };
@@ -26,7 +24,7 @@ export function CopyRecurringTransactionModal({
         title="Copy Recurring Transaction"
         onClose={onClose}
         onSubmit={handleModalSubmit}
-        initialTransaction={initialTransaction}
+        initialTransactions={selectedTransactions.slice(0, 1)}
       />
     </Modal>
   );

@@ -1,4 +1,3 @@
-import PopoverContent from "components/Global/PopoverContent";
 import { COLORS, SPACING } from "theme";
 import styled from "styled-components";
 import {

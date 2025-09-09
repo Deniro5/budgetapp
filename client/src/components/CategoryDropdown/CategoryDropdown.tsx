@@ -5,7 +5,7 @@ import { TransactionCategory } from "types/Transaction";
 interface CategoryDropdownProps {
   handleCategoryChange: (category: TransactionCategory) => void;
   placeholder?: string;
-  selectedCategory: string;
+  selectedCategory: string | null;
 }
 
 export default function CategoryDropdown({
@@ -17,6 +17,7 @@ export default function CategoryDropdown({
 
   const items = userTransactionCategories.map((category) => {
     return {
+      key: category,
       label: category,
       function: () => handleCategoryChange(category),
     };

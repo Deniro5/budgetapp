@@ -21,7 +21,6 @@ export default function Accounts() {
     null
   );
 
-  console.log(activeAccounts);
   const handleCloseOverlay = () => {
     setActiveOverlay(null);
     setActiveAccount(null);

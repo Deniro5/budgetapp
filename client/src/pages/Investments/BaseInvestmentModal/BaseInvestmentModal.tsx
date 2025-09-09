@@ -126,6 +126,7 @@ export function BaseInvestmentModal({
 
   const assetMenuItems = assetsList.map((asset) => {
     return {
+      key: asset._id,
       label: <AssetMenuItem asset={asset} />,
       function: () => handleAssetChange(asset),
     };

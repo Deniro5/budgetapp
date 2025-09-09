@@ -42,9 +42,6 @@ export const updateTransactions = async (
     }
 
     const { transactionIds, updatedFields } = req.body;
-
-    console.log(transactionIds, updatedFields);
-
     await transactionService.updateTransactions(
       userId,
       transactionIds,

@@ -82,7 +82,7 @@ function BaseCalendar({
     <CalendarContainer>
       <Calendar
         selectRange={isRangeCalendar}
-        onClickDay={(value, e) => e.stopPropagation()}
+        onClickDay={(_, e) => e.stopPropagation()}
         onChange={(value) => handleChange(value)}
         value={[startDate, endDate]}
         returnValue={"range"}

@@ -15,7 +15,6 @@ export function EditRecurringTransactionModal({
   const { selectedTransactions } = useTransactionStore();
 
   const handleModalSubmit = (updatedFields: RawRecurringTransaction) => {
-    console.log(selectedTransactions.map((t) => t._id));
     mutate({
       recurringTransactionIds: selectedTransactions.map((t) => t._id),
       updatedFields,

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { Popover } from "react-tiny-popover";
 import PopoverContent from "../Global/PopoverContent";
-import { useMenuFocus } from "hooks/useMenuFocus";
 
 interface MenuItem {
+  key: string;
   label: string;
   function: () => void;
 }

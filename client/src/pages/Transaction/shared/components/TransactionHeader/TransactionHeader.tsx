@@ -3,7 +3,7 @@ import { BaseButton, Flex, PageTitle, SecondaryButton } from "styles";
 import { COLORS, SPACING } from "theme";
 import { faAdd, faFolderPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { TransactionOverlayType, View } from "../../../transactions.types";
+import { TransactionOverlayType } from "../../../transactions.types";
 import useTransactionStore from "store/transaction/transactionStore";
 
 const tabs = [

@@ -154,3 +154,8 @@ export type RawRecurringTransaction = Omit<
 > & {
   account?: string;
 };
+
+export type OnSubmit = {
+  (transaction: RawTransaction): void;
+  (transaction: Partial<RawPresetTransaction>): void;
+};

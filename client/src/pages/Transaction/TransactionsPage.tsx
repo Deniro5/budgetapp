@@ -1,8 +1,6 @@
 import { Flex, PageContainer } from "styles";
 import styled from "styled-components";
 import { COLORS, SPACING } from "theme";
-import { useState } from "react";
-
 import {
   TransactionContextMenu,
   TransactionSearchBar,

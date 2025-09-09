@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import { TransactionTableRow } from "./TransactionTableRow";
 import { PresetTransaction, Transaction } from "types/Transaction";
-import { TransactionOverlayType, View } from "../../../transactions.types";
+import { TransactionOverlayType } from "../../../transactions.types";
 import { Waypoint } from "react-waypoint";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import useTransactionStore from "store/transaction/transactionStore";

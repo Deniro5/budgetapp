@@ -8,11 +8,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { COLORS } from "theme";
-import { AssetWithPrice } from "types/investment";
+import { Asset } from "types/investment";
+
 import { formatCurrencyShort } from "utils";
 
 type AssetChartProps = {
-  asset: AssetWithPrice;
+  asset: Asset;
 };
 
 export const AssetChart = ({ asset }: AssetChartProps) => {

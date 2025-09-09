@@ -1,11 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import PopoverContent from "../Global/PopoverContent";
 import { BaseInput } from "styles";
 import styled from "styled-components";
 import { Popover } from "react-tiny-popover";
 
 interface MenuItem {
-  label: string;
+  key: string;
+  label: React.ReactNode;
   function: () => void;
 }
 
@@ -57,11 +58,6 @@ export const SearchDropdown = ({
     </Popover>
   );
 };
-
-const DropdownContainer = styled.div<{ $width?: number }>`
-  position: relative;
-  width: ${({ $width }) => ($width ? `${$width}px` : "100%")};
-`;
 
 const DropdownInput = styled(BaseInput)`
   width: 100%;

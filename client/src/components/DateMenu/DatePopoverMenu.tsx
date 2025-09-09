@@ -6,6 +6,8 @@ import {
   getDateDaysAgoFormatted,
   getFirstDayOfMonthFormatted,
   getFirstDayOfYearFormatted,
+  getLastDayOfMonthFormatted,
+  getLastDayOfYearFormatted,
 } from "utils/DateUtils";
 
 type DatePopoverMenuProps = {
@@ -22,7 +24,8 @@ function DatePopoverMenu({
 
   const popoverMenuItems = [
     {
-      label: "This Month",
+      key: "mtd",
+      label: "This Month (to date)",
       function: () => {
         setStartDate(getFirstDayOfMonthFormatted());
         setEndDate(getCurrentDateFormatted());
@@ -30,7 +33,18 @@ function DatePopoverMenu({
       },
     },
     {
-      label: "This Year",
+      key: "mth",
+      label: "This Month (Whole)",
+      function: () => {
+        setStartDate(getFirstDayOfMonthFormatted());
+        setEndDate(getLastDayOfMonthFormatted());
+        handleClose();
+      },
+    },
+    {
+      key: "ytd",
+      label: "This Year (to date)",
+
       function: () => {
         setStartDate(getFirstDayOfYearFormatted());
         setEndDate(getCurrentDateFormatted());
@@ -38,6 +52,16 @@ function DatePopoverMenu({
       },
     },
     {
+      key: "yr",
+      label: "This Year (Whole)",
+      function: () => {
+        setStartDate(getFirstDayOfYearFormatted());
+        setEndDate(getLastDayOfYearFormatted());
+        handleClose();
+      },
+    },
+    {
+      key: "last30",
       label: "Last 30 Days",
       function: () => {
         setStartDate(getDateDaysAgoFormatted(30));
@@ -46,6 +70,7 @@ function DatePopoverMenu({
       },
     },
     {
+      key: "last90",
       label: "Last 90 Days",
       function: () => {
         setStartDate(getDateDaysAgoFormatted(90));
@@ -55,6 +80,7 @@ function DatePopoverMenu({
     },
 
     {
+      key: "custom",
       label: "Custom Range",
       function: () => {
         setIsCalendarOpen(true);

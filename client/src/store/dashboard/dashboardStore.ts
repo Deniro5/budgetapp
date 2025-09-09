@@ -1,6 +1,6 @@
 import {
-  getCurrentDateFormatted,
-  getDateDaysAgoFormatted,
+  getFirstDayOfMonthFormatted,
+  getLastDayOfMonthFormatted,
 } from "utils/DateUtils";
 import { create } from "zustand";
 export interface DashboardStore {
@@ -11,8 +11,8 @@ export interface DashboardStore {
 }
 
 const useDashboardStore = create<DashboardStore>((set) => ({
-  startDate: getDateDaysAgoFormatted(30),
-  endDate: getCurrentDateFormatted(),
+  startDate: getFirstDayOfMonthFormatted(),
+  endDate: getLastDayOfMonthFormatted(),
   setStartDate: (newStartDate) => {
     set({ startDate: newStartDate });
   },

@@ -112,7 +112,10 @@ export function BasePresetTransactionModal({
         dirtyFields
       ).reduce((acc, key) => {
         const k = key as keyof RawPresetTransaction;
-        acc[k] = data[k];
+        const value = data[k];
+        if (value !== undefined) {
+          acc[k] = value as any;
+        }
         return acc;
       }, {} as Partial<RawPresetTransaction>);
       onSubmit(updates);

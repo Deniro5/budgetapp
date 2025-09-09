@@ -1,7 +1,7 @@
 import PopoverContent from "components/Global/PopoverContent";
 import { Popover } from "react-tiny-popover";
 import { TransactionCategory } from "types/Transaction";
-import { TransactionOverlayType, View } from "../../../transactions.types";
+import { TransactionOverlayType } from "../../../transactions.types";
 import useTransactionStore from "store/transaction/transactionStore";
 
 type TransactionContextMenuProps = {
@@ -80,24 +80,28 @@ export function TransactionContextMenu({
   const menuItems = multipleSelectedWithTransfer
     ? [
         {
+          key: "notsupported",
           label: "Batch operations with Transfer not supported",
           function: () => {},
         },
       ]
     : [
         {
+          key: "edit",
           label: editLabel,
           function: handleEditClick,
         },
         ...(!multipleTransactionsSelected
           ? [
               {
+                key: "copy",
                 label: copyLabel,
                 function: handleCopyClick,
               },
             ]
           : []),
         {
+          key: "delete",
           label: deleteLabel,
           function: handleDeleteClick,
         },

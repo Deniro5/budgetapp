@@ -19,6 +19,7 @@ import {
   TransactionType,
   PresetTransaction,
   BatchEditTransaction,
+  RawPresetTransaction,
 } from "types/Transaction";
 import { getUserPreferences } from "store/user/userSelectors";
 import { SPACING, FONTSIZE, COLORS } from "theme";
@@ -31,13 +32,18 @@ import { SearchDropdown } from "components/SearchDropdown/SearchDropdown";
 import usePresetTransactionSearch from "../../hooks/usePresetTransactionList";
 import useAccount from "pages/Accounts/hooks/useAccount";
 
+type OnSubmit = {
+  (transaction: RawTransaction): void;
+  (transaction: RawPresetTransaction): void;
+};
+
 type BaseTransactionModalProps =
   | {
       mode: "create";
       title: string;
       confirmText?: string;
       onClose: () => void;
-      onSubmit: (transaction: RawTransaction) => void;
+      onSubmit: OnSubmit;
       isPresetModal?: boolean;
       initialTransactions?: Transaction[];
       ignoreInitialAmount?: boolean;
@@ -167,6 +173,7 @@ export function BaseTransactionModal({
   };
 
   const presetMenuItems = presetTransactions.map((presetTransaction) => ({
+    key: presetTransaction._id,
     label: <PresetTransactionMenuItem presetTransaction={presetTransaction} />,
     function: () => handlePresetSelect(presetTransaction),
   }));

@@ -1,26 +1,24 @@
 import styled from "styled-components";
 import { COLORS, FONTSIZE, SPACING } from "theme";
 import React from "react";
-import { useMenuFocus } from "hooks/useMenuFocus";
 
-type MenuItem = {
-  label: string;
+interface MenuItem {
+  key: string;
+  label: React.ReactNode;
   function: () => void;
-};
+}
 
 type PopoverContentProps = {
   menuItems?: MenuItem[];
   children?: React.ReactNode;
   width?: number;
-  onClose: () => void;
-  onSelect?: () => void;
+  onClose?: () => void;
 };
 
 const PopoverContent = ({
   menuItems,
   width = 180,
   onClose,
-  onSelect,
 }: PopoverContentProps) => {
   // const menuRef = useMenuFocus();
 
@@ -30,15 +28,14 @@ const PopoverContent = ({
   ) => {
     e.stopPropagation();
     callback();
-    if (onSelect) onSelect();
-    onClose();
+    if (onClose) onClose();
   };
 
   const getPopoverContent = () => {
     if (menuItems && menuItems.length) {
       return menuItems.map((menuItem) => (
         <PopoverMenuItem
-          key={menuItem.label}
+          key={menuItem.key}
           onClick={(e) => handleClick(e, menuItem.function)}
         >
           {menuItem.label}
@@ -65,8 +62,7 @@ const PopoverContentContainer = styled.div<{ $width: number }>`
   width: ${({ $width }) => $width}px;
   border-radius: 4px;
   z-index: 1000;
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow: hidden;
   max-height: 220px;
   overflow: scroll;
   scrollbar-width: none;

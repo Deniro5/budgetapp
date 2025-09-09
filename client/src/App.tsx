@@ -1,7 +1,7 @@
 import "./App.css";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
-import { useEffect, useContext, useCallback } from "react";
+import { useEffect } from "react";
 
 import useUserStore from "./store/user/userStore";
 import RouteProtector from "./components/RouteProtector";

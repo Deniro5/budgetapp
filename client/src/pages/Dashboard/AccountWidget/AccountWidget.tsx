@@ -18,8 +18,6 @@ import AccountDropdown from "components/AccountDropdown/AccountDropdown";
 import { SkeletonLoader } from "components/SkeletonLoader/SkeletonLoader";
 import renderChart from "../Hocs/renderChart";
 import { formatCurrencyShort, formatToCurrency } from "utils";
-import useAccounts from "pages/Accounts/hooks/useAccounts";
-
 type AccountWidgetProps = {
   startDate: string;
   endDate: string;
@@ -27,7 +25,6 @@ type AccountWidgetProps = {
 
 export const AccountWidget = ({ startDate, endDate }: AccountWidgetProps) => {
   const [accountWidgetId, setAccountWidgetId] = useState("All");
-  const { activeAccountIds } = useAccounts();
 
   const { accountWithBalances, isLoading, error } = useAccountWidget({
     startDate,

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { BaseButton, BaseInput } from "styles";
+import { BaseInput } from "styles";
 import { ChangeEvent, useEffect, useState } from "react";
 import useTransactionStore from "store/transaction/transactionStore";
 import { COLORS, SPACING } from "theme";
