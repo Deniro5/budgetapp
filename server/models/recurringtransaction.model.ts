@@ -14,7 +14,7 @@ const recurringTransactionSchema: Schema = new Schema(
     interval: {
       type: String,
       required: true,
-      enum: ["daily", "weekly", "bi-weekly", "monthly"],
+      enum: ["daily", "weekly", "bi-weekly", "semi-monthly", "monthly"],
     },
   },
   { timestamps: true }

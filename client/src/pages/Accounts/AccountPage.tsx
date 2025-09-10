@@ -79,7 +79,7 @@ const PageColumnFlexContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${SPACING.spacing6x};
-  margin-top: ${SPACING.spacing9x};
+  margin-top: ${SPACING.spacing6x};
 `;
 
 const ContentContainer = styled(Flex)`

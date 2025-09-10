@@ -21,26 +21,18 @@ export default function AccountDropdown({
   const { activeAccountIds, accountNameByIdMap, isLoading } = useAccounts();
 
   //add the all option and then filter by filteredAccountIdList if there is one
-  const items = [
-    ...(hasAllOption
-      ? [
-          {
-            key: ALL_ACCOUNTS,
-            label: ALL_ACCOUNTS,
-            function: () => handleAccountChange(ALL_ACCOUNTS),
-          },
-        ]
-      : []),
-    ...activeAccountIds
-      .filter((accountId) => filteredAccountIdList.includes(accountId))
-      .map((accountId) => {
-        return {
-          key: accountId,
-          label: accountNameByIdMap[accountId] || accountId,
-          function: () => handleAccountChange(accountId),
-        };
-      }),
-  ];
+  const accounts = [...(hasAllOption ? ["All"] : []), ...activeAccountIds];
+  const filteredAccounts = filteredAccountIdList.length
+    ? accounts.filter((accountId) => filteredAccountIdList.includes(accountId))
+    : accounts;
+
+  const items = filteredAccounts.map((accountId) => {
+    return {
+      key: accountId,
+      label: accountNameByIdMap[accountId] || accountId,
+      function: () => handleAccountChange(accountId),
+    };
+  });
 
   if (isLoading)
     return <SkeletonLoader rows={1} columns={1} height={44}></SkeletonLoader>;

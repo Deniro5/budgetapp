@@ -120,6 +120,7 @@ export enum RecurringTransactionInterval {
   DAILY = "daily",
   WEEKLY = "weekly",
   BI_WEEKLY = "bi-weekly",
+  SEMI_MONTHLY = "semi-monthly",
   MONTHLY = "monthly",
 }
 export type RecurringTransaction = {

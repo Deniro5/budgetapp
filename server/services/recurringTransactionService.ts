@@ -4,6 +4,7 @@ import {
   addOneMonth,
   addOneWeek,
   addTwoWeeks,
+  getNextSemiMonthlyDate,
   getTodayDate,
 } from "../utils/dateutils";
 import { createTransaction } from "./transactionService";
@@ -171,10 +172,13 @@ const getNextRunDate = (interval: string, date: string) => {
       return addOneWeek(date);
     case "bi-weekly":
       return addTwoWeeks(date);
+    case "semi-monthly":
+      return getNextSemiMonthlyDate(date);
     case "monthly":
       return addOneMonth(date);
     default:
-      return date;
+      //if the interval is not valid, default to monthly to prevent loop
+      return addOneMonth(date);
   }
 };
 
@@ -185,8 +189,9 @@ export const processRecurringTransactions = async () => {
     //if the transaction date is less than or equal to the current date
     let nextDate = transaction.date;
     let shouldUpdate = false;
+    let safeGuard = 0; //limit to 50 per transaction
     //loop through until the next date is greater than the current date. This will allow us to create multiple transactions if we need to
-    while (nextDate <= currentDate) {
+    while (nextDate <= currentDate && safeGuard < 50) {
       await createTransaction({
         userId: transaction.userId,
         description: transaction.description,
@@ -200,6 +205,7 @@ export const processRecurringTransactions = async () => {
       });
       nextDate = getNextRunDate(transaction.interval, nextDate);
       shouldUpdate = true;
+      safeGuard++;
     }
     if (shouldUpdate) {
       await updateRecurringTransactions([transaction._id], transaction.userId, {

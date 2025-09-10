@@ -30,11 +30,10 @@ export const IncomeExpenseWidget = ({
       endDate,
     });
   const isIncrease = netIncome >= 0;
+  const hasNoData =
+    !totalIncomeAndExpenseByDate || totalIncomeAndExpenseByDate.length === 0;
 
-  if (!totalIncomeAndExpenseByDate || totalIncomeAndExpenseByDate.length === 0)
-    return null;
-
-  const chartElement = (
+  const chartElement = !hasNoData ? (
     <ResponsiveContainer width="100%" height={350}>
       <AreaChart
         data={totalIncomeAndExpenseByDate}
@@ -71,6 +70,8 @@ export const IncomeExpenseWidget = ({
         />
       </AreaChart>
     </ResponsiveContainer>
+  ) : (
+    <></>
   );
 
   const chartContent = renderChart({

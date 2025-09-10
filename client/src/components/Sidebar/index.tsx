@@ -104,7 +104,7 @@ const MenuItem = styled.button<{ $isActive?: boolean }>`
   cursor: pointer;
   color: ${({ $isActive }) =>
     $isActive ? COLORS.pureWhite : COLORS.darkPrimary};
-  padding: ${SPACING.spacing3x};
+  padding: ${SPACING.spacing3x} ${SPACING.spacing2x};
   border-radius: 4px;
   margin: 0;
   height: 32px;

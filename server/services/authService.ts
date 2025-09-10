@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/user.model";
+import AccountModel from "../models/account.model";
+import { createAccount } from "./accountService";
 
 interface MongoError extends Error {
   code?: number;
@@ -16,6 +18,15 @@ export const generateToken = (userId: string): string => {
 export const createUser = async (username: string, password: string) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = await User.create({ username, password: hashedPassword });
+
+  createAccount({
+    userId: user._id.toString(),
+    name: "Default Account",
+    institution: "Default Institution",
+    baselineAmount: 0,
+    baselineDate: new Date().toISOString().split("T")[0],
+    type: "Chequing",
+  });
   return user;
 };
 
