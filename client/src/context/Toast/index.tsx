@@ -71,7 +71,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({
 
 const ToastContainer = styled.div<{ $show: boolean; $color: string }>`
   position: fixed;
-  top: 16px;
+  bottom: 16px;
   right: 16px;
   width: 320px;
   background: ${({ $color }) => $color};

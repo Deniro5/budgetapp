@@ -1,4 +1,6 @@
-import RecurringTransactionModel from "../models/recurringtransaction.model";
+import RecurringTransactionModel, {
+  IRecurringTransaction,
+} from "../models/recurringtransaction.model";
 import {
   addOneDay,
   addOneMonth,
@@ -14,7 +16,7 @@ interface RecurringTransactionInput {
   description?: string;
   amount: number;
   type: string;
-  date?: Date;
+  date?: string;
   account?: string;
   category?: string;
   vendor?: string;
@@ -193,12 +195,12 @@ export const processRecurringTransactions = async () => {
     //loop through until the next date is greater than the current date. This will allow us to create multiple transactions if we need to
     while (nextDate <= currentDate && safeGuard < 50) {
       await createTransaction({
-        userId: transaction.userId,
+        userId: transaction.userId.toString(),
         description: transaction.description,
         amount: transaction.amount,
         type: transaction.type,
         date: nextDate,
-        account: transaction.account,
+        account: transaction.account.toString(),
         category: transaction.category,
         vendor: transaction.vendor,
         tags: transaction.tags,
@@ -208,9 +210,13 @@ export const processRecurringTransactions = async () => {
       safeGuard++;
     }
     if (shouldUpdate) {
-      await updateRecurringTransactions([transaction._id], transaction.userId, {
-        date: nextDate,
-      });
+      await updateRecurringTransactions(
+        [transaction._id.toString()],
+        transaction.userId.toString(),
+        {
+          date: nextDate,
+        }
+      );
     }
   }
   return { transactions };

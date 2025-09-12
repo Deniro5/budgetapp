@@ -1,4 +1,3 @@
-import { all } from "axios";
 import AccountModel from "../models/account.model";
 import TransactionModel from "../models/transaction.model";
 import {
@@ -7,8 +6,6 @@ import {
   getInvestmentTransactionHistoryByAccount,
 } from "../services/investmentService";
 import { addOneDay } from "../utils/dateutils";
-import InvestmentModel from "../models/investment.model";
-import e from "express";
 
 interface AccountInput {
   userId: string;
@@ -126,7 +123,7 @@ export const getAccountTransactionsFromStartToEnd = async ({
   baselineAmount: number;
   endDate: string;
 }): Promise<any[]> => {
-  const transactions = await TransactionModel.find({
+  const transactions: any = await TransactionModel.find({
     userId,
     account: accountId,
     date: { $gte: startDate, $lte: endDate },
@@ -209,7 +206,7 @@ export const getAccountBalancesById = async ({
     const accountBalanceAtStartDate =
       await getAccountTransactionTotalBetweenDates({
         userId,
-        accountId: _id,
+        accountId: _id.toString(),
         startDate: baselineDate,
         endDate: startDate,
       });
@@ -221,7 +218,7 @@ export const getAccountBalancesById = async ({
     const transactionsFromStartToEnd =
       await getAccountTransactionsFromStartToEnd({
         userId,
-        accountId: _id,
+        accountId: _id.toString(),
         startDate: laterStartDate,
         baselineAmount,
         endDate,

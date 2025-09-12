@@ -159,6 +159,7 @@ export function BaseInvestmentModal({
             <InputLabel>
               Amount{" "}
               {currentValues.asset &&
+                account &&
                 `currently in ${account?.name}: ${assetQuantityOwned}`}
             </InputLabel>
             <BaseInput

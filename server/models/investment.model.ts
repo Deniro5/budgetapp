@@ -1,6 +1,17 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
-const investmentSchema: Schema = new Schema(
+export interface IInvestment extends Document<Types.ObjectId> {
+  asset: Types.ObjectId;
+  account: Types.ObjectId;
+  userId: Types.ObjectId;
+  date: string;
+  quantity: number;
+  price: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const investmentSchema: Schema<IInvestment> = new Schema(
   {
     asset: { type: Schema.Types.ObjectId, ref: "Asset", required: true },
     account: { type: Schema.Types.ObjectId, ref: "Account", required: true },
@@ -12,6 +23,9 @@ const investmentSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-const InvestmentModel = mongoose.model("Investment", investmentSchema);
+const InvestmentModel = mongoose.model<IInvestment>(
+  "Investment",
+  investmentSchema
+);
 
 export default InvestmentModel;

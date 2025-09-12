@@ -34,6 +34,7 @@ export const deleteInvestment = async (
   id: string
 ): Promise<any> => {
   const investment = await InvestmentModel.findOne({ _id: id, userId });
+  investment?._id;
   if (!investment) throw new Error("Unauthorized to delete this transaction");
 
   await InvestmentModel.findByIdAndDelete(id);
@@ -41,7 +42,7 @@ export const deleteInvestment = async (
   const { quantity, price, account } = investment;
 
   await updateAccountBalance({
-    accountId: account,
+    accountId: account.toString(),
     change: quantity * price,
   });
 
@@ -56,7 +57,7 @@ export const getAllInvestments = async (userId: string) => {
 
   const now = new Date();
   updateBatchAssetsByIds(
-    investments.map((i) => i.asset._id),
+    investments.map((i) => i.asset._id.toString()),
     { lastUsed: now }
   );
 

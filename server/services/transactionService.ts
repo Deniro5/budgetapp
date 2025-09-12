@@ -1,10 +1,10 @@
-import TransactionModel from "../models/transaction.model";
+import TransactionModel, { ITransaction } from "../models/transaction.model";
 import mongoose, { FilterQuery } from "mongoose";
 import { updateAccountBalance } from "./accountService";
 
 interface CreateTransactionArgs {
   userId: string;
-  description: string;
+  description?: string;
   amount: number;
   type: "Income" | "Expense" | string;
   date: string;
@@ -146,7 +146,7 @@ export const updateTransactions = async (
   transactionIds: string[],
   updateFields: any
 ): Promise<any> => {
-  const transactions = await TransactionModel.find({
+  const transactions: ITransaction[] = await TransactionModel.find({
     _id: { $in: transactionIds },
     userId,
   });
@@ -168,32 +168,36 @@ export const updateTransactions = async (
   )
     return;
 
-  const accountChangesByAccount = transactions.reduce((acc, transaction) => {
-    const newType = updateFields["type"] ?? transaction.type;
-    const newAccount = updateFields["account"] ?? transaction.account;
-    const newAmount = updateFields["amount"] ?? transaction.amount;
-    const change =
-      (transaction.type === "Expense"
-        ? transaction.amount
-        : -transaction.amount) -
-      (newType === "Expense" ? newAmount : -newAmount);
+  const accountChangesByAccount = transactions.reduce<Record<string, number>>(
+    (acc, transaction) => {
+      const newType = updateFields["type"] ?? transaction.type;
+      const oldAccount = transaction.account.toString();
+      const newAccount = updateFields["account"] ?? oldAccount;
+      const newAmount = updateFields["amount"] ?? transaction.amount;
+      const change =
+        (transaction.type === "Expense"
+          ? transaction.amount
+          : -transaction.amount) -
+        (newType === "Expense" ? newAmount : -newAmount);
 
-    if (transaction.account === newAccount) {
-      acc[transaction.account] = change + (acc[transaction.account] || 0);
-    } else {
-      acc[transaction.account] =
-        Number(
-          transaction.type === "Expense"
-            ? transaction.amount
-            : -transaction.amount
-        ) + (acc[transaction.account] || 0);
+      if (oldAccount === newAccount) {
+        acc[oldAccount] = change + (acc[oldAccount] || 0);
+      } else {
+        acc[oldAccount] =
+          Number(
+            transaction.type === "Expense"
+              ? transaction.amount
+              : -transaction.amount
+          ) + (acc[oldAccount] || 0);
 
-      acc[newAccount] =
-        Number(newType === "Expense" ? -newAmount : newAmount) +
-        (acc[newAccount] || 0);
-    }
-    return acc;
-  }, {});
+        acc[newAccount] =
+          Number(newType === "Expense" ? -newAmount : newAmount) +
+          (acc[newAccount] || 0);
+      }
+      return acc;
+    },
+    {}
+  );
 
   Object.keys(accountChangesByAccount).forEach(async (accountId) => {
     await updateAccountBalance({
@@ -209,7 +213,7 @@ export const deleteTransactions = async (
   userId: string,
   transactionIds: string[]
 ) => {
-  const transactions = await TransactionModel.find({
+  const transactions: ITransaction[] = await TransactionModel.find({
     _id: { $in: transactionIds },
     userId,
   });
@@ -223,13 +227,17 @@ export const deleteTransactions = async (
     userId,
   });
 
-  const accountChangesByAccount = transactions.reduce((acc, cur) => {
-    acc[cur.account] =
-      Number(cur.type === "Expense" ? cur.amount : -cur.amount) +
-      (acc[cur.account] || 0);
+  const accountChangesByAccount = transactions.reduce<Record<string, number>>(
+    (acc, cur) => {
+      const accountId: string = cur.account.toString();
+      acc[accountId] =
+        Number(cur.type === "Expense" ? cur.amount : -cur.amount) +
+        (acc[accountId] || 0);
 
-    return acc;
-  }, {});
+      return acc;
+    },
+    {}
+  );
 
   Object.keys(accountChangesByAccount).forEach(async (accountId) => {
     await updateAccountBalance({

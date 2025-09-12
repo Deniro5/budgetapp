@@ -1,6 +1,22 @@
-import mongoose, { Schema, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
-const presetTransactionSchema: Schema = new Schema(
+export interface IPresetTransaction extends Document<Types.ObjectId> {
+  _id: Types.ObjectId;
+  name: string;
+  userId: Types.ObjectId;
+  description?: string;
+  amount?: number;
+  type?: string;
+  date?: string;
+  account?: Types.ObjectId;
+  category?: string;
+  vendor?: string;
+  tags?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const presetTransactionSchema: Schema<IPresetTransaction> = new Schema(
   {
     name: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -16,9 +32,10 @@ const presetTransactionSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-const PresetTransactionModel = mongoose.model(
-  "PresetTransaction",
-  presetTransactionSchema
-);
+const PresetTransactionModel: Model<IPresetTransaction> =
+  mongoose.model<IPresetTransaction>(
+    "PresetTransaction",
+    presetTransactionSchema
+  );
 
 export default PresetTransactionModel;

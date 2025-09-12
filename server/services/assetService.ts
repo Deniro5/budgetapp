@@ -1,5 +1,5 @@
 import axios from "axios";
-import AssetModel, { Asset } from "../models/asset.model";
+import AssetModel, { IAsset } from "../models/asset.model";
 import JobRunModel from "../models/job.model";
 import { SampleStocks } from "../data/sample-stocks";
 
@@ -19,7 +19,7 @@ interface TimeSeriesEntry {
   };
 }
 
-export async function createAsset(data: Partial<Asset>) {
+export async function createAsset(data: Partial<IAsset>) {
   return await AssetModel.create(data);
 }
 
@@ -31,13 +31,13 @@ export async function getAssetById(id: string) {
   return await AssetModel.findById(id);
 }
 
-export async function updateAssetById(id: string, data: Partial<Asset>) {
+export async function updateAssetById(id: string, data: Partial<IAsset>) {
   return await AssetModel.findByIdAndUpdate(id, data, { new: true });
 }
 
 export async function updateBatchAssetsByIds(
   ids: string[],
-  data: Partial<Asset>
+  data: Partial<IAsset>
 ) {
   return await AssetModel.updateMany({ _id: { $in: ids } }, { $set: data });
 }

@@ -1,6 +1,18 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 
-const transferSchema: Schema = new Schema(
+export interface ITransfer extends Document<Types.ObjectId> {
+  _id: Types.ObjectId;
+  amount: number;
+  date: string;
+  sendingAccountId: Types.ObjectId;
+  receivingAccountId: Types.ObjectId;
+  transactionIds: [Types.ObjectId, Types.ObjectId]; // exactly 2 transaction IDs
+  userId: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const transferSchema: Schema<ITransfer> = new Schema(
   {
     amount: { type: Number, required: true },
     date: { type: String, required: true },
@@ -16,11 +28,11 @@ const transferSchema: Schema = new Schema(
     },
     transactionIds: {
       type: [Schema.Types.ObjectId],
-      ref: "Account",
+      ref: "Transaction",
       required: true,
       validate: {
         validator: (arr: unknown[]) => Array.isArray(arr) && arr.length === 2,
-        message: "transactionIds must contain exactly 2 Account IDs",
+        message: "transactionIds must contain exactly 2 Transaction IDs",
       },
     },
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -28,6 +40,9 @@ const transferSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-const TransferModel = mongoose.model("Transfer", transferSchema);
+const TransferModel: Model<ITransfer> = mongoose.model<ITransfer>(
+  "Transfer",
+  transferSchema
+);
 
 export default TransferModel;
