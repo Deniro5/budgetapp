@@ -39,7 +39,7 @@ export function getCurrentDateFormatted() {
 
 export function getDateDaysAgoFormatted(days: number) {
   const date = new Date();
-  date.setDate(date.getDate() - days);
+  date.setDate(date.getDate() - days + 1);
   return date.toISOString().split("T")[0];
 }
 
